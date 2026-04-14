@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <rect width="512" height="512" rx="112" fill="#080d1a"/>
+  <rect width="512" height="512" rx="112" fill="url(#g)" opacity="0.12"/>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#00e5b0"/>
+      <stop offset="1" stop-color="#3b82f6"/>
+    </linearGradient>
+  </defs>
+  <!-- Chart bars -->
+  <rect x="80" y="290" width="80" height="142" rx="20" fill="#00e5b0" opacity="0.65"/>
+  <rect x="196" y="210" width="80" height="222" rx="20" fill="#00e5b0" opacity="0.8"/>
+  <rect x="312" y="140" width="80" height="292" rx="20" fill="#00e5b0"/>
+  <!-- Upward arrow -->
+  <path d="M430 80L382 152h34v118h28V152h34L430 80z" fill="#00e5b0"/>
+  <!-- ת letter hint — two horizontal bars -->
+  <rect x="80" y="80" width="180" height="28" rx="14" fill="url(#g)" opacity="0.6"/>
+  <rect x="80" y="80" width="28" height="90" rx="14" fill="url(#g)" opacity="0.6"/>
+</svg>

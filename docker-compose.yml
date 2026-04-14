@@ -1,0 +1,26 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: tsua-postgres
+    environment:
+      POSTGRES_DB: tsua
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - tsua_postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: tsua-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - tsua_redis_data:/data
+
+volumes:
+  tsua_postgres_data:
+  tsua_redis_data:

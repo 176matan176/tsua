@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Tsua Frontend (Next.js)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--workspace=@tsua/web"],
+      "port": 3000
+    },
+    {
+      "name": "Tsua API (Node.js)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--workspace=@tsua/api"],
+      "port": 3001
+    }
+  ]
+}

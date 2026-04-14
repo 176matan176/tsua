@@ -1,0 +1,57 @@
+{
+  "name": "תשואה",
+  "short_name": "תשואה",
+  "description": "הרשת החברתית הראשונה לשוק ההון הישראלי — שתף ניתוחים, עקוב אחר מניות, קבל התראות בזמן אמת",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#060b16",
+  "theme_color": "#00e5b0",
+  "lang": "he",
+  "dir": "rtl",
+  "categories": ["finance", "business", "social"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "פיד",
+      "short_name": "פיד",
+      "description": "הפיד הראשי",
+      "url": "/",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "שוק",
+      "short_name": "שוק",
+      "description": "נתוני שוק בזמן אמת",
+      "url": "/markets",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "מעקב",
+      "short_name": "מעקב",
+      "description": "רשימת המעקב שלי",
+      "url": "/watchlist",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

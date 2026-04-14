@@ -1,0 +1,80 @@
+{
+  "nav": {
+    "feed": "פיד",
+    "markets": "שווקים",
+    "rooms": "חדרים",
+    "alerts": "התראות",
+    "news": "חדשות",
+    "reports": "דיווחים",
+    "leaderboard": "מובילים",
+    "portfolio": "תיק",
+    "bookmarks": "סימניות",
+    "settings": "הגדרות",
+    "profile": "פרופיל",
+    "login": "כניסה",
+    "signup": "הרשמה"
+  },
+  "feed": {
+    "whatsHappening": "מה קורה בשוק?",
+    "post": "פרסם",
+    "bullish": "עלייה",
+    "bearish": "ירידה",
+    "noMore": "אין עוד פוסטים",
+    "trending": "טרנדינג"
+  },
+  "stock": {
+    "price": "מחיר",
+    "change": "שינוי",
+    "volume": "מחזור",
+    "marketCap": "שווי שוק",
+    "addAlert": "הוסף התראה",
+    "watchlist": "רשימת מעקב",
+    "posts": "פוסטים",
+    "chart": "גרף",
+    "news": "חדשות"
+  },
+  "rooms": {
+    "title": "חדרי מסחר",
+    "join": "הצטרף",
+    "leave": "עזוב",
+    "members": "חברים",
+    "typeMessage": "הקלד הודעה...",
+    "dayTraders": "יומאים",
+    "dividendSeekers": "מחפשי דיבידנד",
+    "tase125": "ת\"א-125"
+  },
+  "alerts": {
+    "title": "ההתראות שלי",
+    "priceAbove": "מחיר מעל",
+    "priceBelow": "מחיר מתחת",
+    "volumeSpike": "קפיצת מחזור",
+    "newsAlert": "חדשות",
+    "active": "פעיל",
+    "triggered": "הופעל",
+    "delete": "מחק"
+  },
+  "auth": {
+    "email": "אימייל",
+    "password": "סיסמה",
+    "username": "שם משתמש",
+    "loginTitle": "כניסה לחשבון",
+    "signupTitle": "הרשמה לתשואה",
+    "haveAccount": "יש לך חשבון?",
+    "noAccount": "אין לך חשבון?"
+  },
+  "common": {
+    "loading": "טוען...",
+    "error": "שגיאה",
+    "retry": "נסה שוב",
+    "tase": "ת\"א",
+    "us": "ארה\"ב",
+    "ils": "₪",
+    "usd": "$",
+    "follow": "עקוב",
+    "unfollow": "הפסק לעקוב",
+    "like": "לייק",
+    "reply": "תגובה",
+    "share": "שתף",
+    "search": "חיפוש"
+  }
+}
