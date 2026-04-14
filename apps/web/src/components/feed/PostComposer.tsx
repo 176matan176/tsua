@@ -7,6 +7,14 @@ import type { Sentiment } from '@/types/shared';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 
+// Returns true if text contains enough Hebrew characters to be considered Hebrew
+function isHebrew(text: string): boolean {
+  const clean = text.replace(/\$[A-Za-z0-9.]+/g, '').replace(/[0-9\s.,!?%+\-*/()[\]@#^&=<>|~`"';:_]/g, '');
+  if (clean.length === 0) return true;
+  const hebrewChars = (clean.match(/[\u05D0-\u05EA\u05F0-\u05F4\uFB1D-\uFBFF]/g) || []).length;
+  return hebrewChars / clean.length > 0.35;
+}
+
 function extractTickers(body: string): string[] {
   const matches = body.match(/\$([A-Za-zא-ת][A-Za-z0-9.]{0,9})/g) || [];
   return [...new Set(matches.map(m => m.replace('$', '').toUpperCase()))];
@@ -158,6 +166,10 @@ export function PostComposer({ onPost }: { onPost?: () => void }) {
 
   async function handlePost() {
     if (!body.trim() || !user) return;
+    if (!isHebrew(body)) {
+      setError('הפוסטים באפליקציה הם בעברית בלבד 🇮🇱');
+      return;
+    }
     setLoading(true);
     setError('');
     try {
@@ -355,6 +367,13 @@ export function PostComposer({ onPost }: { onPost?: () => void }) {
               </div>
             )}
 
+            {/* Hebrew-only warning */}
+            {body.trim().length > 0 && !isHebrew(body) && (
+              <p className="text-[11px] font-semibold mt-1.5" style={{ color: 'var(--red)' }}>
+                ⚠️ הפוסטים באפליקציה הם בעברית בלבד 🇮🇱
+              </p>
+            )}
+
             {/* Ticker preview chips */}
             {tickers.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-2 mb-1">
@@ -455,7 +474,7 @@ export function PostComposer({ onPost }: { onPost?: () => void }) {
         {/* Post button */}
         <button
           onClick={handlePost}
-          disabled={!body.trim() || loading || body.length > charLimit}
+          disabled={!body.trim() || loading || body.length > charLimit || (body.trim().length > 0 && !isHebrew(body))}
           className="text-[12px] font-black px-5 py-1.5 rounded-lg transition-all duration-150 disabled:opacity-25 disabled:cursor-not-allowed hover:brightness-110 active:scale-95"
           style={{
             background: body.trim() ? 'linear-gradient(135deg, var(--accent), var(--accent2))' : 'var(--surface2)',
