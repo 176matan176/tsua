@@ -16,6 +16,9 @@ import {
 } from '@heroicons/react/24/solid';
 import { ThemeToggleIcon } from './ThemeToggle';
 import { MobileComposeSheet } from '@/components/feed/MobileComposeSheet';
+import { MobileRightDrawer } from './MobileRightDrawer';
+import { ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
+import { ArrowTrendingUpIcon as ArrowTrendingUpIconSolid } from '@heroicons/react/24/solid';
 
 const LEFT_ITEMS = [
   { key: 'feed',    icon: HomeIcon,     iconActive: HomeIconSolid,     href: '',         label: 'פיד' },
@@ -79,6 +82,7 @@ export function BottomNav() {
   const locale = useLocale();
   const pathname = usePathname();
   const [composeOpen, setComposeOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   return (
     <>
@@ -148,6 +152,35 @@ export function BottomNav() {
             />
           ))}
 
+          {/* Trending drawer trigger */}
+          <button
+            onClick={() => setDrawerOpen(true)}
+            className="relative flex flex-col items-center justify-center gap-1 px-5 py-1 transition-all duration-200 active:scale-90"
+          >
+            {drawerOpen && (
+              <span
+                className="absolute inset-0 rounded-2xl"
+                style={{ background: 'radial-gradient(ellipse at center, rgba(0,229,176,0.1) 0%, transparent 70%)' }}
+              />
+            )}
+            {drawerOpen && (
+              <span
+                className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-[2px] rounded-full"
+                style={{ background: 'linear-gradient(90deg, transparent, var(--accent), transparent)' }}
+              />
+            )}
+            {drawerOpen
+              ? <ArrowTrendingUpIconSolid className="w-6 h-6 relative" style={{ color: 'var(--accent)', filter: 'drop-shadow(0 0 8px rgba(0,229,176,0.6))' }} />
+              : <ArrowTrendingUpIcon     className="w-6 h-6 relative" style={{ color: 'var(--muted)' }} />
+            }
+            <span
+              className="text-[10px] font-semibold relative"
+              style={{ color: drawerOpen ? 'var(--accent)' : 'var(--muted)', letterSpacing: '0.01em' }}
+            >
+              טרנד
+            </span>
+          </button>
+
           <ThemeToggleIcon />
         </div>
       </nav>
@@ -156,6 +189,12 @@ export function BottomNav() {
       <MobileComposeSheet
         isOpen={composeOpen}
         onClose={() => setComposeOpen(false)}
+      />
+
+      {/* Mobile right drawer */}
+      <MobileRightDrawer
+        isOpen={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
       />
     </>
   );
