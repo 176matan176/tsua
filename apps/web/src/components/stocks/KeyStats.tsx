@@ -75,7 +75,7 @@ function StatRow({ label, value, highlight, color, tooltip }: {
   return (
     <div
       className="flex items-center justify-between py-2.5 px-3 rounded-xl transition-colors hover:bg-white/2"
-      style={{ borderBottom: '1px solid rgba(26,40,64,0.35)' }}
+      style={{ borderBottom: '1px solid var(--border2)' }}
     >
       <span className="text-xs text-tsua-muted flex items-center">
         {label}
@@ -150,15 +150,15 @@ export function KeyStats({
   ];
 
   return (
-    <div className="rounded-2xl overflow-visible" style={{ background: 'rgba(15,25,41,0.7)', border: '1px solid rgba(26,40,64,0.8)' }}>
-      <div className="px-4 py-3" style={{ borderBottom: '1px solid rgba(26,40,64,0.6)' }}>
+    <div className="rounded-2xl overflow-visible" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
+      <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--border2)' }}>
         <h3 className="text-sm font-bold text-tsua-text">📋 נתונים מרכזיים</h3>
       </div>
       <div className="px-3 pb-3">
         {sections.map((section, si) => (
           section.rows.some(r => r.value) && (
             <div key={section.title} className={si > 0 ? 'mt-3 pt-3' : 'mt-2'}
-              style={si > 0 ? { borderTop: '1px solid rgba(26,40,64,0.5)' } : {}}>
+              style={si > 0 ? { borderTop: '1px solid var(--border2)' } : {}}>
               <div className="text-[10px] font-bold text-tsua-muted uppercase tracking-widest mb-1.5 px-1">
                 {section.title}
               </div>

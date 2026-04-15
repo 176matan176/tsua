@@ -67,7 +67,7 @@ export function CompanyOverview({
   return (
     <div
       className="rounded-2xl p-4"
-      style={{ background: 'rgba(15,25,41,0.7)', border: '1px solid rgba(26,40,64,0.8)' }}
+      style={{ background: 'var(--card)', border: '1px solid var(--border)' }}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
@@ -88,7 +88,7 @@ export function CompanyOverview({
       </div>
 
       {/* Company identity */}
-      <div className="flex items-center gap-3 mb-4 pb-4" style={{ borderBottom: '1px solid rgba(26,40,64,0.5)' }}>
+      <div className="flex items-center gap-3 mb-4 pb-4" style={{ borderBottom: '1px solid var(--border2)' }}>
         {logo ? (
           <img
             src={logo}
@@ -115,7 +115,7 @@ export function CompanyOverview({
           <div
             key={item.label}
             className="rounded-xl px-3 py-2.5"
-            style={{ background: 'rgba(10,16,28,0.6)', border: '1px solid rgba(26,40,64,0.5)' }}
+            style={{ background: 'var(--surface2)', border: '1px solid var(--border2)' }}
           >
             <div className="text-[10px] text-tsua-muted mb-1 uppercase tracking-wider font-bold">
               {item.icon && <span className="me-1">{item.icon}</span>}
