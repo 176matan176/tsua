@@ -52,7 +52,7 @@ export function StockPageClient({ ticker }: { ticker: string }) {
   ) : (
     <div
       className="rounded-2xl animate-pulse"
-      style={{ height: 320, background: 'rgba(15,25,41,0.7)', border: '1px solid rgba(26,40,64,0.8)' }}
+      style={{ height: 320, background: 'var(--card)', border: '1px solid var(--border)' }}
     />
   );
 
@@ -73,7 +73,7 @@ export function StockPageClient({ ticker }: { ticker: string }) {
 
           <div
             className="flex gap-1 p-1 rounded-xl"
-            style={{ background: 'rgba(15,25,41,0.6)', border: '1px solid rgba(26,40,64,0.8)' }}
+            style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}
           >
             {([
               ['feed', '💬 דיון קהילתי'],

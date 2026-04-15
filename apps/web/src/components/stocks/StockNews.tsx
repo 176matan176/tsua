@@ -28,7 +28,7 @@ function NewsCard({ article }: { article: NewsArticle }) {
       target="_blank"
       rel="noopener noreferrer"
       className="group flex gap-3 p-3 rounded-xl transition-all hover:bg-white/3"
-      style={{ borderBottom: '1px solid rgba(26,40,64,0.35)' }}
+      style={{ borderBottom: '1px solid var(--border2)' }}
     >
       {/* Image */}
       {article.image && (
@@ -70,11 +70,11 @@ function SkeletonNews() {
     <div className="space-y-3 animate-pulse px-1">
       {[1, 2, 3].map(i => (
         <div key={i} className="flex gap-3 p-3">
-          <div className="w-16 h-16 rounded-lg shrink-0" style={{ background: 'rgba(26,40,64,0.5)' }} />
+          <div className="w-16 h-16 rounded-lg shrink-0" style={{ background: 'var(--border)' }} />
           <div className="flex-1 space-y-2">
-            <div className="h-3 w-16 rounded" style={{ background: 'rgba(26,40,64,0.5)' }} />
-            <div className="h-3 w-full rounded" style={{ background: 'rgba(26,40,64,0.4)' }} />
-            <div className="h-3 w-3/4 rounded" style={{ background: 'rgba(26,40,64,0.3)' }} />
+            <div className="h-3 w-16 rounded" style={{ background: 'var(--border)' }} />
+            <div className="h-3 w-full rounded" style={{ background: 'var(--border2)' }} />
+            <div className="h-3 w-3/4 rounded" style={{ background: 'var(--border2)' }} />
           </div>
         </div>
       ))}
@@ -98,9 +98,9 @@ export function StockNews({ ticker }: { ticker: string }) {
   return (
     <div
       className="rounded-2xl overflow-hidden"
-      style={{ background: 'rgba(15,25,41,0.7)', border: '1px solid rgba(26,40,64,0.8)' }}
+      style={{ background: 'var(--card)', border: '1px solid var(--border)' }}
     >
-      <div className="px-4 py-3" style={{ borderBottom: '1px solid rgba(26,40,64,0.6)' }}>
+      <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--border2)' }}>
         <h3 className="text-sm font-bold text-tsua-text">
           {'📰 חדשות אחרונות'}
         </h3>
