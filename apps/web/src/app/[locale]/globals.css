@@ -393,6 +393,32 @@ main { animation: fade-in 0.3s ease-out; }
 /* ─── Selection color ────────────────────────────────────────────────── */
 ::selection { background: rgba(0,229,176,0.2); color: #e8f0ff; }
 
+/* ─── Sheet / Modal Animations ───────────────────────────────────────── */
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+@keyframes modalUp {
+  from { opacity: 0; transform: translateY(40px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes modalDown {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to   { opacity: 0; transform: translateY(20px) scale(0.97); }
+}
+@keyframes featureIn {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
 /* ─── Market Bar Scroll ───────────────────────────────────────────────── */
 @keyframes marketScroll {
   0%   { transform: translateX(0); }

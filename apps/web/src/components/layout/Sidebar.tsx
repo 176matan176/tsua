@@ -86,7 +86,7 @@ export function Sidebar() {
                   />
                 : <Icon
                     className="w-[18px] h-[18px] shrink-0 transition-colors"
-                    style={{ color: 'rgba(90,112,144,0.8)' }}
+                    style={{ color: 'var(--muted)' }}
                   />
               }
             </span>
@@ -95,7 +95,7 @@ export function Sidebar() {
             <span
               className="text-[13px] transition-colors"
               style={{
-                color: isActive ? '#e0f0ff' : 'rgba(140,165,200,0.85)',
+                color: isActive ? 'var(--text)' : 'var(--text2)',
                 fontWeight: isActive ? 700 : 500,
                 letterSpacing: '-0.01em',
               }}
@@ -115,19 +115,19 @@ export function Sidebar() {
       })}
 
       {/* Divider */}
-      <div className="my-2 mx-1" style={{ height: '1px', background: 'linear-gradient(90deg, transparent, rgba(26,40,64,0.8), transparent)' }} />
+      <div className="my-2 mx-1" style={{ height: '1px', background: 'linear-gradient(90deg, transparent, var(--border), transparent)' }} />
 
       {/* Trending widget */}
       <TrendingWidget />
 
-      <div className="my-2 mx-1" style={{ height: '1px', background: 'linear-gradient(90deg, transparent, rgba(26,40,64,0.8), transparent)' }} />
+      <div className="my-2 mx-1" style={{ height: '1px', background: 'linear-gradient(90deg, transparent, var(--border), transparent)' }} />
 
       {/* User card or CTA */}
       {user ? (
         <Link
           href={`/${locale}/profile/${displayName}`}
           className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 group hover:bg-white/3"
-          style={{ border: '1px solid rgba(26,40,64,0.6)' }}
+          style={{ border: '1px solid var(--border)' }}
         >
           {/* Avatar */}
           <div
@@ -167,7 +167,7 @@ export function Sidebar() {
             >
               הצטרף עכשיו
             </div>
-            <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(140,165,200,0.7)' }}>
+            <p className="text-[11px] leading-relaxed" style={{ color: 'var(--text2)' }}>
               קהילת המשקיעים הישראלים
             </p>
           </div>
@@ -200,7 +200,7 @@ export function Sidebar() {
             key={i}
             href={i === 0 ? '/terms' : i === 1 ? '/privacy' : 'mailto:support@tsua.co'}
             className="text-[10px] transition-colors hover:text-tsua-muted"
-            style={{ color: 'rgba(60,80,110,0.7)', fontFamily: 'monospace' }}
+            style={{ color: 'var(--muted2)', fontFamily: 'monospace' }}
           >
             {label}
           </a>

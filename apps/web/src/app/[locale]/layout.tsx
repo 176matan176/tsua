@@ -14,6 +14,7 @@ import { PriceProvider } from '@/contexts/PriceContext';
 import { ServiceWorkerRegister } from '@/components/pwa/ServiceWorkerRegister';
 import { TermsConsent } from '@/components/layout/TermsConsent';
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import { OnboardingModal } from '@/components/ui/OnboardingModal';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -88,6 +89,7 @@ export default async function RootLayout({ children, params: { locale } }: RootL
           <PriceProvider>
             <ServiceWorkerRegister />
             <TermsConsent />
+            <OnboardingModal />
             <div className="min-h-screen flex flex-col">
               <Navbar />
               <LiveMarketBar />

@@ -12,7 +12,7 @@ export function ThemeToggle() {
       onClick={toggleTheme}
       aria-label={isDark ? 'עבור למצב יום' : 'עבור למצב לילה'}
       className="relative flex items-center p-1 rounded-lg transition-all duration-200 hover:bg-white/5"
-      style={{ border: '1px solid rgba(26,40,64,0.5)' }}
+      style={{ border: '1px solid var(--border)' }}
     >
       <div
         className="relative w-11 h-6 rounded-full transition-all duration-300"
