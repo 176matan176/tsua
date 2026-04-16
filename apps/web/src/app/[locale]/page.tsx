@@ -4,6 +4,7 @@ import { FeedStream } from '@/components/feed/FeedStream';
 import { PostComposer } from '@/components/feed/PostComposer';
 import { TrendingStocks } from '@/components/stocks/TrendingStocks';
 import { MarketSummary } from '@/components/stocks/MarketSummary';
+import { HotStocksWidget } from '@/components/stocks/HotStocksWidget';
 import { LiveStream } from '@/components/stream/LiveStream';
 import { useState } from 'react';
 
@@ -21,6 +22,7 @@ export default function HomePage() {
     <div className="flex gap-6 items-start">
       {/* ── Main feed ── */}
       <div className="flex-1 min-w-0 space-y-4">
+        <HotStocksWidget />
         <MarketSummary />
         <PostComposer />
         <FeedStream />
