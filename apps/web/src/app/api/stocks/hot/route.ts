@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import {
-  IL_UNIVERSE, US_UNIVERSE, computeHotScore, buildSparklinePoints,
+  IL_UNIVERSE, US_UNIVERSE, computeHotScore,
   type UniverseStock, type StockScore,
 } from '@/lib/hotStocks';
 
@@ -49,7 +49,11 @@ function getSentiment(posts: { sentiment: string | null }[]) {
 }
 
 export async function GET(req: NextRequest) {
-  const market = (req.nextUrl.searchParams.get('market') ?? 'il') as 'il' | 'us';
+  const rawMarket = req.nextUrl.searchParams.get('market') ?? 'il';
+  if (rawMarket !== 'il' && rawMarket !== 'us') {
+    return NextResponse.json({ error: 'Invalid market. Use ?market=il or ?market=us' }, { status: 400 });
+  }
+  const market = rawMarket as 'il' | 'us';
   const universe: UniverseStock[] = market === 'il' ? IL_UNIVERSE : US_UNIVERSE;
   const tickers = universe.map(s => s.ticker);
 
