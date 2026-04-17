@@ -84,13 +84,11 @@ export function LiveMarketBar() {
     >
       {/* Fade left */}
       <div
-        className="absolute start-14 top-0 bottom-0 w-8 z-10 pointer-events-none"
-        style={{ background: 'linear-gradient(to right, rgba(6,11,22,0.9), transparent)' }}
+        className="absolute start-14 top-0 bottom-0 w-8 z-10 pointer-events-none market-fade-left"
       />
       {/* Fade right */}
       <div
-        className="absolute end-0 top-0 bottom-0 w-8 z-10 pointer-events-none"
-        style={{ background: 'linear-gradient(to left, rgba(6,11,22,0.9), transparent)' }}
+        className="absolute end-0 top-0 bottom-0 w-8 z-10 pointer-events-none market-fade-right"
       />
 
       {/* Fixed "שוק" label */}

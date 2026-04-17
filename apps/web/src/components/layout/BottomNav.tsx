@@ -129,7 +129,7 @@ export function BottomNav() {
                 border: '1.5px solid rgba(0,229,176,0.35)',
               }}
             >
-              <PlusIcon className="w-6 h-6" style={{ color: '#03120d', strokeWidth: 3 }} />
+              <PlusIcon className="w-6 h-6" style={{ color: 'var(--accent-contrast)', strokeWidth: 3 }} />
             </div>
             <span
               className="text-[10px] font-black"

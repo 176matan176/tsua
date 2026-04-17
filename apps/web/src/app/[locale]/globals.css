@@ -19,10 +19,15 @@
   --nav-bg:      rgba(5,9,18,0.97);
   --input-bg:    rgba(12,18,32,0.7);
   --hover-bg:    rgba(255,255,255,0.03);
-  --accent:      #00e5b0;
-  --accent2:     #00a884;
-  --red:         #ff4d6a;
-  --gold:        #f5b942;
+  --accent:          #00e5b0;
+  --accent2:         #00a884;
+  --accent-contrast: #03120d;
+  --red:             #ff4d6a;
+  --gold:            #f5b942;
+  --hot:             #f58220;
+  --hot-tint:        rgba(245,130,32,0.15);
+  --hot-border:      rgba(245,130,32,0.25);
+  --value:           #c8d8f0;
 }
 
 [data-theme="light"] {
@@ -42,10 +47,15 @@
   --nav-bg:      rgba(250,247,240,0.98);
   --input-bg:    rgba(242,238,231,0.9);
   --hover-bg:    rgba(0,0,0,0.03);
-  --accent:      #007a5c;
-  --accent2:     #005c45;
-  --red:         #c0182e;
-  --gold:        #b07d10;
+  --accent:          #007a5c;
+  --accent2:         #005c45;
+  --accent-contrast: #ffffff;
+  --red:             #c0182e;
+  --gold:            #b07d10;
+  --hot:             #c86100;
+  --hot-tint:        rgba(200,97,0,0.10);
+  --hot-border:      rgba(200,97,0,0.22);
+  --value:           #1a2332;
 }
 
 /* Apply theme to body */
@@ -194,6 +204,65 @@ body {
 [data-theme="light"] [style*="color:#ff4d6a"] { color: var(--red) !important; }
 [data-theme="light"] [style*="color: #f5b942"],
 [data-theme="light"] [style*="color:#f5b942"] { color: var(--gold) !important; }
+
+/* Neutral value text (#c8d8f0) — light gray in dark mode, dark blue-gray in light */
+[data-theme="light"] [style*="color: #c8d8f0"],
+[data-theme="light"] [style*="color:#c8d8f0"] { color: var(--value) !important; }
+
+/* Muted link (#5a7090) — too light for cream bg */
+[data-theme="light"] [style*="color: #5a7090"],
+[data-theme="light"] [style*="color:#5a7090"] { color: var(--muted) !important; }
+
+/* Hot/fire orange accent (#f58220) — deeper for contrast on warm cream */
+[data-theme="light"] [style*="color: #f58220"],
+[data-theme="light"] [style*="color:#f58220"] { color: var(--hot) !important; }
+[data-theme="light"] [style*="background: rgba(245,130,32"],
+[data-theme="light"] [style*="background:rgba(245,130,32"] {
+  background: var(--hot-tint) !important;
+}
+[data-theme="light"] [style*="rgba(245,130,32,0.25)"],
+[data-theme="light"] [style*="rgba(245,130,32,0.3)"] {
+  border-color: var(--hot-border) !important;
+}
+
+/* Yellow-gold tints (rgba(245,185,66,*)) — deeper amber in light */
+[data-theme="light"] [style*="background: rgba(245,185,66"],
+[data-theme="light"] [style*="background:rgba(245,185,66"] {
+  background: rgba(176,125,16,0.12) !important;
+}
+
+/* Accent pill tints not yet covered (0.15, 0.12, 0.2) */
+[data-theme="light"] [style*="background: rgba(0,229,176,0.12)"],
+[data-theme="light"] [style*="background:rgba(0,229,176,0.12)"],
+[data-theme="light"] [style*="background: rgba(0,229,176,0.15)"],
+[data-theme="light"] [style*="background:rgba(0,229,176,0.15)"],
+[data-theme="light"] [style*="background: rgba(0,229,176,0.2)"],
+[data-theme="light"] [style*="background:rgba(0,229,176,0.2)"] {
+  background: rgba(0,122,92,0.10) !important;
+  border-color: rgba(0,122,92,0.22) !important;
+}
+[data-theme="light"] [style*="background: rgba(0,229,176,0.2)"] * ,
+[data-theme="light"] [style*="background: rgba(0,229,176,0.15)"] * ,
+[data-theme="light"] [style*="background: rgba(0,229,176,0.12)"] * { color: #007a5c !important; }
+
+/* Red/bearish tints (rgba(255,77,106,0.1/0.15/0.2/0.25/0.3)) */
+[data-theme="light"] [style*="background: rgba(255,77,106"],
+[data-theme="light"] [style*="background:rgba(255,77,106"] {
+  background: rgba(192,24,46,0.10) !important;
+}
+[data-theme="light"] [style*="border: 1px solid rgba(255,77,106"],
+[data-theme="light"] [style*="rgba(255,77,106,0.2)"],
+[data-theme="light"] [style*="rgba(255,77,106,0.25)"],
+[data-theme="light"] [style*="rgba(255,77,106,0.3)"] {
+  border-color: rgba(192,24,46,0.22) !important;
+}
+
+/* Accent-colored borders (tooltip, pill outlines, etc.) */
+[data-theme="light"] [style*="border: 1px solid rgba(0,229,176"],
+[data-theme="light"] [style*="border:1px solid rgba(0,229,176"],
+[data-theme="light"] [style*="border: 1.5px solid rgba(0,229,176"] {
+  border-color: rgba(0,122,92,0.28) !important;
+}
 
 /* BottomNav active icon glow — softer in light */
 [data-theme="light"] [style*="filter: drop-shadow"][style*="0,229,176"] {
@@ -424,6 +493,11 @@ main { animation: fade-in 0.3s ease-out; }
 }
 
 /* ─── Market Bar Scroll ───────────────────────────────────────────────── */
+.market-fade-left  { background: linear-gradient(to right, var(--bg),        transparent); }
+.market-fade-right { background: linear-gradient(to left,  var(--bg),        transparent); }
+[data-theme="light"] .market-fade-left  { background: linear-gradient(to right, var(--bg2), transparent) !important; }
+[data-theme="light"] .market-fade-right { background: linear-gradient(to left,  var(--bg2), transparent) !important; }
+
 @keyframes marketScroll {
   0%   { transform: translateX(0); }
   100% { transform: translateX(-33.333%); }
