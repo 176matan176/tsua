@@ -27,6 +27,7 @@ export function StockPageClient({ ticker }: { ticker: string }) {
         week52High={stockData.week52High}
         week52Low={stockData.week52Low}
         peRatio={stockData.peRatio}
+        forwardPE={stockData.forwardPE}
         eps={stockData.eps}
         beta={stockData.beta}
         dividendYield={stockData.dividendYield}

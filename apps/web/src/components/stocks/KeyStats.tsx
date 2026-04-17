@@ -13,6 +13,7 @@ interface KeyStatsProps {
   week52High: number | null;
   week52Low: number | null;
   peRatio: number | null;
+  forwardPE: number | null;
   eps: number | null;
   beta: number | null;
   dividendYield: number | null;
@@ -24,6 +25,7 @@ interface KeyStatsProps {
 
 const TOOLTIPS: Record<string, string> = {
   pe:       'מכפיל הרווח מראה כמה משקיעים משלמים על כל ₪/$ של רווח שנתי. מכפיל 20 = משלמים 20₪ על כל ₪ רווח. גבוה = ציפייה לצמיחה.',
+  forwardPe:'מכפיל רווח עתידי — המחיר חלקי הרווח הצפוי בשנה הקרובה (לפי אומדנים). אם נמוך מהמכפיל הנוכחי = האנליסטים צופים צמיחה ברווחים.',
   pb:       'מחיר המנייה חלקי שווי הנכסים נטו למנייה. מתחת ל-1 = החברה נסחרת מתחת לשווי הנכסים שלה — עשוי להיות הזדמנות.',
   eps:      'הרווח הנקי של החברה חלקי מספר המניות. TTM = 12 החודשים האחרונים. EPS גבוה = החברה מרוויחה יותר למנייה.',
   beta:     'מדד תנודתיות. בטא 1 = זז כמו השוק. מעל 1 = תנודתי יותר. מתחת ל-1 = יציב יותר. שלילי = זז הפוך לשוק.',
@@ -108,7 +110,7 @@ function fmtVol(n: number | null): string | null {
 
 export function KeyStats({
   ticker, currency, prevClose, volume, high, low,
-  week52High, week52Low, peRatio, eps, beta,
+  week52High, week52Low, peRatio, forwardPE, eps, beta,
   dividendYield, pbRatio, roeTTM, revenueGrowthTTM, marketCap,
 }: KeyStatsProps) {
   const sym = currency === 'ILS' ? '₪' : '$';
@@ -130,6 +132,7 @@ export function KeyStats({
       rows: [
         { label: 'שווי שוק',          value: fmtLarge(marketCap, sym), highlight: true, tooltip: TOOLTIPS.marketcap },
         { label: 'מכפיל רווח (P/E)',   value: fmt(peRatio, 2),  tooltip: TOOLTIPS.pe },
+        { label: 'מכפיל רווח עתידי',   value: fmt(forwardPE, 2), tooltip: TOOLTIPS.forwardPe },
         { label: 'מכפיל הון (P/B)',    value: fmt(pbRatio, 2),  tooltip: TOOLTIPS.pb },
         { label: 'רווח למניה (EPS)',   value: fmt(eps, 2, sym), tooltip: TOOLTIPS.eps },
         { label: 'תשואת דיבידנד',     value: dividendYield != null ? `${dividendYield.toFixed(2)}%` : null, tooltip: TOOLTIPS.dividend },

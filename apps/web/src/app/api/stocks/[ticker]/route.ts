@@ -75,6 +75,7 @@ export async function GET(
       week52High: m['52WeekHigh'] ?? null,
       week52Low: m['52WeekLow'] ?? null,
       peRatio: m['peBasicExclExtraTTM'] ?? m['peTTM'] ?? null,
+      forwardPE: m['peNormalizedAnnual'] ?? m['peExclExtraAnnual'] ?? null,
       eps: m['epsBasicExclExtraItemsTTM'] ?? null,
       beta: m['beta'] ?? null,
       dividendYield: m['dividendYieldIndicatedAnnual'] ?? null,

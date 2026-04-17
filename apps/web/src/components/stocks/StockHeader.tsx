@@ -24,6 +24,7 @@ export interface StockData {
   week52High: number | null;
   week52Low: number | null;
   peRatio: number | null;
+  forwardPE: number | null;
   eps: number | null;
   beta: number | null;
   dividendYield: number | null;
@@ -72,7 +73,7 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
       .catch(() => setData({
         ticker, name: ticker, currency: 'USD', exchange: '', logo: null,
         open: 0, high: 0, low: 0, prevClose: null, volume: null, marketCap: null,
-        week52High: null, week52Low: null, peRatio: null, eps: null,
+        week52High: null, week52Low: null, peRatio: null, forwardPE: null, eps: null,
         beta: null, dividendYield: null, pbRatio: null, roeTTM: null, revenueGrowthTTM: null,
         industry: null, sector: null, weburl: null, employees: null, ipo: null, country: null,
       }))
