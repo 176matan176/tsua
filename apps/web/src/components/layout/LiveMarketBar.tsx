@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import { useLivePrice } from '@/contexts/PriceContext';
 
+// Only market indices — US (S&P, NASDAQ, Dow, Russell) + Tel Aviv (TA 35, TA 125)
 const INDICES = [
   { symbol: 'SPY',      label: 'S&P 500',   flag: '🇺🇸' },
   { symbol: 'QQQ',      label: 'NASDAQ',    flag: '🇺🇸' },
@@ -12,12 +13,6 @@ const INDICES = [
   { symbol: 'IWM',      label: 'RUSSELL',   flag: '🇺🇸' },
   { symbol: 'EIS',      label: 'ת"א 35',    flag: '🇮🇱' },
   { symbol: 'TA125.TA', label: 'ת"א 125',   flag: '🇮🇱' },
-  { symbol: 'BTC-USD',  label: 'Bitcoin',   flag: '₿'   },
-  { symbol: 'ETH-USD',  label: 'Ethereum',  flag: '⟠'   },
-  { symbol: 'GLD',      label: 'זהב',       flag: '🥇'  },
-  { symbol: 'USO',      label: 'נפט',       flag: '🛢️'  },
-  { symbol: 'TLT',      label: 'אג"ח 20Y',  flag: '📊'  },
-  { symbol: 'VIXY',     label: 'VIX',       flag: '😱'  },
 ];
 
 // Memoized so it only re-renders when its own price changes
@@ -103,8 +98,11 @@ export function LiveMarketBar() {
         <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#00e5b0' }}>שוק</span>
       </div>
 
-      {/* Scrolling strip — always LTR so translateX(-33.33%) works correctly */}
-      <div className="market-scroll items-center py-2 ps-20" dir="ltr">
+      {/* Scrolling strip — always LTR so translateX(-33.33%) works correctly.
+          NOTE: NO padding allowed here — it breaks the seamless -33.333% loop.
+          The "שוק" label on the left is absolutely-positioned (z-20) and masks any
+          items that scroll underneath it. */}
+      <div className="market-scroll items-center py-2" dir="ltr">
         {items.map((item, i) => (
           <span key={`${item.symbol}-${i}`} className="contents">
             <TickerItem symbol={item.symbol} label={item.label} flag={item.flag} />
