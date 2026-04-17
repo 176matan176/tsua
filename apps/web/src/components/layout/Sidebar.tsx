@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   HomeIcon, ChartBarIcon, UsersIcon, BellIcon, NewspaperIcon, DocumentTextIcon, TrophyIcon, BriefcaseIcon,
-  BookmarkIcon, Cog6ToothIcon, FireIcon, Squares2X2Icon,
+  BookmarkIcon, Cog6ToothIcon, FireIcon, Squares2X2Icon, CurrencyDollarIcon,
 } from '@heroicons/react/24/outline';
 import { TrendingWidget } from './TrendingWidget';
 import {
@@ -22,12 +22,14 @@ import {
   Cog6ToothIcon as Cog6ToothSolid,
   FireIcon as FireIconSolid,
   Squares2X2Icon as Squares2X2IconSolid,
+  CurrencyDollarIcon as CurrencyDollarIconSolid,
 } from '@heroicons/react/24/solid';
 
 const NAV_ITEMS = [
   { key: 'feed',        icon: HomeIcon,         iconActive: HomeIconSolid,         href: '',             label: 'פיד' },
   { key: 'markets',     icon: ChartBarIcon,     iconActive: ChartBarIconSolid,     href: '/markets',     label: 'שווקים' },
   { key: 'sectors',     icon: Squares2X2Icon,   iconActive: Squares2X2IconSolid,   href: '/sectors',     label: '🗺️ מגזרים' },
+  { key: 'crypto',      icon: CurrencyDollarIcon, iconActive: CurrencyDollarIconSolid, href: '/crypto',   label: '₿ קריפטו' },
   { key: 'hot',         icon: FireIcon,         iconActive: FireIconSolid,         href: '/hot',         label: '🔥 חמות' },
   { key: 'news',        icon: NewspaperIcon,    iconActive: NewspaperIconSolid,    href: '/news',        label: 'חדשות' },
   { key: 'rooms',       icon: UsersIcon,        iconActive: UsersIconSolid,        href: '/rooms',       label: 'חדרים' },
