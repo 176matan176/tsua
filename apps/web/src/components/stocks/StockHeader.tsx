@@ -7,6 +7,8 @@ import { useLivePrice } from '@/contexts/PriceContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { BookmarkIcon, BookmarkSlashIcon } from '@heroicons/react/24/outline';
 import { BookmarkIcon as BookmarkSolid } from '@heroicons/react/24/solid';
+import { InfoTooltip } from '@/components/ui/InfoTooltip';
+import { DICTIONARY, type DictEntry } from '@/lib/financialDictionary';
 
 export interface StockData {
   ticker: string;
@@ -279,19 +281,23 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
         className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4"
         style={{ borderTop: '1px solid rgba(26,40,64,0.5)' }}
       >
-        {[
-          { label: 'פתיחה',     value: data?.open    ? `${currencySymbol}${data.open.toFixed(2)}` : '—' },
-          { label: 'שיא יומי', value: data?.high    ? `${currencySymbol}${data.high.toFixed(2)}` : '—' },
-          { label: 'שפל יומי', value: data?.low     ? `${currencySymbol}${data.low.toFixed(2)}`  : '—' },
+        {([
+          { label: 'פתיחה',     value: data?.open    ? `${currencySymbol}${data.open.toFixed(2)}` : '—', term: DICTIONARY.open },
+          { label: 'שיא יומי', value: data?.high    ? `${currencySymbol}${data.high.toFixed(2)}` : '—', term: DICTIONARY.high },
+          { label: 'שפל יומי', value: data?.low     ? `${currencySymbol}${data.low.toFixed(2)}`  : '—', term: DICTIONARY.low },
           { label: 'שווי שוק', value: data?.marketCap
             ? data.marketCap >= 1e9
               ? `${currencySymbol}${(data.marketCap / 1e9).toFixed(1)}B`
               : `${currencySymbol}${(data.marketCap / 1e6).toFixed(0)}M`
-            : '—'
+            : '—',
+            term: DICTIONARY.marketcap,
           },
-        ].map((stat) => (
+        ] as { label: string; value: string; term: DictEntry }[]).map((stat) => (
           <div key={stat.label} className="text-center">
-            <div className="text-tsua-muted text-xs mb-0.5">{stat.label}</div>
+            <div className="text-tsua-muted text-xs mb-0.5 inline-flex items-center justify-center">
+              {stat.label}
+              <InfoTooltip term={stat.term} />
+            </div>
             <div dir="ltr" className="text-tsua-text font-bold text-sm">{stat.value}</div>
           </div>
         ))}

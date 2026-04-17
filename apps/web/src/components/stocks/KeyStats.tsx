@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { InformationCircleIcon } from '@heroicons/react/24/outline';
+import { InfoTooltip } from '@/components/ui/InfoTooltip';
+import { DICTIONARY, type DictEntry } from '@/lib/financialDictionary';
 
 interface KeyStatsProps {
   ticker: string;
@@ -23,56 +23,8 @@ interface KeyStatsProps {
   marketCap: number | null;
 }
 
-const TOOLTIPS: Record<string, string> = {
-  pe:       'מכפיל הרווח מראה כמה משקיעים משלמים על כל ₪/$ של רווח שנתי. מכפיל 20 = משלמים 20₪ על כל ₪ רווח. גבוה = ציפייה לצמיחה.',
-  forwardPe:'מכפיל רווח עתידי — המחיר חלקי הרווח הצפוי בשנה הקרובה (לפי אומדנים). אם נמוך מהמכפיל הנוכחי = האנליסטים צופים צמיחה ברווחים.',
-  pb:       'מחיר המנייה חלקי שווי הנכסים נטו למנייה. מתחת ל-1 = החברה נסחרת מתחת לשווי הנכסים שלה — עשוי להיות הזדמנות.',
-  eps:      'הרווח הנקי של החברה חלקי מספר המניות. TTM = 12 החודשים האחרונים. EPS גבוה = החברה מרוויחה יותר למנייה.',
-  beta:     'מדד תנודתיות. בטא 1 = זז כמו השוק. מעל 1 = תנודתי יותר. מתחת ל-1 = יציב יותר. שלילי = זז הפוך לשוק.',
-  dividend: 'אחוז הדיבידנד השנתי ממחיר המנייה. תשואה 3% על מנייה ב-100$ = 3$ דיבידנד בשנה.',
-  roe:      'כמה רווח מייצרת החברה מכל ₪/$ הון עצמי. ROE מעל 15% נחשב טוב. בנקים בדרך כלל 10-15%.',
-  revenue:  'שינוי אחוזי בהכנסות לעומת אשתקד. חיובי = החברה גדלה. חשוב מאוד לחברות צמיחה.',
-  marketcap:'מחיר המנייה × מספר המניות = שווי שוק כולל. Large Cap: מעל $10B, Mid Cap: $2-10B, Small Cap: מתחת ל-$2B.',
-  week52:   'הטווח שבו נסחרה המנייה בשנה האחרונה. מחיר קרוב לשיא = מומנטום חיובי. קרוב לשפל = חולשה או הזדמנות.',
-  volume:   'מספר המניות שנסחרו היום. נפח גבוה מעיד על עניין ומאשר מגמת מחיר. נפח נמוך = מגמה פחות אמינה.',
-};
-
-function Tooltip({ text }: { text: string }) {
-  const [show, setShow] = useState(false);
-
-  return (
-    <span className="relative inline-flex items-center ms-1.5">
-      <button
-        type="button"
-        onMouseEnter={() => setShow(true)}
-        onMouseLeave={() => setShow(false)}
-        onTouchStart={e => { e.stopPropagation(); setShow(v => !v); }}
-        className="leading-none"
-        aria-label="הסבר"
-      >
-        <InformationCircleIcon className="w-3.5 h-3.5 transition-colors"
-          style={{ color: show ? '#00e5b0' : 'rgba(90,112,144,0.7)' }} />
-      </button>
-      {show && (
-        <span
-          className="absolute bottom-6 start-0 z-50 w-60 rounded-xl text-xs leading-relaxed p-3"
-          style={{
-            background: 'rgba(10,16,30,0.98)',
-            border: '1px solid rgba(0,229,176,0.25)',
-            color: '#c8d8f0',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.7)',
-          }}
-          dir="rtl"
-        >
-          {text}
-        </span>
-      )}
-    </span>
-  );
-}
-
-function StatRow({ label, value, highlight, color, tooltip }: {
-  label: string; value: string | null; highlight?: boolean; color?: string; tooltip?: string;
+function StatRow({ label, value, highlight, color, term }: {
+  label: string; value: string | null; highlight?: boolean; color?: string; term?: DictEntry;
 }) {
   return (
     <div
@@ -81,7 +33,7 @@ function StatRow({ label, value, highlight, color, tooltip }: {
     >
       <span className="text-xs text-tsua-muted flex items-center">
         {label}
-        {tooltip && <Tooltip text={tooltip} />}
+        {term && <InfoTooltip term={term} />}
       </span>
       <span className="text-xs font-bold font-mono" style={{ color: color ?? (highlight ? '#00e5b0' : '#c8d8f0') }} dir="ltr">
         {value ?? '—'}
@@ -119,24 +71,24 @@ export function KeyStats({
     {
       title: 'מחיר',
       rows: [
-        { label: 'סגירה קודמת',   value: fmt(prevClose, 2, sym) },
-        { label: 'שיא יומי',      value: fmt(high, 2, sym) },
-        { label: 'שפל יומי',      value: fmt(low, 2, sym) },
-        { label: 'שיא 52 שבועות', value: fmt(week52High, 2, sym), highlight: true, tooltip: TOOLTIPS.week52 },
-        { label: 'שפל 52 שבועות', value: fmt(week52Low, 2, sym),  tooltip: TOOLTIPS.week52 },
-        { label: 'נפח מסחר',      value: fmtVol(volume), tooltip: TOOLTIPS.volume },
+        { label: 'סגירה קודמת',   value: fmt(prevClose, 2, sym), term: DICTIONARY.prevClose },
+        { label: 'שיא יומי',      value: fmt(high, 2, sym),      term: DICTIONARY.high },
+        { label: 'שפל יומי',      value: fmt(low, 2, sym),       term: DICTIONARY.low },
+        { label: 'שיא 52 שבועות', value: fmt(week52High, 2, sym), highlight: true, term: DICTIONARY.week52 },
+        { label: 'שפל 52 שבועות', value: fmt(week52Low, 2, sym),  term: DICTIONARY.week52 },
+        { label: 'נפח מסחר',      value: fmtVol(volume),          term: DICTIONARY.volume },
       ],
     },
     {
       title: 'שווי',
       rows: [
-        { label: 'שווי שוק',          value: fmtLarge(marketCap, sym), highlight: true, tooltip: TOOLTIPS.marketcap },
-        { label: 'מכפיל רווח (P/E)',   value: fmt(peRatio, 2),  tooltip: TOOLTIPS.pe },
-        { label: 'מכפיל רווח עתידי',   value: fmt(forwardPE, 2), tooltip: TOOLTIPS.forwardPe },
-        { label: 'מכפיל הון (P/B)',    value: fmt(pbRatio, 2),  tooltip: TOOLTIPS.pb },
-        { label: 'רווח למניה (EPS)',   value: fmt(eps, 2, sym), tooltip: TOOLTIPS.eps },
-        { label: 'תשואת דיבידנד',     value: dividendYield != null ? `${dividendYield.toFixed(2)}%` : null, tooltip: TOOLTIPS.dividend },
-        { label: 'בטא',               value: fmt(beta, 2), tooltip: TOOLTIPS.beta,
+        { label: 'שווי שוק',          value: fmtLarge(marketCap, sym), highlight: true, term: DICTIONARY.marketcap },
+        { label: 'מכפיל רווח (P/E)',   value: fmt(peRatio, 2),  term: DICTIONARY.pe },
+        { label: 'מכפיל רווח עתידי',   value: fmt(forwardPE, 2), term: DICTIONARY.forwardPe },
+        { label: 'מכפיל הון (P/B)',    value: fmt(pbRatio, 2),  term: DICTIONARY.pb },
+        { label: 'רווח למניה (EPS)',   value: fmt(eps, 2, sym), term: DICTIONARY.eps },
+        { label: 'תשואת דיבידנד',     value: dividendYield != null ? `${dividendYield.toFixed(2)}%` : null, term: DICTIONARY.dividend },
+        { label: 'בטא',               value: fmt(beta, 2), term: DICTIONARY.beta,
           color: beta != null ? (beta > 1.5 ? '#ff4d6a' : beta < 0.8 ? '#00e5b0' : '#c8d8f0') : undefined },
       ],
     },
@@ -144,9 +96,9 @@ export function KeyStats({
       title: 'ביצועים',
       rows: [
         { label: 'תשואה על ההון (ROE)', value: roeTTM != null ? `${roeTTM.toFixed(1)}%` : null,
-          highlight: roeTTM != null && roeTTM > 15, tooltip: TOOLTIPS.roe },
+          highlight: roeTTM != null && roeTTM > 15, term: DICTIONARY.roe },
         { label: 'צמיחת הכנסות',        value: revenueGrowthTTM != null ? `${revenueGrowthTTM.toFixed(1)}%` : null,
-          tooltip: TOOLTIPS.revenue,
+          term: DICTIONARY.revenue,
           color: revenueGrowthTTM != null ? (revenueGrowthTTM >= 0 ? '#00e5b0' : '#ff4d6a') : undefined },
       ].filter(r => r.value),
     },
@@ -167,7 +119,7 @@ export function KeyStats({
               </div>
               {section.rows.filter(r => r.value).map(row => (
                 <StatRow key={row.label} label={row.label} value={row.value}
-                  highlight={(row as any).highlight} color={(row as any).color} tooltip={(row as any).tooltip} />
+                  highlight={(row as any).highlight} color={(row as any).color} term={(row as any).term} />
               ))}
             </div>
           )

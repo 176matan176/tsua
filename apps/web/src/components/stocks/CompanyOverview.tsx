@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
+import { InfoTooltip } from '@/components/ui/InfoTooltip';
+import { DICTIONARY, type DictEntry } from '@/lib/financialDictionary';
 
 interface CompanyOverviewProps {
   ticker: string;
@@ -29,26 +31,30 @@ export function CompanyOverview({
   const flag = country ? (COUNTRY_FLAG[country.toUpperCase()] ?? '🌍') : '';
   const currencySymbol = currency === 'ILS' ? '₪' : '$';
 
-  const items = [
+  const items: { label: string; value: string | null; icon: string | null; term?: DictEntry }[] = [
     {
       label: 'תעשייה',
       value: industry,
       icon: '🏭',
+      term: DICTIONARY.industry,
     },
     {
       label: 'ענף',
       value: sector,
       icon: '📂',
+      term: DICTIONARY.sector,
     },
     {
       label: 'עובדים',
       value: employees ? employees.toLocaleString() : null,
       icon: '👥',
+      term: DICTIONARY.employees,
     },
     {
       label: 'IPO',
       value: ipo ? new Date(ipo).getFullYear().toString() : null,
       icon: '📅',
+      term: DICTIONARY.ipo,
     },
     {
       label: 'מדינה',
@@ -117,9 +123,10 @@ export function CompanyOverview({
             className="rounded-xl px-3 py-2.5"
             style={{ background: 'var(--surface2)', border: '1px solid var(--border2)' }}
           >
-            <div className="text-[10px] text-tsua-muted mb-1 uppercase tracking-wider font-bold">
+            <div className="text-[10px] text-tsua-muted mb-1 uppercase tracking-wider font-bold inline-flex items-center">
               {item.icon && <span className="me-1">{item.icon}</span>}
               {item.label}
+              {item.term && <InfoTooltip term={item.term} size={12} />}
             </div>
             <div className="text-sm font-semibold text-tsua-text truncate" dir="ltr">
               {item.value}
