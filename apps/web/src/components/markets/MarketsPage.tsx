@@ -9,6 +9,7 @@ import { FearGreedWidget } from './FearGreedWidget';
 import { MarketPE } from './MarketPE';
 import { HotStocks } from './HotStocks';
 import { SectorHeatmap as LiveSectorHeatmap } from './SectorHeatmap';
+import { MacroWidget } from './MacroWidget';
 import { useLocale } from 'next-intl';
 
 interface IndexData {
@@ -310,6 +311,9 @@ export function MarketsPage() {
         <MarketPE />
         <HotStocks />
       </div>
+
+      {/* Macro data */}
+      <MacroWidget />
 
       {/* Disclaimer */}
       <p className="text-[10px] text-tsua-muted text-center pb-2">
