@@ -8,6 +8,8 @@ import { CurrencyRates } from './CurrencyRates';
 import { FearGreedWidget } from './FearGreedWidget';
 import { MarketPE } from './MarketPE';
 import { HotStocks } from './HotStocks';
+import { SectorHeatmap as LiveSectorHeatmap } from './SectorHeatmap';
+import { useLocale } from 'next-intl';
 
 interface IndexData {
   symbol: string; nameHe: string; nameEn: string;
@@ -28,17 +30,6 @@ interface MarketsData {
   losers: StockRow[];
   forex: ForexRate[];
 }
-
-const SECTORS = [
-  { name: 'טכנולוגיה', changePercent: +2.1,  emoji: '💻' },
-  { name: 'ביטחון',    changePercent: +1.8,  emoji: '🛡️' },
-  { name: 'נדל"ן',     changePercent: +0.4,  emoji: '🏢' },
-  { name: 'אנרגיה',    changePercent: -0.2,  emoji: '⚡' },
-  { name: 'בנקאות',    changePercent: -1.3,  emoji: '🏦' },
-  { name: 'ביו-פארמה', changePercent: -2.8,  emoji: '💊' },
-  { name: 'תקשורת',    changePercent: -1.1,  emoji: '📡' },
-  { name: 'תעשייה',    changePercent: +0.7,  emoji: '🏭' },
-];
 
 function pct(n: number) {
   const sign = n >= 0 ? '+' : '';
@@ -151,46 +142,26 @@ function StockTable({ stocks, type }: { stocks: StockRow[]; type: 'gainers' | 'l
   );
 }
 
-function SectorHeatmap() {
+function SectorHeatmapCard({ locale }: { locale: string }) {
   return (
     <div
       className="rounded-2xl overflow-hidden"
       style={{ background: 'rgba(13,20,36,0.8)', border: '1px solid rgba(26,40,64,0.8)' }}
     >
-      <div className="px-4 py-3" style={{ borderBottom: '1px solid rgba(26,40,64,0.6)' }}>
-        <h3 className="text-sm font-black text-tsua-text">
-          🗺️ מפת סקטורים
-        </h3>
+      <div
+        className="px-4 py-3 flex items-center justify-between"
+        style={{ borderBottom: '1px solid rgba(26,40,64,0.6)' }}
+      >
+        <h3 className="text-sm font-black text-tsua-text">🗺️ מפת מגזרים</h3>
+        <Link
+          href={`/${locale}/sectors`}
+          className="text-[10px] font-bold text-tsua-muted hover:text-tsua-accent transition-colors"
+        >
+          כל המגזרים ←
+        </Link>
       </div>
-      <div className="grid grid-cols-4 gap-1.5 p-3">
-        {SECTORS.map(s => {
-          const isUp = s.changePercent >= 0;
-          const intensity = Math.min(Math.abs(s.changePercent) / 3, 1);
-          const bg = isUp
-            ? `rgba(0,229,176,${0.06 + intensity * 0.18})`
-            : `rgba(255,77,106,${0.06 + intensity * 0.18})`;
-          const border = isUp
-            ? `rgba(0,229,176,${0.1 + intensity * 0.25})`
-            : `rgba(255,77,106,${0.1 + intensity * 0.25})`;
-          return (
-            <div
-              key={s.name}
-              className="rounded-xl p-2.5 text-center transition-all hover:scale-105 cursor-default"
-              style={{ background: bg, border: `1px solid ${border}` }}
-            >
-              <div className="text-lg mb-0.5">{s.emoji}</div>
-              <div className="text-[9px] font-bold text-tsua-text truncate">
-                {s.name}
-              </div>
-              <div
-                className="text-[10px] font-black mt-0.5"
-                style={{ color: isUp ? '#00e5b0' : '#ff4d6a' }}
-              >
-                {pct(s.changePercent)}
-              </div>
-            </div>
-          );
-        })}
+      <div className="p-3">
+        <LiveSectorHeatmap variant="compact" />
       </div>
     </div>
   );
@@ -251,6 +222,7 @@ function SkeletonCard() {
 }
 
 export function MarketsPage() {
+  const locale = useLocale();
   const [data, setData] = useState<MarketsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
@@ -328,7 +300,7 @@ export function MarketsPage() {
 
       {/* Sector heatmap + Currency Rates */}
       <div className="grid grid-cols-1 md:grid-cols-[1fr_240px] gap-4">
-        <SectorHeatmap />
+        <SectorHeatmapCard locale={locale} />
         <CurrencyRates />
       </div>
 
