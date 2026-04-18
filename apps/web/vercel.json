@@ -3,5 +3,11 @@
   "buildCommand": "npm run build",
   "outputDirectory": ".next",
   "installCommand": "npm install",
-  "alias": ["tsua-rho.vercel.app"]
+  "alias": ["tsua-rho.vercel.app"],
+  "crons": [
+    {
+      "path": "/api/cron/alerts",
+      "schedule": "*/2 * * * 1-5"
+    }
+  ]
 }

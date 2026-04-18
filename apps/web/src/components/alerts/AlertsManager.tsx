@@ -6,6 +6,7 @@ import { BellIcon, TrashIcon, PlusIcon, XMarkIcon } from '@heroicons/react/24/ou
 import { BellIcon as BellSolid } from '@heroicons/react/24/solid';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
+import { PushToggle } from './PushToggle';
 
 interface Alert {
   id: string;
@@ -222,6 +223,9 @@ export function AlertsManager() {
             {'התראה חדשה'}
           </button>
         </div>
+
+        {/* Push subscription toggle */}
+        <PushToggle />
 
         {/* Loading */}
         {loading && (

@@ -1,0 +1,1179 @@
+/* Tsua investor deck — Hebrew RTL landscape slide stylesheet */
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+html, body {
+  direction: rtl;
+  text-align: right;
+  font-family: 'Heebo', 'Arial Hebrew', sans-serif;
+  font-size: 12pt;
+  line-height: 1.55;
+  color: #0a1a2e;
+  background: #ffffff;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ────────────────────────────────────────────────────────────
+   PAGE LAYOUT — A4 landscape with tighter margins
+   ──────────────────────────────────────────────────────────── */
+@page {
+  size: A4 landscape;
+  margin: 14mm 18mm 14mm 18mm;
+}
+
+/* ────────────────────────────────────────────────────────────
+   SLIDE WRAPPER — each .slide is ONE page
+   ──────────────────────────────────────────────────────────── */
+.slide {
+  page-break-before: always;
+  page-break-after: avoid;
+  page-break-inside: avoid;
+  padding: 0;
+}
+
+.slide:first-of-type {
+  page-break-before: avoid;
+}
+
+/* HR just forces a break — invisible, zero height */
+hr {
+  display: none;
+  page-break-after: always;
+  margin: 0;
+  padding: 0;
+  border: none;
+  height: 0;
+}
+
+/* ────────────────────────────────────────────────────────────
+   HEADINGS — no page-break-before (slide wrapper handles that)
+   ──────────────────────────────────────────────────────────── */
+h1 {
+  font-size: 36pt;
+  font-weight: 900;
+  color: #003d2e;
+  margin: 0 0 0.3em 0;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  page-break-before: avoid;
+  page-break-after: avoid;
+}
+
+h2 {
+  font-size: 14pt;
+  color: #00a884;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin: 0 0 0.3em 0;
+  padding: 0;
+  border: none;
+  page-break-after: avoid;
+}
+
+h3 {
+  font-size: 22pt;
+  color: #003d2e;
+  font-weight: 800;
+  margin: 0.2em 0 0.6em 0;
+  page-break-after: avoid;
+  line-height: 1.2;
+}
+
+h4 {
+  font-size: 14pt;
+  color: #1a2238;
+  font-weight: 700;
+  margin: 0.7em 0 0.35em 0;
+  page-break-after: avoid;
+}
+
+p { margin: 0.45em 0; font-size: 12pt; }
+
+ul, ol { padding-right: 1.4em; padding-left: 0; margin: 0.45em 0; }
+li { margin: 0.25em 0; font-size: 11.5pt; line-height: 1.5; }
+
+a { color: #006b52; text-decoration: none; border-bottom: 1px dotted #00a884; }
+
+strong, b { font-weight: 800; color: #003d2e; }
+em, i { font-style: italic; color: #2a4d3e; }
+
+code {
+  font-family: 'JetBrains Mono', 'Menlo', monospace;
+  background: #e8f5f0;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  color: #003d2e;
+  direction: ltr;
+  unicode-bidi: embed;
+}
+
+pre {
+  background: #0a1a2e;
+  color: #c8ffe5;
+  padding: 14px 18px;
+  border-radius: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5pt;
+  direction: ltr;
+  text-align: left;
+  unicode-bidi: embed;
+  page-break-inside: avoid;
+}
+
+/* ────────────────────────────────────────────────────────────
+   TABLES — compact, branded
+   ──────────────────────────────────────────────────────────── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.6em 0;
+  font-size: 10.5pt;
+  page-break-inside: avoid;
+  direction: rtl;
+}
+
+th, td {
+  border: 1px solid #c0dace;
+  padding: 7px 10px;
+  text-align: right;
+  vertical-align: top;
+}
+
+th {
+  background: linear-gradient(135deg, #00a884, #006b52);
+  color: white;
+  font-weight: 800;
+  font-size: 10.5pt;
+  border-color: #006b52;
+}
+
+tr:nth-child(even) td {
+  background: #f4faf8;
+}
+
+/* Blockquote */
+blockquote {
+  border-right: 5px solid #00a884;
+  border-left: none;
+  padding: 0.7em 1.1em;
+  margin: 0.8em 0;
+  background: linear-gradient(135deg, #e8f5f0 0%, #f4faf8 100%);
+  color: #003d2e;
+  font-size: 13pt;
+  font-weight: 600;
+  border-radius: 6px;
+  page-break-inside: avoid;
+}
+
+blockquote p { margin: 0.2em 0; font-size: 13pt; }
+
+img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+/* ────────────────────────────────────────────────────────────
+   COVER SLIDE — full bleed hero
+   ──────────────────────────────────────────────────────────── */
+.cover {
+  position: relative;
+  min-height: 175mm;
+  page-break-after: always;
+  page-break-before: avoid;
+  color: white;
+  overflow: hidden;
+  border-radius: 0;
+  background: linear-gradient(135deg, #003d2e 0%, #00a884 100%);
+}
+
+.cover-image {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.28;
+  filter: saturate(1.1);
+}
+
+.cover-overlay {
+  position: relative;
+  padding: 40mm 20mm 15mm 20mm;
+  background: linear-gradient(135deg, rgba(0,61,46,0.85) 0%, rgba(0,168,132,0.55) 100%);
+  min-height: 175mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.cover-overlay h1 {
+  font-size: 72pt;
+  color: white;
+  margin: 0 0 0.15em 0;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  letter-spacing: -0.02em;
+  border: none;
+}
+
+.cover-overlay h2 {
+  font-size: 26pt;
+  color: #c8ffe5;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.6em 0;
+}
+
+.cover-overlay > p {
+  font-size: 15pt;
+  color: #e8f5f0;
+  font-weight: 500;
+  margin: 0.4em 0;
+  max-width: 60%;
+}
+
+.cover-overlay blockquote {
+  background: rgba(255,255,255,0.1);
+  border-right-color: #c8ffe5;
+  color: white;
+  font-size: 15pt;
+  font-style: italic;
+  max-width: 50%;
+  backdrop-filter: blur(4px);
+}
+
+.cover-overlay blockquote p { color: white; }
+
+.cover-meta {
+  margin-top: 1.2em;
+  padding-top: 0.8em;
+  border-top: 1px solid rgba(255,255,255,0.3);
+  color: #e8f5f0;
+  font-size: 11pt;
+  font-weight: 500;
+}
+
+.cover-meta a { color: #c8ffe5; border-bottom-color: #c8ffe5; }
+
+/* ────────────────────────────────────────────────────────────
+   HERO IMAGE inside a slide
+   ──────────────────────────────────────────────────────────── */
+.hero-img {
+  width: 100%;
+  max-height: 55mm;
+  object-fit: cover;
+  border-radius: 10px;
+  margin: 0.3em 0 0.6em 0;
+  box-shadow: 0 4px 16px rgba(0,61,46,0.15);
+}
+
+/* ────────────────────────────────────────────────────────────
+   TWO-COLUMN GRID
+   ──────────────────────────────────────────────────────────── */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14mm;
+  margin: 0.6em 0;
+}
+
+.grid-2 .col { min-width: 0; }
+
+/* ────────────────────────────────────────────────────────────
+   PAIN LIST (slide 2)
+   ──────────────────────────────────────────────────────────── */
+.pain-list {
+  background: #fff5f5;
+  border-right: 4px solid #ef4444;
+  border-radius: 6px;
+  padding: 0.8em 1em 0.8em 1em;
+  margin: 0.5em 0;
+}
+
+.pain-list ul { margin: 0; padding-right: 1.2em; }
+.pain-list li { font-size: 11pt; margin: 0.4em 0; }
+
+.big-quote {
+  background: linear-gradient(135deg, #003d2e, #00a884);
+  color: white !important;
+  font-size: 14pt !important;
+  font-weight: 700;
+  text-align: center;
+  padding: 1em 1.2em !important;
+  border: none !important;
+  border-radius: 10px;
+  margin-top: 1em !important;
+}
+
+.big-quote p { color: white !important; font-size: 14pt !important; }
+
+/* ────────────────────────────────────────────────────────────
+   PILLARS (slide 3)
+   ──────────────────────────────────────────────────────────── */
+.pillars {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4mm;
+  margin: 0.8em 0;
+}
+
+.pillar {
+  background: linear-gradient(135deg, #f4faf8 0%, #e8f5f0 100%);
+  border: 1px solid #c0dace;
+  border-radius: 12px;
+  padding: 14px 12px;
+  text-align: center;
+}
+
+.pillar-icon {
+  font-size: 32pt;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.pillar-title {
+  font-size: 13pt;
+  font-weight: 800;
+  color: #003d2e;
+  margin-bottom: 6px;
+  line-height: 1.2;
+}
+
+.pillar-text {
+  font-size: 10pt;
+  color: #2a4d3e;
+  line-height: 1.4;
+}
+
+.magic {
+  margin-top: 0.8em;
+  padding: 0.8em 1em;
+  background: linear-gradient(135deg, #fff9e8 0%, #fff5d4 100%);
+  border-right: 4px solid #f59e0b;
+  border-radius: 8px;
+}
+
+.magic h3 {
+  margin-top: 0;
+  font-size: 14pt;
+  color: #b45309;
+}
+
+.magic ul { margin: 0.3em 0 0 0; }
+.magic li { font-size: 11pt; }
+
+/* ────────────────────────────────────────────────────────────
+   STAT GRID (slide 4, others)
+   ──────────────────────────────────────────────────────────── */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 4mm;
+  margin: 0.8em 0;
+}
+
+.stat {
+  background: linear-gradient(135deg, #00a884 0%, #006b52 100%);
+  color: white;
+  border-radius: 10px;
+  padding: 10px 8px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,168,132,0.2);
+}
+
+.stat-num {
+  font-size: 22pt;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  direction: ltr;
+}
+
+.stat-label {
+  font-size: 9pt;
+  color: #e8f5f0;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.module-table { margin-top: 0.6em; }
+
+/* ────────────────────────────────────────────────────────────
+   FUNNEL (slide 5 — market size)
+   ──────────────────────────────────────────────────────────── */
+.funnel { margin: 0.8em 0; }
+
+.funnel-row {
+  display: flex;
+  align-items: center;
+  gap: 10mm;
+  margin: 0.4em 0;
+}
+
+.funnel-label {
+  width: 35mm;
+  font-size: 14pt;
+  font-weight: 900;
+  color: #003d2e;
+  text-align: left;
+}
+
+.funnel-bar {
+  flex: 1;
+  padding: 12px 18px;
+  border-radius: 10px;
+  color: white;
+  font-weight: 700;
+  font-size: 12pt;
+  display: flex;
+  align-items: center;
+}
+
+.funnel-row.tam .funnel-bar { background: linear-gradient(90deg, #003d2e, #00a884); }
+.funnel-row.sam .funnel-bar { background: linear-gradient(90deg, #006b52, #1a9eff); }
+.funnel-row.som .funnel-bar { background: linear-gradient(90deg, #1a9eff, #8b5cf6); }
+
+.funnel-value { font-size: 11.5pt; font-weight: 700; }
+
+.revenue-model {
+  margin-top: 1em;
+  padding: 0.8em 1em;
+  background: #f4faf8;
+  border: 1px solid #c0dace;
+  border-radius: 10px;
+}
+
+.revenue-model h3 {
+  margin-top: 0;
+  font-size: 14pt;
+  color: #003d2e;
+}
+
+.revenue-grid .rev-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  border-bottom: 1px dashed #c0dace;
+  font-size: 11pt;
+}
+
+.revenue-grid .rev-total {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0 0 0;
+  border-top: 2px solid #00a884;
+  margin-top: 4px;
+  font-size: 13pt;
+  font-weight: 800;
+  color: #003d2e;
+}
+
+/* ────────────────────────────────────────────────────────────
+   MOAT BOX + PILLS (slide 6)
+   ──────────────────────────────────────────────────────────── */
+.moat-box {
+  margin-top: 0.8em;
+  padding: 1em 1.2em;
+  background: linear-gradient(135deg, #003d2e 0%, #00a884 100%);
+  color: white;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.moat-box h3 {
+  color: white;
+  margin-top: 0;
+  font-size: 14pt;
+}
+
+.moat-box strong { color: #c8ffe5; }
+
+.moat-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin: 0.8em 0;
+}
+
+.pill {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: white;
+  padding: 5px 12px;
+  border-radius: 100px;
+  font-size: 10.5pt;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+}
+
+/* ────────────────────────────────────────────────────────────
+   TIMELINE (slide 7 — traction)
+   ──────────────────────────────────────────────────────────── */
+.timeline {
+  margin: 0.6em 0;
+  padding-right: 20px;
+  border-right: 3px solid #c0dace;
+}
+
+.timeline-item {
+  position: relative;
+  padding: 6px 16px 6px 0;
+  margin: 0.3em 0;
+}
+
+.timeline-marker {
+  position: absolute;
+  right: -30px;
+  top: 4px;
+  width: 22px;
+  height: 22px;
+  background: white;
+  border: 2px solid #00a884;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11pt;
+}
+
+.timeline-item.done .timeline-marker { background: #00a884; color: white; }
+.timeline-item.next .timeline-marker { background: #f59e0b; color: white; border-color: #f59e0b; }
+
+.timeline-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.timeline-body strong {
+  font-size: 12.5pt;
+  color: #003d2e;
+}
+
+.timeline-body span {
+  font-size: 10.5pt;
+  color: #2a4d3e;
+}
+
+.velocity-callout {
+  margin-top: 0.8em;
+  padding: 0.8em 1em;
+  background: linear-gradient(135deg, #fff9e8, #fff5d4);
+  border-right: 4px solid #f59e0b;
+  border-radius: 8px;
+  color: #b45309;
+  font-size: 12.5pt;
+  font-weight: 600;
+}
+
+/* ────────────────────────────────────────────────────────────
+   BUSINESS STAGES (slide 8)
+   ──────────────────────────────────────────────────────────── */
+.business-stages {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6mm;
+  margin: 0.8em 0;
+}
+
+.stage {
+  background: white;
+  border: 2px solid #c0dace;
+  border-radius: 12px;
+  padding: 14px;
+  position: relative;
+}
+
+.stage.highlight {
+  background: linear-gradient(135deg, #f4faf8, #e8f5f0);
+  border-color: #00a884;
+  box-shadow: 0 4px 12px rgba(0,168,132,0.15);
+}
+
+.stage-num {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 28px;
+  height: 28px;
+  background: #00a884;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 13pt;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.stage-head {
+  font-size: 13pt;
+  font-weight: 800;
+  color: #003d2e;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+.stage-head .price {
+  color: #00a884;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16pt;
+}
+
+.stage-head .price-unit {
+  font-size: 10pt;
+  color: #2a4d3e;
+}
+
+.stage ul { margin: 0; padding-right: 1.1em; }
+.stage li { font-size: 10.5pt; margin: 0.25em 0; }
+
+.target-box {
+  margin-top: 1em;
+  padding: 0.8em;
+  background: linear-gradient(135deg, #003d2e, #00a884);
+  color: white;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 13pt;
+  font-weight: 700;
+}
+
+/* ────────────────────────────────────────────────────────────
+   ROADMAP (slide 9)
+   ──────────────────────────────────────────────────────────── */
+.roadmap {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 4mm;
+  margin: 0.8em 0;
+}
+
+.rm-quarter {
+  background: white;
+  border: 2px solid #c0dace;
+  border-radius: 10px;
+  padding: 12px 10px;
+  position: relative;
+}
+
+.rm-quarter:first-child {
+  border-color: #f59e0b;
+  background: linear-gradient(135deg, #fff9e8, #fff5d4);
+}
+
+.rm-head {
+  font-size: 10pt;
+  color: #2a4d3e;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.rm-title {
+  font-size: 12.5pt;
+  font-weight: 800;
+  color: #003d2e;
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+.rm-quarter ul { margin: 0 0 0.5em 0; padding-right: 1em; }
+.rm-quarter li { font-size: 10pt; margin: 0.2em 0; }
+
+.rm-ms {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed #c0dace;
+  font-size: 10pt;
+  color: #00a884;
+  font-weight: 700;
+}
+
+/* ────────────────────────────────────────────────────────────
+   TEAM (slide 10)
+   ──────────────────────────────────────────────────────────── */
+.team-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 5mm;
+  margin: 0.5em 0;
+}
+
+.team-card {
+  background: #f4faf8;
+  border: 1px solid #c0dace;
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+}
+
+.team-role {
+  font-size: 9.5pt;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #00a884;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.team-name {
+  font-size: 13pt;
+  font-weight: 800;
+  color: #003d2e;
+  margin-bottom: 4px;
+}
+
+.team-bio {
+  font-size: 10pt;
+  color: #2a4d3e;
+}
+
+.advisors {
+  margin-top: 0.7em;
+  padding: 0.7em 1em;
+  background: #f8fafb;
+  border-right: 3px solid #c0dace;
+  border-radius: 6px;
+}
+
+.advisors h3 { margin: 0 0 0.3em 0; font-size: 12pt; color: #003d2e; }
+.advisors ul { margin: 0; padding-right: 1.1em; }
+.advisors li { font-size: 10.5pt; }
+
+.why-us {
+  margin-top: 0.7em;
+  padding: 0.7em 1em;
+  background: linear-gradient(135deg, #e8f5f0, #f4faf8);
+  border: 1px solid #c0dace;
+  border-radius: 8px;
+}
+
+.why-us h3 { margin: 0 0 0.3em 0; font-size: 13pt; color: #003d2e; }
+.why-us ul { margin: 0; padding-right: 1.2em; }
+.why-us li { font-size: 11pt; }
+
+/* ────────────────────────────────────────────────────────────
+   UNIT ECONOMICS (slide 11)
+   ──────────────────────────────────────────────────────────── */
+.econ-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 3mm;
+  margin: 0.8em 0;
+}
+
+.econ-card {
+  background: white;
+  border: 1.5px solid #c0dace;
+  border-radius: 8px;
+  padding: 10px 8px;
+  text-align: center;
+}
+
+.econ-card.highlight {
+  background: linear-gradient(135deg, #003d2e, #00a884);
+  border-color: #003d2e;
+  color: white;
+}
+
+.econ-label {
+  font-size: 8.5pt;
+  color: #2a4d3e;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+  line-height: 1.2;
+}
+
+.econ-card.highlight .econ-label { color: #c8ffe5; }
+
+.econ-value {
+  font-size: 18pt;
+  font-weight: 900;
+  color: #003d2e;
+  font-family: 'JetBrains Mono', monospace;
+  direction: ltr;
+  line-height: 1;
+  margin-bottom: 3px;
+}
+
+.econ-card.highlight .econ-value { color: white; }
+
+.econ-value span {
+  font-size: 9pt;
+  font-weight: 500;
+  color: #2a4d3e;
+}
+
+.econ-card.highlight .econ-value span { color: #c8ffe5; }
+
+.econ-calc {
+  font-size: 8.5pt;
+  color: #2a4d3e;
+  font-weight: 500;
+}
+
+.econ-card.highlight .econ-calc { color: #c8ffe5; }
+
+.costs-box {
+  margin-top: 0.8em;
+  padding: 0.8em 1em;
+  background: #fff9e8;
+  border: 1px solid #f59e0b;
+  border-radius: 10px;
+}
+
+.costs-box h3 { margin: 0 0 0.4em 0; font-size: 13pt; color: #b45309; }
+
+.costs {
+  width: 70%;
+  margin: 0;
+  font-size: 11pt;
+}
+
+.costs td {
+  padding: 5px 10px;
+  border-color: rgba(245,158,11,0.25);
+  background: rgba(255,255,255,0.6);
+}
+
+.costs td:last-child {
+  font-family: 'JetBrains Mono', monospace;
+  direction: ltr;
+  text-align: left;
+}
+
+.costs .total td {
+  background: #f59e0b;
+  color: white;
+  font-weight: 800;
+}
+
+/* ────────────────────────────────────────────────────────────
+   RISKS (slide 12)
+   ──────────────────────────────────────────────────────────── */
+.risks { margin: 0.6em 0; }
+
+.risk-row {
+  display: grid;
+  grid-template-columns: 90px 280px 1fr;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin: 4px 0;
+  align-items: center;
+  border-right: 4px solid #c0dace;
+  background: #f8fafb;
+}
+
+.risk-row.high { border-right-color: #ef4444; background: #fff5f5; }
+.risk-row.med { border-right-color: #f59e0b; background: #fff9e8; }
+.risk-row.low { border-right-color: #00a884; background: #f4faf8; }
+
+.risk-level {
+  font-size: 10pt;
+  font-weight: 800;
+}
+
+.risk-title {
+  font-size: 11.5pt;
+  font-weight: 700;
+  color: #003d2e;
+}
+
+.risk-mitigate {
+  font-size: 10.5pt;
+  color: #2a4d3e;
+}
+
+/* ────────────────────────────────────────────────────────────
+   THE ASK (slide 13)
+   ──────────────────────────────────────────────────────────── */
+.slide.the-ask { }
+
+.ask-big {
+  font-size: 56pt;
+  font-weight: 900;
+  color: #00a884;
+  text-align: center;
+  margin: 0.2em 0 0.3em 0;
+  font-family: 'JetBrains Mono', monospace;
+  direction: ltr;
+  text-shadow: 0 4px 14px rgba(0,168,132,0.2);
+  letter-spacing: -0.02em;
+}
+
+.use-of-funds h3 {
+  font-size: 14pt;
+  margin: 0.3em 0;
+  color: #003d2e;
+}
+
+.funds-bars { margin: 0.5em 0; }
+
+.fund-row {
+  display: grid;
+  grid-template-columns: 180px 1fr 70px;
+  gap: 12px;
+  align-items: center;
+  padding: 4px 0;
+  font-size: 10.5pt;
+}
+
+.fund-label { color: #2a4d3e; font-weight: 600; }
+
+.fund-bar {
+  height: 22px;
+  background: #e8f5f0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.fund-fill {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  color: white;
+  font-weight: 800;
+  font-size: 10pt;
+  font-family: 'JetBrains Mono', monospace;
+  direction: ltr;
+}
+
+.fund-amount {
+  text-align: left;
+  font-family: 'JetBrains Mono', monospace;
+  direction: ltr;
+  font-weight: 800;
+  color: #003d2e;
+}
+
+.milestones-box {
+  margin-top: 0.6em;
+  padding: 0.8em 1em;
+  background: linear-gradient(135deg, #003d2e, #00a884);
+  color: white;
+  border-radius: 10px;
+}
+
+.milestones-box h3 { color: white; margin: 0 0 0.4em 0; font-size: 13pt; }
+
+.milestones-box ul { margin: 0; padding-right: 1.2em; }
+.milestones-box li { font-size: 11pt; color: white; margin: 3px 0; }
+.milestones-box strong { color: #c8ffe5; }
+
+/* ────────────────────────────────────────────────────────────
+   WHY NOW (slide 14)
+   ──────────────────────────────────────────────────────────── */
+.trends {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 5mm;
+  margin: 0.8em 0;
+}
+
+.trend {
+  background: linear-gradient(135deg, #f4faf8, #e8f5f0);
+  border-right: 4px solid #00a884;
+  border-radius: 10px;
+  padding: 14px;
+  position: relative;
+}
+
+.trend-num {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 32px;
+  height: 32px;
+  background: #00a884;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 15pt;
+  font-family: 'JetBrains Mono', monospace;
+  box-shadow: 0 3px 8px rgba(0,168,132,0.3);
+}
+
+.trend-title {
+  font-size: 13pt;
+  font-weight: 800;
+  color: #003d2e;
+  margin-bottom: 6px;
+  line-height: 1.2;
+}
+
+.trend-body {
+  font-size: 10.5pt;
+  color: #2a4d3e;
+  line-height: 1.5;
+}
+
+.closing-quote {
+  margin-top: 1em !important;
+  background: linear-gradient(135deg, #003d2e, #00a884) !important;
+  color: white !important;
+  border: none !important;
+  text-align: center;
+  font-size: 14pt !important;
+  padding: 1em 1.5em !important;
+  border-radius: 10px;
+}
+
+.closing-quote strong { color: #c8ffe5; }
+.closing-quote p { color: white !important; font-size: 14pt !important; }
+
+/* ────────────────────────────────────────────────────────────
+   CONTACT (slide 15)
+   ──────────────────────────────────────────────────────────── */
+.slide.contact {
+  text-align: center;
+}
+
+.slide.contact h3 {
+  text-align: center;
+  margin-top: 1em;
+}
+
+.contact-hero {
+  margin: 1em 0;
+  padding: 1.5em 1em;
+}
+
+.contact-hero h1 {
+  font-size: 42pt;
+  color: #003d2e;
+  text-align: center;
+  margin: 0.2em 0;
+}
+
+.contact-lines {
+  margin-top: 0.8em;
+  font-size: 13pt;
+  color: #2a4d3e;
+  line-height: 2;
+}
+
+.contact-lines p { margin: 0.2em 0; text-align: center; }
+
+.demo-box {
+  margin: 1em auto;
+  max-width: 60%;
+  padding: 1em 1.5em;
+  background: linear-gradient(135deg, #003d2e, #00a884);
+  color: white;
+  border-radius: 12px;
+}
+
+.demo-box h3 { color: white; margin: 0 0 0.3em 0; font-size: 14pt; }
+
+.demo-link {
+  font-family: 'JetBrains Mono', monospace;
+  direction: ltr;
+  font-size: 18pt;
+  font-weight: 800;
+  color: #c8ffe5;
+  margin: 0.4em 0;
+}
+
+.demo-box strong { color: #c8ffe5; }
+
+.footer-note {
+  margin-top: 1.5em;
+  color: #8a9cb8;
+  font-size: 10pt;
+  font-style: italic;
+}
+
+/* ────────────────────────────────────────────────────────────
+   APPENDIX SLIDES
+   ──────────────────────────────────────────────────────────── */
+.slide.appendix h2 {
+  color: #8b5cf6;
+  font-size: 12pt;
+}
+
+.slide.appendix h3 {
+  color: #003d2e;
+}
+
+.moat-list { margin: 0.6em 0; }
+
+.moat-item {
+  display: grid;
+  grid-template-columns: 50px 1fr;
+  gap: 14px;
+  padding: 10px;
+  border-radius: 10px;
+  margin: 6px 0;
+  background: #f4faf8;
+  border-right: 3px solid #8b5cf6;
+  align-items: start;
+}
+
+.moat-num {
+  width: 38px;
+  height: 38px;
+  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15pt;
+  font-weight: 900;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.moat-body {
+  font-size: 11.5pt;
+  color: #2a4d3e;
+  line-height: 1.5;
+}
+
+.moat-body strong { color: #003d2e; }
+
+.comparison { font-size: 11pt; }
+.comparison th { background: linear-gradient(135deg, #8b5cf6, #6366f1); }
+.comparison td.win {
+  background: #e8f5f0 !important;
+  color: #003d2e;
+  font-weight: 700;
+}
+.comparison tr:nth-child(even) td.win { background: #d0ebe0 !important; }
+
+.insight {
+  margin-top: 0.8em;
+  padding: 0.8em 1em;
+  background: linear-gradient(135deg, #fff9e8, #fff5d4);
+  border-right: 4px solid #f59e0b;
+  border-radius: 8px;
+  font-size: 12pt;
+  color: #b45309;
+}
+
+.insight strong { color: #7c3f00; }
+
+/* ────────────────────────────────────────────────────────────
+   PRINT rules
+   ──────────────────────────────────────────────────────────── */
+@media print {
+  .slide { page-break-before: always; page-break-inside: avoid; }
+  .slide:first-of-type { page-break-before: avoid; }
+  table, blockquote, pre { page-break-inside: avoid; }
+  .stat-grid, .pillars, .trends, .roadmap, .business-stages, .econ-grid { page-break-inside: avoid; }
+}

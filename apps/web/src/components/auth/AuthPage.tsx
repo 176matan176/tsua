@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
@@ -16,6 +16,7 @@ interface AuthPageProps {
 export function AuthPage({ mode }: AuthPageProps) {
   const locale = useLocale();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
 
   const [email, setEmail] = useState('');
@@ -25,6 +26,24 @@ export function AuthPage({ mode }: AuthPageProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [referrerName, setReferrerName] = useState<string | null>(null);
+
+  // Capture ?ref=<code> for signup — store in sessionStorage so it survives email confirm
+  useEffect(() => {
+    if (mode !== 'signup') return;
+    const ref = searchParams?.get('ref');
+    if (ref) {
+      try { sessionStorage.setItem('tsua_ref', ref.trim().toLowerCase()); } catch {}
+    }
+    // Try to show who invited
+    const stored = (() => { try { return sessionStorage.getItem('tsua_ref'); } catch { return null; } })();
+    if (stored) {
+      fetch(`/api/profile/by-code?code=${encodeURIComponent(stored)}`)
+        .then(r => r.ok ? r.json() : null)
+        .then(d => { if (d?.username) setReferrerName(d.username); })
+        .catch(() => {});
+    }
+  }, [mode, searchParams]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -57,6 +76,19 @@ export function AuthPage({ mode }: AuthPageProps) {
           options: { data: { username, display_name: username } },
         });
         if (error) throw error;
+
+        // Redeem referral code (if any) once session is available
+        let refCode: string | null = null;
+        try { refCode = sessionStorage.getItem('tsua_ref'); } catch {}
+        if (refCode && data.session) {
+          fetch('/api/referral', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: refCode }),
+          }).catch(() => {});
+          try { sessionStorage.removeItem('tsua_ref'); } catch {}
+        }
+
         // If session is returned immediately (email confirmation disabled), redirect now
         if (data.session) {
           router.push('/');
@@ -135,6 +167,21 @@ export function AuthPage({ mode }: AuthPageProps) {
           }}
         >
           <form onSubmit={handleSubmit} className="space-y-4">
+
+            {/* Referral banner */}
+            {mode === 'signup' && referrerName && (
+              <div
+                className="rounded-xl px-3 py-2.5 text-[12px] flex items-center gap-2"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(0,229,176,0.08), rgba(59,130,246,0.05))',
+                  border: '1px solid rgba(0,229,176,0.25)',
+                  color: '#b3c2d6',
+                }}
+              >
+                <span style={{ fontSize: '18px' }}>🎁</span>
+                <span>הוזמנת על ידי <strong style={{ color: '#00e5b0' }}>@{referrerName}</strong> — נהנה מברכת פנים חמה!</span>
+              </div>
+            )}
 
             {/* Username — signup only */}
             {mode === 'signup' && (

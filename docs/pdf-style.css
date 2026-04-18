@@ -1,0 +1,240 @@
+/* Hebrew-first PDF stylesheet for Tsua docs */
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+html, body {
+  direction: rtl;
+  text-align: right;
+  font-family: 'Heebo', 'Arial Hebrew', sans-serif;
+  font-size: 11pt;
+  line-height: 1.65;
+  color: #1a2238;
+  background: #ffffff;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page-break { page-break-after: always; }
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  direction: rtl;
+  text-align: right;
+  color: #0a1a2e;
+  font-weight: 800;
+  line-height: 1.25;
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  page-break-after: avoid;
+}
+
+h1 {
+  font-size: 28pt;
+  font-weight: 900;
+  color: #003d2e;
+  border-bottom: 3px solid #00a884;
+  padding-bottom: 0.3em;
+  margin-top: 0.5em;
+  page-break-before: always;
+}
+
+h1:first-of-type {
+  page-break-before: avoid;
+}
+
+h2 {
+  font-size: 20pt;
+  color: #00a884;
+  border-bottom: 1px solid #d0e5dd;
+  padding-bottom: 0.2em;
+  margin-top: 2em;
+}
+
+h3 {
+  font-size: 15pt;
+  color: #004d3a;
+}
+
+h4 {
+  font-size: 13pt;
+  color: #1a2238;
+}
+
+/* Paragraphs */
+p {
+  margin: 0.6em 0;
+  text-align: right;
+  orphans: 3;
+  widows: 3;
+}
+
+/* Lists */
+ul, ol {
+  padding-right: 1.8em;
+  padding-left: 0;
+  margin: 0.6em 0;
+}
+
+li {
+  margin: 0.25em 0;
+  text-align: right;
+}
+
+li > ul, li > ol {
+  margin: 0.2em 0;
+}
+
+/* Links */
+a {
+  color: #006b52;
+  text-decoration: none;
+  border-bottom: 1px dotted #00a884;
+}
+
+/* Code */
+code {
+  font-family: 'JetBrains Mono', 'Menlo', monospace;
+  background: #f4f7f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.88em;
+  color: #0a3d2e;
+  direction: ltr;
+  unicode-bidi: embed;
+}
+
+pre {
+  background: #0a1a2e;
+  color: #c8ffe5;
+  padding: 14px 18px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: 'JetBrains Mono', 'Menlo', monospace;
+  font-size: 9.5pt;
+  line-height: 1.5;
+  direction: ltr;
+  text-align: left;
+  unicode-bidi: embed;
+  page-break-inside: avoid;
+}
+
+pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  direction: ltr;
+  font-size: inherit;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+  font-size: 10pt;
+  page-break-inside: avoid;
+  direction: rtl;
+}
+
+th, td {
+  border: 1px solid #d0dae5;
+  padding: 8px 10px;
+  text-align: right;
+  vertical-align: top;
+}
+
+th {
+  background: #e8f5f0;
+  color: #003d2e;
+  font-weight: 700;
+  font-size: 10pt;
+}
+
+tr:nth-child(even) {
+  background: #f8fafb;
+}
+
+tr:hover {
+  background: #f0f5f2;
+}
+
+/* Blockquote */
+blockquote {
+  border-right: 4px solid #00a884;
+  border-left: none;
+  padding: 0.5em 1em 0.5em 1em;
+  margin: 1em 0;
+  background: #f4f9f7;
+  color: #1a4d3e;
+  font-style: italic;
+  border-radius: 4px;
+  page-break-inside: avoid;
+}
+
+blockquote p {
+  margin: 0.3em 0;
+}
+
+/* Horizontal rule — use as section divider */
+hr {
+  border: none;
+  border-top: 2px dashed #c0dace;
+  margin: 2.5em 0;
+  page-break-after: always;
+}
+
+/* Images */
+img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  margin: 0.8em 0;
+}
+
+/* Strong / em */
+strong, b {
+  font-weight: 800;
+  color: #003d2e;
+}
+
+em, i {
+  font-style: italic;
+  color: #2a4d3e;
+}
+
+/* LTR helpers for mixed content */
+.ltr, [dir="ltr"] {
+  direction: ltr !important;
+  unicode-bidi: embed;
+  display: inline-block;
+}
+
+/* Numbers & tickers inside Hebrew text */
+kbd {
+  direction: ltr;
+  unicode-bidi: embed;
+  font-family: 'JetBrains Mono', monospace;
+  background: #e8f5f0;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+/* Print-specific */
+@media print {
+  h1 { page-break-before: always; }
+  h1:first-of-type { page-break-before: avoid; }
+  h2, h3 { page-break-after: avoid; }
+  table, pre, blockquote { page-break-inside: avoid; }
+  p, li { orphans: 3; widows: 3; }
+}
+
+/* Page setup */
+@page {
+  size: A4;
+  margin: 22mm 20mm 22mm 20mm;
+}
+
+@page :first {
+  margin-top: 30mm;
+}

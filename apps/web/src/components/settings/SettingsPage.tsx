@@ -17,6 +17,7 @@ import {
   EyeSlashIcon,
   UserCircleIcon,
 } from '@heroicons/react/24/outline';
+import { ReferralsCard } from '@/components/referrals/ReferralsCard';
 
 function createSupabase() {
   return createBrowserClient(
@@ -180,6 +181,9 @@ export function SettingsPage() {
               פרופיל
             </Link>
           </div>
+
+          {/* Referrals card */}
+          <ReferralsCard />
 
           {/* Settings menu items */}
           <div

@@ -111,6 +111,13 @@ self.addEventListener('push', (event) => {
   event.waitUntil(self.registration.showNotification(title, options));
 });
 
+// Browser rotated subscription — re-register silently
+self.addEventListener('pushsubscriptionchange', (event) => {
+  event.waitUntil(
+    fetch('/api/push/resubscribe', { method: 'POST', credentials: 'include' }).catch(() => {})
+  );
+});
+
 // Notification click — open the app
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
