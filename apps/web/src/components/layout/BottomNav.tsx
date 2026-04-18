@@ -14,12 +14,9 @@ import {
   NewspaperIcon as NewspaperIconSolid,
   TrophyIcon as TrophyIconSolid,
 } from '@heroicons/react/24/solid';
-import { ThemeToggleIcon } from './ThemeToggle';
 import { MobileComposeSheet } from '@/components/feed/MobileComposeSheet';
-import { MobileRightDrawer } from './MobileRightDrawer';
-import { ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
-import { ArrowTrendingUpIcon as ArrowTrendingUpIconSolid } from '@heroicons/react/24/solid';
 
+// Exactly 4 most-important destinations — 2 on each side of the central compose button.
 const LEFT_ITEMS = [
   { key: 'feed',    icon: HomeIcon,     iconActive: HomeIconSolid,     href: '',         label: 'פיד' },
   { key: 'markets', icon: ChartBarIcon, iconActive: ChartBarIconSolid, href: '/markets', label: 'שווקים' },
@@ -41,12 +38,12 @@ function NavItem({ navKey, icon: Icon, iconActive: IconActive, href, locale, pat
   return (
     <Link
       href={fullHref}
-      className="relative flex flex-col items-center justify-center gap-1 px-5 py-1 transition-all duration-200 active:scale-90"
+      className="relative flex flex-col items-center justify-center gap-1 flex-1 py-1 transition-all duration-200 active:scale-90"
     >
       {isActive && (
         <span
           className="absolute inset-0 rounded-2xl"
-          style={{ background: 'radial-gradient(ellipse at center, rgba(0,229,176,0.1) 0%, transparent 70%)' }}
+          style={{ background: 'radial-gradient(ellipse at center, rgba(0,229,176,0.12) 0%, transparent 70%)' }}
         />
       )}
       {isActive && (
@@ -82,7 +79,6 @@ export function BottomNav() {
   const locale = useLocale();
   const pathname = usePathname();
   const [composeOpen, setComposeOpen] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false);
 
   return (
     <>
@@ -100,7 +96,7 @@ export function BottomNav() {
         }}
       >
         <div
-          className="flex items-center justify-around px-1 pt-1.5"
+          className="flex items-center justify-around px-2 pt-1.5 gap-1"
           style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}
         >
           {LEFT_ITEMS.map(item => (
@@ -119,17 +115,18 @@ export function BottomNav() {
           {/* Center compose button — opens sheet */}
           <button
             onClick={() => setComposeOpen(true)}
-            className="flex flex-col items-center gap-1 -mt-5 transition-transform duration-150 active:scale-90"
+            className="flex flex-col items-center gap-1 -mt-5 transition-transform duration-150 active:scale-90 shrink-0"
+            aria-label="פרסם"
           >
             <div
-              className="w-[52px] h-[52px] rounded-2xl flex items-center justify-center"
+              className="w-[56px] h-[56px] rounded-2xl flex items-center justify-center"
               style={{
                 background: 'linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%)',
-                boxShadow: '0 0 24px rgba(0,229,176,0.4), 0 6px 16px rgba(0,0,0,0.4)',
-                border: '1.5px solid rgba(0,229,176,0.35)',
+                boxShadow: '0 0 28px rgba(0,229,176,0.5), 0 8px 20px rgba(0,0,0,0.45)',
+                border: '1.5px solid rgba(0,229,176,0.4)',
               }}
             >
-              <PlusIcon className="w-6 h-6" style={{ color: 'var(--accent-contrast)', strokeWidth: 3 }} />
+              <PlusIcon className="w-7 h-7" style={{ color: 'var(--accent-contrast)', strokeWidth: 3 }} />
             </div>
             <span
               className="text-[10px] font-black"
@@ -151,37 +148,6 @@ export function BottomNav() {
               label={item.label}
             />
           ))}
-
-          {/* Trending drawer trigger */}
-          <button
-            onClick={() => setDrawerOpen(true)}
-            className="relative flex flex-col items-center justify-center gap-1 px-5 py-1 transition-all duration-200 active:scale-90"
-          >
-            {drawerOpen && (
-              <span
-                className="absolute inset-0 rounded-2xl"
-                style={{ background: 'radial-gradient(ellipse at center, rgba(0,229,176,0.1) 0%, transparent 70%)' }}
-              />
-            )}
-            {drawerOpen && (
-              <span
-                className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-[2px] rounded-full"
-                style={{ background: 'linear-gradient(90deg, transparent, var(--accent), transparent)' }}
-              />
-            )}
-            {drawerOpen
-              ? <ArrowTrendingUpIconSolid className="w-6 h-6 relative" style={{ color: 'var(--accent)', filter: 'drop-shadow(0 0 8px rgba(0,229,176,0.6))' }} />
-              : <ArrowTrendingUpIcon     className="w-6 h-6 relative" style={{ color: 'var(--muted)' }} />
-            }
-            <span
-              className="text-[10px] font-semibold relative"
-              style={{ color: drawerOpen ? 'var(--accent)' : 'var(--muted)', letterSpacing: '0.01em' }}
-            >
-              טרנד
-            </span>
-          </button>
-
-          <ThemeToggleIcon />
         </div>
       </nav>
 
@@ -189,12 +155,6 @@ export function BottomNav() {
       <MobileComposeSheet
         isOpen={composeOpen}
         onClose={() => setComposeOpen(false)}
-      />
-
-      {/* Mobile right drawer */}
-      <MobileRightDrawer
-        isOpen={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
       />
     </>
   );

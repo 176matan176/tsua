@@ -4,9 +4,10 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { MagnifyingGlassIcon, UserCircleIcon, ChevronDownIcon, XMarkIcon, BookmarkIcon, BellIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon, UserCircleIcon, ChevronDownIcon, XMarkIcon, BookmarkIcon, BellIcon, Cog6ToothIcon, Bars3Icon } from '@heroicons/react/24/outline';
 import { NotificationsDropdown } from './NotificationsDropdown';
 import { ThemeToggle } from './ThemeToggle';
+import { MobileNavDrawer } from './MobileNavDrawer';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface StockResult {
@@ -42,6 +43,7 @@ export function Navbar() {
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const menuRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
@@ -323,24 +325,42 @@ export function Navbar() {
           {/* Mobile search button */}
           <button
             onClick={() => { setMobileSearchOpen(true); setTimeout(() => mobileInputRef.current?.focus(), 50); }}
-            className="sm:hidden p-2 rounded-xl text-tsua-muted hover:text-tsua-text transition-colors hover:bg-tsua-card"
+            className="md:hidden p-2 rounded-xl text-tsua-muted hover:text-tsua-text transition-colors hover:bg-tsua-card"
+            aria-label="חפש"
           >
             <MagnifyingGlassIcon className="w-5 h-5" />
           </button>
 
-          {/* Right side */}
-          <div className="flex items-center gap-1.5 shrink-0">
-
-            {/* Theme toggle — desktop only (mobile uses BottomNav) */}
-            <div className="hidden md:block">
-              <ThemeToggle />
+          {/* Mobile notifications bell (compact) */}
+          {user && (
+            <div className="md:hidden">
+              <NotificationsDropdown userId={user.id} />
             </div>
+          )}
+
+          {/* Mobile hamburger — opens full-nav drawer */}
+          <button
+            onClick={() => setMobileMenuOpen(true)}
+            className="md:hidden relative p-2 rounded-xl transition-all active:scale-90"
+            style={{
+              color: 'var(--text, #e8f4ff)',
+              background: 'rgba(0,229,176,0.06)',
+              border: '1px solid rgba(0,229,176,0.2)',
+            }}
+            aria-label="תפריט"
+          >
+            <Bars3Icon className="w-5 h-5" />
+          </button>
+
+          {/* Right side (desktop only) */}
+          <div className="hidden md:flex items-center gap-1.5 shrink-0">
+
+            {/* Theme toggle — desktop only (mobile uses drawer) */}
+            <ThemeToggle />
 
             {/* Notifications */}
             {user && (
-              <div className="hidden md:block">
-                <NotificationsDropdown userId={user.id} />
-              </div>
+              <NotificationsDropdown userId={user.id} />
             )}
 
             {/* Auth area */}
@@ -475,6 +495,12 @@ export function Navbar() {
           </div>
         </div>
       </nav>
+
+      {/* Mobile navigation drawer */}
+      <MobileNavDrawer
+        isOpen={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+      />
 
       {/* Mobile full-screen search overlay */}
       {mobileSearchOpen && (
