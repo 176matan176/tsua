@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import {
   XMarkIcon,
@@ -14,10 +14,15 @@ import {
   BookmarkIcon,
   UserCircleIcon,
   Cog6ToothIcon,
-  ArrowRightOnRectangleIcon,
   ArrowLeftOnRectangleIcon,
-  SparklesIcon,
+  UsersIcon,
   BriefcaseIcon,
+  DocumentTextIcon,
+  FireIcon,
+  Squares2X2Icon,
+  CurrencyDollarIcon,
+  ScaleIcon,
+  CalendarDaysIcon,
   MegaphoneIcon,
 } from '@heroicons/react/24/outline';
 import { useAuth } from '@/contexts/AuthContext';
@@ -28,9 +33,73 @@ interface Props {
   onClose: () => void;
 }
 
+interface NavLinkProps {
+  href: string;
+  icon: any;
+  label: string;
+  locale: string;
+  pathname: string;
+  onClose: () => void;
+  badge?: string;
+}
+
+function NavLink({ href, icon: Icon, label, locale, pathname, onClose, badge }: NavLinkProps) {
+  const fullHref = `/${locale}${href}`;
+  const isActive = href === ''
+    ? pathname === `/${locale}` || pathname === `/${locale}/`
+    : pathname.startsWith(fullHref);
+
+  return (
+    <Link
+      href={fullHref}
+      onClick={onClose}
+      className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all active:scale-[0.98]"
+      style={isActive
+        ? {
+            background: 'rgba(0,229,176,0.1)',
+            border: '1px solid rgba(0,229,176,0.22)',
+            color: 'var(--text, #e8f4ff)',
+          }
+        : { color: 'var(--text, #e8f4ff)' }
+      }
+    >
+      <div
+        className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+        style={{
+          background: isActive ? 'rgba(0,229,176,0.2)' : 'var(--surface2, rgba(15,25,41,0.5))',
+          border: isActive ? '1px solid rgba(0,229,176,0.35)' : '1px solid var(--border, rgba(26,40,64,0.6))',
+          boxShadow: isActive ? '0 0 10px rgba(0,229,176,0.15)' : 'none',
+        }}
+      >
+        <Icon style={{ color: isActive ? '#00e5b0' : 'var(--accent, #00e5b0)', width: 18, height: 18 }} />
+      </div>
+      <span
+        className="text-sm flex-1 truncate"
+        style={{ fontWeight: isActive ? 800 : 600 }}
+      >
+        {label}
+      </span>
+      {badge && (
+        <span
+          className="text-[10px] font-black px-1.5 py-0.5 rounded-md shrink-0"
+          style={{
+            background: 'rgba(0,229,176,0.15)',
+            color: '#00e5b0',
+            border: '1px solid rgba(0,229,176,0.3)',
+          }}
+        >
+          {badge}
+        </span>
+      )}
+      <span style={{ color: 'var(--muted, #5a7090)' }} className="text-xs opacity-50">←</span>
+    </Link>
+  );
+}
+
 export function MobileNavDrawer({ isOpen, onClose }: Props) {
   const locale = useLocale();
   const router = useRouter();
+  const pathname = usePathname();
   const { user, signOut, loading } = useAuth();
 
   useEffect(() => {
@@ -53,20 +122,33 @@ export function MobileNavDrawer({ isOpen, onClose }: Props) {
 
   const close = () => onClose();
 
+  // Main navigation — main public destinations
   const mainLinks = [
-    { href: '',             icon: HomeIcon,       label: 'פיד' },
-    { href: '/markets',     icon: ChartBarIcon,   label: 'שווקים' },
-    { href: '/news',        icon: NewspaperIcon,  label: 'חדשות' },
-    { href: '/leaderboard', icon: TrophyIcon,     label: 'דירוג' },
-    { href: '/live',        icon: MegaphoneIcon,  label: 'פיד חי' },
+    { href: '',             icon: HomeIcon,      label: 'פיד' },
+    { href: '/markets',     icon: ChartBarIcon,  label: 'שווקים' },
+    { href: '/news',        icon: NewspaperIcon, label: 'חדשות' },
+    { href: '/leaderboard', icon: TrophyIcon,    label: 'לידרבורד' },
+    { href: '/rooms',       icon: UsersIcon,     label: 'חדרים' },
+    { href: '/live',        icon: MegaphoneIcon, label: 'פיד חי' },
   ];
 
+  // Discovery — market exploration
+  const discoveryLinks = [
+    { href: '/sectors',  icon: Squares2X2Icon,     label: 'מגזרים' },
+    { href: '/crypto',   icon: CurrencyDollarIcon, label: 'קריפטו' },
+    { href: '/hot',      icon: FireIcon,           label: 'חמות', badge: '🔥' },
+    { href: '/compare',  icon: ScaleIcon,          label: 'השוואה' },
+    { href: '/earnings', icon: CalendarDaysIcon,   label: 'דוחות כספיים' },
+  ];
+
+  // Personal (only shown for logged in user)
   const personalLinks = user ? [
-    { href: `/profile/${displayName}`, icon: UserCircleIcon, label: 'הפרופיל שלי' },
-    { href: '/alerts',                 icon: BellIcon,       label: 'התראות' },
-    { href: '/portfolio',              icon: BriefcaseIcon,  label: 'התיק שלי' },
-    { href: '/watchlist',              icon: BookmarkIcon,   label: 'רשימת מעקב' },
-    { href: '/bookmarks',              icon: SparklesIcon,   label: 'סימניות' },
+    { href: `/profile/${displayName}`, icon: UserCircleIcon,    label: 'הפרופיל שלי' },
+    { href: '/alerts',                 icon: BellIcon,          label: 'התראות' },
+    { href: '/portfolio',              icon: BriefcaseIcon,     label: 'תיק השקעות' },
+    { href: '/watchlist',              icon: BookmarkIcon,      label: 'רשימת מעקב' },
+    { href: '/bookmarks',              icon: BookmarkIcon,      label: 'שמורים' },
+    { href: '/reports',                icon: DocumentTextIcon,  label: 'דוחות' },
   ] : [];
 
   async function handleLogout() {
@@ -90,21 +172,20 @@ export function MobileNavDrawer({ isOpen, onClose }: Props) {
         onClick={close}
       />
 
-      {/* Drawer — slides in from the end side (left in RTL) */}
+      {/* Drawer — slides in from the start side (right in RTL) */}
       <div
-        className="fixed top-0 bottom-0 z-[91] w-[85vw] max-w-[340px] flex flex-col overflow-hidden md:hidden"
+        className="fixed top-0 bottom-0 z-[91] w-[88vw] max-w-[360px] flex flex-col overflow-hidden md:hidden"
         style={{
-          // In RTL, "start" is right; end is left. We want drawer on the opposite
-          // side of the hamburger (hamburger is end → drawer comes from end).
-          insetInlineEnd: 0,
+          // Hamburger is on the START (right in RTL) → drawer comes from the same side
+          insetInlineStart: 0,
           background: 'var(--card, rgba(8,14,26,0.99))',
-          borderInlineStart: '1px solid var(--border, rgba(26,40,64,0.6))',
-          boxShadow: '-16px 0 48px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.02)',
-          animation: 'slideInEnd 0.28s cubic-bezier(0.32,0.72,0,1)',
+          borderInlineEnd: '1px solid var(--border, rgba(26,40,64,0.6))',
+          boxShadow: '16px 0 48px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.02)',
+          animation: 'slideInStart 0.28s cubic-bezier(0.32,0.72,0,1)',
         }}
         dir="rtl"
       >
-        {/* User card / Auth CTA */}
+        {/* Header with logo + close */}
         <div
           className="shrink-0 px-4 py-4"
           style={{ borderBottom: '1px solid var(--border2, rgba(26,40,64,0.6))' }}
@@ -222,32 +303,44 @@ export function MobileNavDrawer({ isOpen, onClose }: Props) {
               className="px-3 pb-1.5 text-[10px] font-black tracking-widest uppercase"
               style={{ color: 'var(--muted, #5a7090)' }}
             >
-              ניווט
+              ראשי
             </div>
-            {mainLinks.map(link => {
-              const Icon = link.icon;
-              return (
-                <Link
-                  key={link.href}
-                  href={`/${locale}${link.href}`}
-                  onClick={close}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all active:scale-[0.98]"
-                  style={{ color: 'var(--text, #e8f4ff)' }}
-                >
-                  <div
-                    className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                    style={{
-                      background: 'var(--surface2, rgba(15,25,41,0.5))',
-                      border: '1px solid var(--border, rgba(26,40,64,0.6))',
-                    }}
-                  >
-                    <Icon className="w-4.5 h-4.5" style={{ color: 'var(--accent, #00e5b0)', width: 18, height: 18 }} />
-                  </div>
-                  <span className="text-sm font-semibold flex-1">{link.label}</span>
-                  <span style={{ color: 'var(--muted, #5a7090)' }} className="text-xs opacity-60">←</span>
-                </Link>
-              );
-            })}
+            {mainLinks.map(link => (
+              <NavLink
+                key={link.href}
+                href={link.href}
+                icon={link.icon}
+                label={link.label}
+                locale={locale}
+                pathname={pathname}
+                onClose={close}
+              />
+            ))}
+          </div>
+
+          {/* Discovery */}
+          <div
+            className="px-2 pt-3 pb-1 mt-2"
+            style={{ borderTop: '1px solid var(--border2, rgba(26,40,64,0.5))' }}
+          >
+            <div
+              className="px-3 pb-1.5 pt-2 text-[10px] font-black tracking-widest uppercase"
+              style={{ color: 'var(--muted, #5a7090)' }}
+            >
+              גלה שוק
+            </div>
+            {discoveryLinks.map(link => (
+              <NavLink
+                key={link.href}
+                href={link.href}
+                icon={link.icon}
+                label={link.label}
+                locale={locale}
+                pathname={pathname}
+                onClose={close}
+                badge={(link as any).badge}
+              />
+            ))}
           </div>
 
           {/* Personal section */}
@@ -262,34 +355,21 @@ export function MobileNavDrawer({ isOpen, onClose }: Props) {
               >
                 שלי
               </div>
-              {personalLinks.map(link => {
-                const Icon = link.icon;
-                return (
-                  <Link
-                    key={link.href}
-                    href={`/${locale}${link.href}`}
-                    onClick={close}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all active:scale-[0.98]"
-                    style={{ color: 'var(--text, #e8f4ff)' }}
-                  >
-                    <div
-                      className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                      style={{
-                        background: 'var(--surface2, rgba(15,25,41,0.5))',
-                        border: '1px solid var(--border, rgba(26,40,64,0.6))',
-                      }}
-                    >
-                      <Icon style={{ color: 'var(--accent, #00e5b0)', width: 18, height: 18 }} />
-                    </div>
-                    <span className="text-sm font-semibold flex-1">{link.label}</span>
-                    <span style={{ color: 'var(--muted, #5a7090)' }} className="text-xs opacity-60">←</span>
-                  </Link>
-                );
-              })}
+              {personalLinks.map(link => (
+                <NavLink
+                  key={link.href}
+                  href={link.href}
+                  icon={link.icon}
+                  label={link.label}
+                  locale={locale}
+                  pathname={pathname}
+                  onClose={close}
+                />
+              ))}
             </div>
           )}
 
-          {/* Settings + theme + logout */}
+          {/* Tools — theme + settings + logout */}
           <div
             className="px-2 pt-3 pb-2 mt-2"
             style={{ borderTop: '1px solid var(--border2, rgba(26,40,64,0.5))' }}
@@ -322,24 +402,14 @@ export function MobileNavDrawer({ isOpen, onClose }: Props) {
             </div>
 
             {user && (
-              <Link
-                href={`/${locale}/settings`}
-                onClick={close}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all active:scale-[0.98]"
-                style={{ color: 'var(--text, #e8f4ff)' }}
-              >
-                <div
-                  className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                  style={{
-                    background: 'var(--surface2, rgba(15,25,41,0.5))',
-                    border: '1px solid var(--border, rgba(26,40,64,0.6))',
-                  }}
-                >
-                  <Cog6ToothIcon style={{ color: 'var(--accent, #00e5b0)', width: 18, height: 18 }} />
-                </div>
-                <span className="text-sm font-semibold flex-1">הגדרות</span>
-                <span style={{ color: 'var(--muted, #5a7090)' }} className="text-xs opacity-60">←</span>
-              </Link>
+              <NavLink
+                href="/settings"
+                icon={Cog6ToothIcon}
+                label="הגדרות"
+                locale={locale}
+                pathname={pathname}
+                onClose={close}
+              />
             )}
 
             {user && (
@@ -361,14 +431,44 @@ export function MobileNavDrawer({ isOpen, onClose }: Props) {
               </button>
             )}
           </div>
+
+          {/* Footer */}
+          <div
+            className="px-4 pt-4 pb-2 mt-2 flex flex-wrap gap-x-3 gap-y-1 justify-center"
+            style={{ borderTop: '1px solid var(--border2, rgba(26,40,64,0.5))' }}
+          >
+            <Link
+              href={`/${locale}/terms`}
+              onClick={close}
+              className="text-[10px] transition-colors"
+              style={{ color: 'var(--muted, rgba(90,112,144,0.7))', fontFamily: 'monospace' }}
+            >
+              תנאי שימוש
+            </Link>
+            <Link
+              href={`/${locale}/privacy`}
+              onClick={close}
+              className="text-[10px] transition-colors"
+              style={{ color: 'var(--muted, rgba(90,112,144,0.7))', fontFamily: 'monospace' }}
+            >
+              פרטיות
+            </Link>
+            <a
+              href="mailto:support@tsua.co"
+              className="text-[10px] transition-colors"
+              style={{ color: 'var(--muted, rgba(90,112,144,0.7))', fontFamily: 'monospace' }}
+            >
+              צור קשר
+            </a>
+          </div>
         </div>
       </div>
 
       {/* Keyframes */}
       <style jsx>{`
-        @keyframes slideInEnd {
-          from { transform: translateX(-100%); opacity: 0.6; }
-          to   { transform: translateX(0);     opacity: 1; }
+        @keyframes slideInStart {
+          from { transform: translateX(100%); opacity: 0.6; }
+          to   { transform: translateX(0);    opacity: 1; }
         }
         @keyframes fadeIn {
           from { opacity: 0; }

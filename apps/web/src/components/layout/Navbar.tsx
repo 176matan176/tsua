@@ -261,7 +261,71 @@ export function Navbar() {
           boxShadow: '0 1px 0 rgba(0,229,176,0.03), 0 4px 24px rgba(0,0,0,0.35)',
         }}
       >
-        <div className="max-w-7xl mx-auto px-3 md:px-5 h-14 flex items-center gap-3">
+        {/* ─────────────── MOBILE HEADER ─────────────── */}
+        <div className="md:hidden max-w-7xl mx-auto px-3 h-14 flex items-center gap-2">
+
+          {/* Hamburger — right side (RTL start) */}
+          <button
+            onClick={() => setMobileMenuOpen(true)}
+            className="relative p-2 rounded-xl transition-all active:scale-90 shrink-0"
+            style={{
+              color: 'var(--text, #e8f4ff)',
+              background: 'rgba(0,229,176,0.06)',
+              border: '1px solid rgba(0,229,176,0.22)',
+            }}
+            aria-label="תפריט"
+          >
+            <Bars3Icon className="w-5 h-5" />
+          </button>
+
+          {/* Search button */}
+          <button
+            onClick={() => { setMobileSearchOpen(true); setTimeout(() => mobileInputRef.current?.focus(), 50); }}
+            className="p-2 rounded-xl text-tsua-muted hover:text-tsua-text transition-colors hover:bg-tsua-card shrink-0"
+            aria-label="חפש"
+          >
+            <MagnifyingGlassIcon className="w-5 h-5" />
+          </button>
+
+          {/* Notifications bell */}
+          {user && (
+            <div className="shrink-0">
+              <NotificationsDropdown userId={user.id} />
+            </div>
+          )}
+
+          {/* Spacer */}
+          <div className="flex-1" />
+
+          {/* Theme toggle + Logo — left side (RTL end) */}
+          <div className="flex items-center gap-2 shrink-0">
+            <ThemeToggle />
+            <Link href={`/${locale}`} className="flex items-center gap-2 group">
+              <div className="flex flex-col leading-none gap-0.5 items-end">
+                <span style={{ color: 'var(--text, #e8f4ff)', fontWeight: 900, fontSize: '15px', letterSpacing: '-0.02em' }}>תשואה</span>
+                <div className="flex items-center gap-1">
+                  <span
+                    className="w-1 h-1 rounded-full animate-pulse"
+                    style={{ background: '#00e5b0', boxShadow: '0 0 4px rgba(0,229,176,0.8)' }}
+                  />
+                  <span style={{ color: 'rgba(0,229,176,0.7)', fontSize: '8px', fontFamily: 'monospace', letterSpacing: '0.12em' }}>LIVE</span>
+                </div>
+              </div>
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all duration-200 group-hover:scale-105"
+                style={{
+                  background: 'linear-gradient(135deg, #00e5b0 0%, #0090cc 100%)',
+                  boxShadow: '0 0 18px rgba(0,229,176,0.3)',
+                }}
+              >
+                <span style={{ color: '#03120d', fontWeight: 900, fontSize: '15px', fontFamily: 'Heebo, Arial, sans-serif' }}>ת</span>
+              </div>
+            </Link>
+          </div>
+        </div>
+
+        {/* ─────────────── DESKTOP HEADER ─────────────── */}
+        <div className="hidden md:flex max-w-7xl mx-auto px-5 h-14 items-center gap-3">
 
           {/* Logo */}
           <Link href={`/${locale}`} className="flex items-center gap-2.5 shrink-0 group">
@@ -274,7 +338,7 @@ export function Navbar() {
             >
               <span style={{ color: '#03120d', fontWeight: 900, fontSize: '15px', fontFamily: 'Heebo, Arial, sans-serif' }}>ת</span>
             </div>
-            <div className="hidden sm:flex flex-col leading-none gap-0.5">
+            <div className="flex flex-col leading-none gap-0.5">
               <span style={{ color: '#e8f4ff', fontWeight: 900, fontSize: '15px', letterSpacing: '-0.02em' }}>תשואה</span>
               <div className="flex items-center gap-1">
                 <span
@@ -287,7 +351,7 @@ export function Navbar() {
           </Link>
 
           {/* Desktop Search */}
-          <div className="flex-1 max-w-sm hidden sm:block" ref={searchRef}>
+          <div className="flex-1 max-w-sm" ref={searchRef}>
             <div className="relative">
               <MagnifyingGlassIcon className="absolute start-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 pointer-events-none z-10" style={{ color: 'rgba(90,112,144,0.6)' }} />
               <input
@@ -320,40 +384,8 @@ export function Navbar() {
             </div>
           </div>
 
-          <div className="flex-1 sm:hidden" />
-
-          {/* Mobile search button */}
-          <button
-            onClick={() => { setMobileSearchOpen(true); setTimeout(() => mobileInputRef.current?.focus(), 50); }}
-            className="md:hidden p-2 rounded-xl text-tsua-muted hover:text-tsua-text transition-colors hover:bg-tsua-card"
-            aria-label="חפש"
-          >
-            <MagnifyingGlassIcon className="w-5 h-5" />
-          </button>
-
-          {/* Mobile notifications bell (compact) */}
-          {user && (
-            <div className="md:hidden">
-              <NotificationsDropdown userId={user.id} />
-            </div>
-          )}
-
-          {/* Mobile hamburger — opens full-nav drawer */}
-          <button
-            onClick={() => setMobileMenuOpen(true)}
-            className="md:hidden relative p-2 rounded-xl transition-all active:scale-90"
-            style={{
-              color: 'var(--text, #e8f4ff)',
-              background: 'rgba(0,229,176,0.06)',
-              border: '1px solid rgba(0,229,176,0.2)',
-            }}
-            aria-label="תפריט"
-          >
-            <Bars3Icon className="w-5 h-5" />
-          </button>
-
-          {/* Right side (desktop only) */}
-          <div className="hidden md:flex items-center gap-1.5 shrink-0">
+          {/* Right side */}
+          <div className="flex items-center gap-1.5 shrink-0">
 
             {/* Theme toggle — desktop only (mobile uses drawer) */}
             <ThemeToggle />
@@ -382,7 +414,7 @@ export function Navbar() {
                   >
                     {initial}
                   </div>
-                  <span className="text-sm font-semibold text-tsua-text hidden sm:block max-w-[80px] truncate">
+                  <span className="text-sm font-semibold text-tsua-text max-w-[80px] truncate">
                     {displayName}
                   </span>
                   <ChevronDownIcon className={`w-3.5 h-3.5 text-tsua-muted transition-transform duration-200 ${menuOpen ? 'rotate-180' : ''}`} />
@@ -477,7 +509,7 @@ export function Navbar() {
               <div className="flex items-center gap-1.5">
                 <Link
                   href={`/${locale}/login`}
-                  className="text-sm font-semibold px-3 py-1.5 rounded-xl text-tsua-muted hover:text-tsua-text transition-all hidden sm:block"
+                  className="text-sm font-semibold px-3 py-1.5 rounded-xl text-tsua-muted hover:text-tsua-text transition-all"
                   style={{ background: 'rgba(15,25,41,0.5)', border: '1px solid rgba(26,40,64,0.7)' }}
                 >
                   כניסה
@@ -487,8 +519,7 @@ export function Navbar() {
                   className="flex items-center gap-1.5 text-sm font-black px-4 py-1.5 rounded-xl text-tsua-bg transition-all hover:opacity-90 active:scale-95"
                   style={{ background: 'linear-gradient(135deg, #00e5b0, #00c49a)', boxShadow: '0 4px 16px rgba(0,229,176,0.3)' }}
                 >
-                  <span className="hidden sm:inline">הצטרף חינם</span>
-                  <span className="sm:hidden">+</span>
+                  הצטרף חינם
                 </Link>
               </div>
             )}
@@ -505,7 +536,7 @@ export function Navbar() {
       {/* Mobile full-screen search overlay */}
       {mobileSearchOpen && (
         <div
-          className="fixed inset-0 z-[100] sm:hidden flex flex-col"
+          className="fixed inset-0 z-[100] md:hidden flex flex-col"
           style={{ background: 'rgba(6,11,22,0.98)', backdropFilter: 'blur(24px)' }}
         >
           {/* Header */}
