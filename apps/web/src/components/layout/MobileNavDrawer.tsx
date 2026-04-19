@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useLocale } from 'next-intl';
@@ -24,6 +24,7 @@ import {
   ScaleIcon,
   CalendarDaysIcon,
   MegaphoneIcon,
+  ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
 import { useAuth } from '@/contexts/AuthContext';
 import { ThemeToggle } from './ThemeToggle';
@@ -101,6 +102,7 @@ export function MobileNavDrawer({ isOpen, onClose }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const { user, signOut, loading } = useAuth();
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -110,6 +112,18 @@ export function MobileNavDrawer({ isOpen, onClose }: Props) {
     }
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
+
+  // Probe admin status once the user is known — cheap endpoint that
+  // just returns { isAdmin: bool }.
+  useEffect(() => {
+    if (!user) { setIsAdmin(false); return; }
+    let alive = true;
+    fetch('/api/admin/check', { cache: 'no-store' })
+      .then(r => r.json())
+      .then(d => { if (alive) setIsAdmin(!!d?.isAdmin); })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, [user]);
 
   if (!isOpen) return null;
 
@@ -342,6 +356,30 @@ export function MobileNavDrawer({ isOpen, onClose }: Props) {
               />
             ))}
           </div>
+
+          {/* Admin section — hidden unless user is in ADMIN_EMAILS */}
+          {isAdmin && (
+            <div
+              className="px-2 pt-3 pb-1 mt-2"
+              style={{ borderTop: '1px solid var(--border2, rgba(26,40,64,0.5))' }}
+            >
+              <div
+                className="px-3 pb-1.5 pt-2 text-[10px] font-black tracking-widest uppercase flex items-center gap-1.5"
+                style={{ color: '#00e5b0' }}
+              >
+                🛡️ ניהול
+              </div>
+              <NavLink
+                href="/admin"
+                icon={ShieldCheckIcon}
+                label="חדר בקרה"
+                locale={locale}
+                pathname={pathname}
+                onClose={close}
+                badge="ADMIN"
+              />
+            </div>
+          )}
 
           {/* Personal section */}
           {user && personalLinks.length > 0 && (

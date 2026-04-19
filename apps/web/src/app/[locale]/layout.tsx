@@ -12,6 +12,7 @@ import { LiveMarketBar } from '@/components/layout/LiveMarketBar';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { PriceProvider } from '@/contexts/PriceContext';
 import { ServiceWorkerRegister } from '@/components/pwa/ServiceWorkerRegister';
+import { PWAInstallPrompt } from '@/components/pwa/PWAInstallPrompt';
 import { TermsConsent } from '@/components/layout/TermsConsent';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { OnboardingModal } from '@/components/ui/OnboardingModal';
@@ -88,6 +89,7 @@ export default async function RootLayout({ children, params: { locale } }: RootL
           <AuthProvider>
           <PriceProvider>
             <ServiceWorkerRegister />
+            <PWAInstallPrompt />
             <TermsConsent />
             <OnboardingModal />
             <div className="min-h-screen flex flex-col">

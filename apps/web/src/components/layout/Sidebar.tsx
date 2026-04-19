@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -7,7 +8,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import {
   HomeIcon, ChartBarIcon, UsersIcon, BellIcon, NewspaperIcon, DocumentTextIcon, TrophyIcon, BriefcaseIcon,
   BookmarkIcon, Cog6ToothIcon, FireIcon, Squares2X2Icon, CurrencyDollarIcon, ScaleIcon, CalendarDaysIcon,
+  ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
+import { ShieldCheckIcon as ShieldCheckIconSolid } from '@heroicons/react/24/solid';
 import { TrendingWidget } from './TrendingWidget';
 import {
   HomeIcon as HomeIconSolid,
@@ -49,9 +52,21 @@ export function Sidebar() {
   const locale = useLocale();
   const pathname = usePathname();
   const { user } = useAuth();
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const displayName = user?.user_metadata?.username || user?.user_metadata?.display_name || user?.email?.split('@')[0] || '';
   const initial = displayName.charAt(0).toUpperCase();
+
+  // Show admin link only for users whose email is in ADMIN_EMAILS.
+  useEffect(() => {
+    if (!user) { setIsAdmin(false); return; }
+    let alive = true;
+    fetch('/api/admin/check', { cache: 'no-store' })
+      .then(r => r.json())
+      .then(d => { if (alive) setIsAdmin(!!d?.isAdmin); })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, [user]);
 
   return (
     <aside className="hidden md:flex flex-col w-52 shrink-0 gap-0.5 pt-1">
@@ -123,6 +138,39 @@ export function Sidebar() {
           </Link>
         );
       })}
+
+      {/* Admin shortcut — only visible to admins */}
+      {isAdmin && (() => {
+        const adminHref = `/${locale}/admin`;
+        const adminActive = pathname.startsWith(adminHref);
+        const AdminIcon = adminActive ? ShieldCheckIconSolid : ShieldCheckIcon;
+        return (
+          <Link
+            href={adminHref}
+            className="relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 group"
+            style={adminActive
+              ? { background: 'rgba(0,229,176,0.12)', border: '1px solid rgba(0,229,176,0.3)' }
+              : { border: '1px solid rgba(0,229,176,0.08)' }}
+          >
+            <AdminIcon
+              className="w-[18px] h-[18px] shrink-0"
+              style={{ color: '#00e5b0', filter: 'drop-shadow(0 0 5px rgba(0,229,176,0.5))' }}
+            />
+            <span
+              className="text-[13px]"
+              style={{ color: '#00e5b0', fontWeight: 800, letterSpacing: '-0.01em' }}
+            >
+              חדר בקרה
+            </span>
+            <span
+              className="ms-auto text-[9px] font-black px-1.5 py-0.5 rounded"
+              style={{ background: 'rgba(0,229,176,0.15)', color: '#00e5b0', border: '1px solid rgba(0,229,176,0.3)' }}
+            >
+              ADMIN
+            </span>
+          </Link>
+        );
+      })()}
 
       {/* Divider */}
       <div className="my-2 mx-1" style={{ height: '1px', background: 'linear-gradient(90deg, transparent, var(--border), transparent)' }} />
