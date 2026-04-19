@@ -9,6 +9,7 @@ import { BookmarkIcon, BookmarkSlashIcon } from '@heroicons/react/24/outline';
 import { BookmarkIcon as BookmarkSolid } from '@heroicons/react/24/solid';
 import { InfoTooltip } from '@/components/ui/InfoTooltip';
 import { DICTIONARY, type DictEntry } from '@/lib/financialDictionary';
+import { getStockDescription } from '@/lib/stockDescriptions';
 
 export interface StockData {
   ticker: string;
@@ -124,6 +125,7 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
   const flash = livePrice?.flash ?? null;
   const isPositive = changePercent >= 0;
   const currencySymbol = data?.currency === 'ILS' ? '₪' : '$';
+  const description = getStockDescription(ticker);
 
   if (loading || !livePrice) {
     return (
@@ -202,6 +204,19 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
               </span>
             )}
           </div>
+
+          {/* Hebrew one-line company description */}
+          {description && (
+            <p
+              className="mt-2 text-[13px] leading-relaxed max-w-2xl"
+              style={{
+                color: 'var(--muted, #9ab1cc)',
+                fontWeight: 500,
+              }}
+            >
+              {description}
+            </p>
+          )}
 
           {/* Price row */}
           <div className="mt-4 flex items-end gap-3">

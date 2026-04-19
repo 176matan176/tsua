@@ -3,10 +3,10 @@
 import { useLivePrice } from '@/contexts/PriceContext';
 
 const INDICES = [
-  { nameHe: 'S&P 500', nameEn: 'S&P 500', symbol: 'SPY',  flag: '🇺🇸', label: 'SPY' },
-  { nameHe: 'נאסד"ק',  nameEn: 'NASDAQ',  symbol: 'QQQ',  flag: '🇺🇸', label: 'QQQ' },
-  { nameHe: 'טבע',     nameEn: 'TEVA',    symbol: 'TEVA', flag: '🇮🇱', label: 'TEVA' },
-  { nameHe: 'אנבידיה', nameEn: 'NVIDIA',  symbol: 'NVDA', flag: '🇺🇸', label: 'NVDA' },
+  { nameHe: 'S&P 500', nameEn: 'S&P 500', symbol: 'SPY',      flag: '🇺🇸', label: 'SPY' },
+  { nameHe: 'נאסד"ק',  nameEn: 'NASDAQ',  symbol: 'QQQ',      flag: '🇺🇸', label: 'QQQ' },
+  { nameHe: 'ת"א 35',  nameEn: 'TA 35',   symbol: 'EIS',      flag: '🇮🇱', label: 'TA35' },
+  { nameHe: 'ת"א 125', nameEn: 'TA 125',  symbol: 'TA125.TA', flag: '🇮🇱', label: 'TA125' },
 ];
 
 function IndexCard({ nameHe, nameEn, symbol, flag, label }: typeof INDICES[0]) {
