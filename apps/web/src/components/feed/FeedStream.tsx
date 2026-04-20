@@ -119,33 +119,51 @@ export function FeedStream({ ticker, onPostsLoaded }: FeedStreamProps) {
     setPosts([]);
     fetchPosts();
 
-    // Supabase Realtime — new posts appear instantly
-    const channel = supabase
-      .channel('posts-feed')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'posts' },
-        async (payload) => {
-          // Only care about top-level posts in this feed
-          if (payload.new.parent_id) return;
-          if (ticker && !payload.new.stock_mentions?.includes(ticker.toUpperCase())) return;
+    // Supabase Realtime — new posts appear instantly.
+    //
+    // Use a unique channel name per effect run so StrictMode / HMR
+    // doesn't hand us back an already-subscribed channel (realtime
+    // throws "cannot add postgres_changes callbacks after subscribe()"
+    // when .on() is called on a live channel). Wrap the whole thing
+    // in try/catch so a realtime hiccup never blanks the feed.
+    let cancelled = false;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
 
-          // Fetch full post with author profile
-          const res = await fetch(`/api/posts?limit=1`, { cache: 'no-store' });
-          if (!res.ok) return;
-          const [freshPost] = await res.json();
-          if (freshPost?.id === payload.new.id) {
-            setPosts(prev => {
-              if (prev[0]?.id === freshPost.id) return prev; // dedupe
-              return [freshPost, ...prev.filter(p => !p.id.startsWith('mock-'))];
-            });
-            setUsingMock(false);
+    try {
+      const suffix = Math.random().toString(36).slice(2, 10);
+      channel = supabase
+        .channel(`posts-feed:${suffix}`)
+        .on(
+          'postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'posts' },
+          async (payload) => {
+            if (cancelled) return;
+            if (payload.new.parent_id) return;
+            if (ticker && !payload.new.stock_mentions?.includes(ticker.toUpperCase())) return;
+
+            const res = await fetch(`/api/posts?limit=1`, { cache: 'no-store' });
+            if (!res.ok || cancelled) return;
+            const [freshPost] = await res.json();
+            if (freshPost?.id === payload.new.id) {
+              setPosts(prev => {
+                if (prev[0]?.id === freshPost.id) return prev;
+                return [freshPost, ...prev.filter(p => !p.id.startsWith('mock-'))];
+              });
+              setUsingMock(false);
+            }
           }
-        }
-      )
-      .subscribe();
+        )
+        .subscribe();
+    } catch (err) {
+      console.warn('[FeedStream] realtime subscribe failed', err);
+    }
 
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      cancelled = true;
+      if (channel) {
+        try { supabase.removeChannel(channel); } catch {}
+      }
+    };
   }, [ticker]);
 
   if (loading) {

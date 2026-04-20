@@ -67,36 +67,68 @@ export function NotificationsDropdown({ userId }: { userId: string }) {
     if (open && !loaded) fetchNotifications();
   }, [open, loaded, fetchNotifications]);
 
-  // Realtime subscription — new notifications
+  // Realtime subscription — new notifications.
+  //
+  // Supabase realtime returns the same channel instance if asked for a
+  // channel name that's already registered on this client. Under React
+  // StrictMode (dev) or HMR the effect can re-run before the cleanup
+  // has fully torn down the previous channel, which means `.on(...)` on
+  // the second pass tries to attach a postgres_changes listener to an
+  // already-subscribed channel → realtime throws:
+  //   "cannot add `postgres_changes` callbacks after `subscribe()`".
+  //
+  // The fix is two-fold:
+  //   1. Use a per-effect unique channel name so every run gets a
+  //      fresh, unsubscribed channel.
+  //   2. Wrap registration in a try/catch + mounted guard so any
+  //      transient subscribe error never bubbles up to React and
+  //      blanks the page.
   useEffect(() => {
-    const channel = supabase
-      .channel(`notifications:${userId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'notifications',
-          filter: `user_id=eq.${userId}`,
-        },
-        (payload) => {
-          const n = payload.new as any;
-          const newNotif: Notification = {
-            id: n.id,
-            type: n.type,
-            title: n.title,
-            body: n.body,
-            link: n.link,
-            isRead: false,
-            createdAt: n.created_at,
-            actor: null,
-          };
-          setNotifications(prev => [newNotif, ...prev]);
-        }
-      )
-      .subscribe();
+    let cancelled = false;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
 
-    return () => { supabase.removeChannel(channel); };
+    try {
+      const suffix = Math.random().toString(36).slice(2, 10);
+      channel = supabase
+        .channel(`notifications:${userId}:${suffix}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'notifications',
+            filter: `user_id=eq.${userId}`,
+          },
+          (payload) => {
+            if (cancelled) return;
+            const n = payload.new as any;
+            const newNotif: Notification = {
+              id: n.id,
+              type: n.type,
+              title: n.title,
+              body: n.body,
+              link: n.link,
+              isRead: false,
+              createdAt: n.created_at,
+              actor: null,
+            };
+            setNotifications(prev => [newNotif, ...prev]);
+          }
+        )
+        .subscribe();
+    } catch (err) {
+      // Realtime unavailable or channel already subscribed — fall back
+      // to polling-only behavior. Notifications still work, they just
+      // don't stream in live until the dropdown is reopened.
+      console.warn('[NotificationsDropdown] realtime subscribe failed', err);
+    }
+
+    return () => {
+      cancelled = true;
+      if (channel) {
+        try { supabase.removeChannel(channel); } catch {}
+      }
+    };
   }, [userId]);
 
   async function markAllRead() {
