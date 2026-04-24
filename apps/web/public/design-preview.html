@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>תשואה — Design Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Heebo', sans-serif; background: #0a0f1e; color: #e8f4ff; min-height: 100vh; }
+
+  /* ─── NAV ─── */
+  .nav { display: flex; justify-content: space-between; align-items: center; padding: 12px 24px;
+    background: rgba(8,14,26,0.95); border-bottom: 1px solid rgba(255,255,255,0.06); position: sticky; top: 0; z-index: 10; }
+  .nav-logo { font-weight: 900; font-size: 18px; color: #00e5b0; letter-spacing: -0.03em; }
+  .nav-btns { display: flex; gap: 8px; }
+  .nav-btns button { padding: 6px 16px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; border: none; font-family: inherit; }
+  .btn-sel { background: #00e5b0; color: #060b16; }
+  .btn-unsel { background: rgba(26,40,64,0.6); color: #9ab1cc; border: 1px solid rgba(26,40,64,0.8); }
+
+  /* ─── SECTION HEADER ─── */
+  .sec-head { padding: 40px 32px 16px; text-align: center; }
+  .sec-head h2 { font-size: 13px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; color: #00e5b0; margin-bottom: 8px; }
+  .sec-head p { font-size: 22px; font-weight: 900; color: #ddeeff; letter-spacing: -0.02em; }
+  .sec-head small { font-size: 13px; color: #5a7090; margin-top: 6px; display: block; }
+
+  /* ─── GRID ─── */
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 0 24px 60px; max-width: 1100px; margin: 0 auto; }
+  @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
+
+  /* ─── CARD WRAPPER ─── */
+  .variant-card { border-radius: 20px; overflow: hidden; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
+  .variant-card:hover { transform: translateY(-4px); box-shadow: 0 24px 64px rgba(0,0,0,0.5); }
+  .variant-card.selected { outline: 3px solid #00e5b0; outline-offset: 3px; }
+  .variant-label { position: absolute; top: 12px; right: 12px; font-size: 11px; font-weight: 800;
+    padding: 4px 10px; border-radius: 20px; letter-spacing: 0.05em; z-index: 2; }
+
+  /* ══════════════════════════════════════════
+     VARIANT 1 — Bloomberg Noir (current+sharp)
+  ══════════════════════════════════════════ */
+  .v1 { background: #080d1a; }
+  .v1 .variant-label { background: rgba(0,229,176,0.15); color: #00e5b0; border: 1px solid rgba(0,229,176,0.3); }
+  .v1-bar { background: #040710; border-bottom: 1px solid #0d1628; padding: 8px 14px; display: flex; gap: 10px; overflow: hidden; }
+  .v1-tick { font-size: 11px; font-family: monospace; color: #9ab1cc; white-space: nowrap; }
+  .v1-tick .up { color: #00e5b0; }
+  .v1-tick .dn { color: #ff4d6a; }
+  .v1-nav { background: rgba(8,14,26,0.98); border-bottom: 1px solid #0d1628; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; }
+  .v1-nav .logo { font-weight: 900; font-size: 15px; color: #00e5b0; letter-spacing: -0.03em; }
+  .v1-nav .search { background: rgba(13,22,40,0.8); border: 1px solid #0d1628; border-radius: 8px; padding: 5px 10px; font-size: 11px; color: #5a7090; width: 120px; }
+  .v1-body { display: flex; padding: 10px; gap: 8px; }
+  .v1-sidebar { width: 110px; flex-shrink: 0; display: flex; flex-direction: column; gap: 2px; }
+  .v1-sitem { font-size: 11px; padding: 6px 8px; border-radius: 8px; color: #5a7090; display: flex; align-items: center; gap: 6px; }
+  .v1-sitem.act { background: rgba(0,229,176,0.08); color: #ddeeff; border: 1px solid rgba(0,229,176,0.1); }
+  .v1-sitem.act .dot { width: 3px; height: 14px; background: #00e5b0; border-radius: 2px; box-shadow: 0 0 6px rgba(0,229,176,0.6); }
+  .v1-sitem .dot { width: 3px; height: 14px; border-radius: 2px; background: transparent; }
+  .v1-feed { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+  .v1-post { background: #0d1628; border: 1px solid #0d1e38; border-radius: 10px; padding: 10px; }
+  .v1-post-head { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+  .v1-avatar { width: 26px; height: 26px; border-radius: 6px; background: linear-gradient(135deg, #003d2e, #00e5b0); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; color: #00e5b0; flex-shrink: 0; }
+  .v1-uname { font-size: 11px; font-weight: 700; color: #ddeeff; }
+  .v1-time { font-size: 10px; color: #3a5070; margin-right: auto; }
+  .v1-bull { font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 4px; background: rgba(0,229,176,0.1); color: #00e5b0; border: 1px solid rgba(0,229,176,0.2); }
+  .v1-bear { font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 4px; background: rgba(255,77,106,0.1); color: #ff4d6a; border: 1px solid rgba(255,77,106,0.2); }
+  .v1-text { font-size: 11px; color: #9ab1cc; line-height: 1.5; margin-bottom: 6px; }
+  .v1-ticker-chip { display: inline-block; font-size: 10px; font-weight: 700; font-family: monospace; padding: 2px 7px; border-radius: 4px; background: rgba(0,229,176,0.08); color: #00e5b0; border: 1px solid rgba(0,229,176,0.2); margin-left: 4px; }
+  .v1-actions { display: flex; gap: 12px; }
+  .v1-action { font-size: 10px; color: #3a5070; display: flex; align-items: center; gap: 3px; }
+  .v1-widget { background: #0a1120; border: 1px solid #0d1628; border-radius: 10px; padding: 8px; margin-top: 6px; }
+  .v1-widget-title { font-size: 9px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #3a5070; margin-bottom: 6px; }
+  .v1-wrow { display: flex; align-items: center; gap: 6px; padding: 3px 0; }
+  .v1-wrow .sym { font-size: 11px; font-weight: 800; font-family: monospace; color: #ddeeff; width: 40px; }
+  .v1-wrow .bar { flex: 1; height: 3px; border-radius: 2px; background: rgba(0,229,176,0.15); }
+  .v1-wrow .fill { height: 100%; border-radius: 2px; background: #00e5b0; }
+  .v1-wrow .pct { font-size: 10px; font-weight: 700; font-family: monospace; }
+
+  /* ══════════════════════════════════════════
+     VARIANT 2 — Robinhood Clean (minimal)
+  ══════════════════════════════════════════ */
+  .v2 { background: #ffffff; }
+  .v2 .variant-label { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+  .v2-nav { background: #fff; border-bottom: 1px solid #e5e7eb; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; }
+  .v2-nav .logo { font-weight: 900; font-size: 15px; color: #16a34a; letter-spacing: -0.03em; }
+  .v2-nav .search { background: #f3f4f6; border: none; border-radius: 8px; padding: 5px 10px; font-size: 11px; color: #9ca3af; width: 120px; }
+  .v2-tabs { display: flex; gap: 0; border-bottom: 1px solid #e5e7eb; padding: 0 14px; }
+  .v2-tab { font-size: 11px; font-weight: 700; padding: 8px 12px; color: #9ca3af; cursor: pointer; border-bottom: 2px solid transparent; }
+  .v2-tab.act { color: #111827; border-bottom-color: #16a34a; }
+  .v2-body { display: flex; padding: 10px; gap: 8px; }
+  .v2-feed { flex: 1; display: flex; flex-direction: column; gap: 1px; }
+  .v2-post { background: #fff; border-bottom: 1px solid #f3f4f6; padding: 12px; }
+  .v2-post:first-child { border-radius: 10px 10px 0 0; }
+  .v2-post:last-child { border-radius: 0 0 10px 10px; border-bottom: none; }
+  .v2-post-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .v2-avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #d1fae5, #10b981); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #065f46; flex-shrink: 0; }
+  .v2-uname { font-size: 12px; font-weight: 700; color: #111827; }
+  .v2-time { font-size: 10px; color: #9ca3af; margin-right: auto; }
+  .v2-bull { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 20px; background: #f0fdf4; color: #16a34a; }
+  .v2-bear { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 20px; background: #fff1f2; color: #e11d48; }
+  .v2-text { font-size: 12px; color: #374151; line-height: 1.5; margin-bottom: 8px; }
+  .v2-ticker-chip { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; background: #f0fdf4; color: #16a34a; margin-left: 4px; }
+  .v2-actions { display: flex; gap: 16px; }
+  .v2-action { font-size: 11px; color: #9ca3af; display: flex; align-items: center; gap: 4px; }
+  .v2-action.liked { color: #16a34a; }
+  .v2-summary { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 10px; margin-bottom: 8px; }
+  .v2-sum-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #9ca3af; margin-bottom: 8px; }
+  .v2-sum-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; }
+  .v2-sum-idx { font-size: 12px; font-weight: 600; color: #111827; }
+  .v2-sum-val { font-size: 11px; font-weight: 700; }
+  .grn { color: #16a34a; }
+  .red { color: #e11d48; }
+
+  /* ══════════════════════════════════════════
+     VARIANT 3 — Glass Morphism (2024)
+  ══════════════════════════════════════════ */
+  .v3 { background: linear-gradient(135deg, #1a0533 0%, #0d1654 40%, #091a3e 100%); }
+  .v3 .variant-label { background: rgba(139,92,246,0.2); color: #c4b5fd; border: 1px solid rgba(139,92,246,0.3); }
+  .v3-nav { background: rgba(255,255,255,0.03); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.06); padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; }
+  .v3-nav .logo { font-weight: 900; font-size: 15px; background: linear-gradient(135deg, #a78bfa, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.03em; }
+  .v3-nav .search { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 5px 10px; font-size: 11px; color: rgba(255,255,255,0.4); width: 120px; }
+  .v3-body { display: flex; padding: 10px; gap: 8px; }
+  .v3-feed { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+  .v3-post { background: rgba(255,255,255,0.04); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 12px; }
+  .v3-post-head { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+  .v3-avatar { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, #7c3aed, #2563eb); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; color: #fff; flex-shrink: 0; box-shadow: 0 0 12px rgba(124,58,237,0.4); }
+  .v3-uname { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.9); }
+  .v3-time { font-size: 10px; color: rgba(255,255,255,0.3); margin-right: auto; }
+  .v3-bull { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 20px; background: rgba(52,211,153,0.15); color: #6ee7b7; border: 1px solid rgba(52,211,153,0.2); }
+  .v3-bear { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 20px; background: rgba(248,113,113,0.1); color: #fca5a5; border: 1px solid rgba(248,113,113,0.2); }
+  .v3-text { font-size: 11px; color: rgba(255,255,255,0.65); line-height: 1.55; margin-bottom: 8px; }
+  .v3-ticker-chip { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 8px; background: rgba(139,92,246,0.2); color: #c4b5fd; border: 1px solid rgba(139,92,246,0.3); margin-left: 4px; }
+  .v3-actions { display: flex; gap: 14px; }
+  .v3-action { font-size: 10px; color: rgba(255,255,255,0.3); display: flex; align-items: center; gap: 3px; }
+  .v3-card { background: rgba(255,255,255,0.04); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 10px; margin-bottom: 8px; }
+  .v3-card-title { font-size: 9px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 8px; }
+  .v3-idx-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; }
+  .v3-idx-name { font-size: 12px; color: rgba(255,255,255,0.7); }
+  .v3-idx-val { font-size: 11px; font-weight: 700; }
+  .grn3 { color: #6ee7b7; }
+  .red3 { color: #fca5a5; }
+  .v3-glow { position: absolute; width: 120px; height: 120px; border-radius: 50%; pointer-events: none; filter: blur(40px); opacity: 0.12; }
+
+  /* ══════════════════════════════════════════
+     VARIANT 4 — Editorial / TheMarker style
+  ══════════════════════════════════════════ */
+  .v4 { background: #fafaf8; }
+  .v4 .variant-label { background: #1c1917; color: #d6c38a; border: none; }
+  .v4-top-bar { background: #1c1917; padding: 5px 14px; display: flex; align-items: center; justify-content: space-between; }
+  .v4-top-bar .date { font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 0.06em; font-family: Georgia, serif; }
+  .v4-top-bar .markets { font-size: 10px; color: #d6c38a; font-family: monospace; }
+  .v4-nav { background: #fafaf8; border-bottom: 2px solid #1c1917; padding: 8px 14px; display: flex; align-items: center; justify-content: space-between; }
+  .v4-nav .logo { font-weight: 900; font-size: 16px; color: #1c1917; letter-spacing: -0.04em; font-family: Georgia, serif; }
+  .v4-nav .logo span { color: #b45309; }
+  .v4-sub-nav { background: #f5f5f0; border-bottom: 1px solid #d6d3cd; padding: 6px 14px; display: flex; gap: 16px; }
+  .v4-sub-item { font-size: 10px; font-weight: 700; color: #78716c; text-transform: uppercase; letter-spacing: 0.08em; }
+  .v4-sub-item.act { color: #1c1917; border-bottom: 2px solid #1c1917; padding-bottom: 2px; }
+  .v4-body { display: flex; padding: 10px; gap: 10px; }
+  .v4-main { flex: 1; }
+  .v4-aside { width: 90px; }
+  .v4-headline { font-size: 16px; font-weight: 900; color: #1c1917; letter-spacing: -0.04em; line-height: 1.2; margin-bottom: 4px; font-family: Georgia, serif; }
+  .v4-byline { font-size: 10px; color: #78716c; margin-bottom: 8px; letter-spacing: 0.04em; }
+  .v4-byline strong { color: #1c1917; }
+  .v4-bull { font-size: 9px; font-weight: 700; padding: 2px 7px; background: #d1fae5; color: #065f46; border-radius: 2px; display: inline-block; margin-left: 4px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .v4-bear { font-size: 9px; font-weight: 700; padding: 2px 7px; background: #fce7f3; color: #9d174d; border-radius: 2px; display: inline-block; margin-left: 4px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .v4-text { font-size: 11px; color: #44403c; line-height: 1.65; margin-bottom: 8px; font-family: Georgia, serif; }
+  .v4-divider { border: none; border-top: 1px solid #d6d3cd; margin: 8px 0; }
+  .v4-ticker { display: inline-block; font-size: 10px; font-weight: 700; font-family: monospace; color: #b45309; background: #fef3c7; padding: 1px 6px; border-radius: 2px; margin-left: 3px; }
+  .v4-actions { display: flex; gap: 12px; }
+  .v4-action { font-size: 10px; color: #78716c; }
+  .v4-aside-title { font-size: 8px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: #1c1917; border-bottom: 2px solid #1c1917; padding-bottom: 3px; margin-bottom: 6px; }
+  .v4-idx { padding: 4px 0; border-bottom: 1px solid #d6d3cd; }
+  .v4-idx-name { font-size: 10px; font-weight: 700; color: #1c1917; }
+  .v4-idx-val { font-size: 10px; font-weight: 700; }
+  .v4grn { color: #047857; }
+  .v4red { color: #b91c1c; }
+
+  /* ─── VOTE SECTION ─── */
+  .vote-section { padding: 40px 24px; text-align: center; background: rgba(0,229,176,0.03); border-top: 1px solid rgba(0,229,176,0.1); }
+  .vote-section h3 { font-size: 18px; font-weight: 900; color: #ddeeff; margin-bottom: 6px; }
+  .vote-section p { font-size: 13px; color: #5a7090; margin-bottom: 24px; }
+  .vote-btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+  .vote-btn { padding: 10px 22px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; border: none; font-family: inherit; transition: all 0.2s; }
+  .vote-btn:hover { transform: translateY(-2px); }
+  .v-1 { background: rgba(0,229,176,0.12); color: #00e5b0; border: 1px solid rgba(0,229,176,0.3); }
+  .v-2 { background: rgba(22,163,74,0.12); color: #4ade80; border: 1px solid rgba(22,163,74,0.3); }
+  .v-3 { background: rgba(139,92,246,0.12); color: #c4b5fd; border: 1px solid rgba(139,92,246,0.3); }
+  .v-4 { background: rgba(180,83,9,0.12); color: #fbbf24; border: 1px solid rgba(180,83,9,0.3); }
+  .v-mix { background: rgba(59,130,246,0.12); color: #93c5fd; border: 1px solid rgba(59,130,246,0.3); }
+
+  .badge { display: inline-block; font-size: 10px; font-weight: 800; background: rgba(0,229,176,0.15); color: #00e5b0; border: 1px solid rgba(0,229,176,0.25); padding: 3px 8px; border-radius: 20px; margin-bottom: 8px; letter-spacing: 0.06em; text-transform: uppercase; }
+</style>
+</head>
+<body>
+
+<!-- Sticky Nav -->
+<nav class="nav">
+  <div class="nav-logo">🎨 תשואה — Design Preview</div>
+  <div class="nav-btns">
+    <button class="btn-sel">4 כיוונים</button>
+    <button class="btn-unsel" onclick="window.location='https://tsua-rho.vercel.app/he'" >← לאתר</button>
+  </div>
+</nav>
+
+<!-- Section header -->
+<div class="sec-head">
+  <span class="badge">Design Lab</span>
+  <p>4 כיוונים אפשריים לתשואה</p>
+  <small>לחץ על עיצוב כדי להגדיל — בסוף הדף יש כפתורי הצבעה</small>
+</div>
+
+<!-- 2x2 Grid -->
+<div class="grid">
+
+  <!-- ─── V1: Bloomberg Noir ─── -->
+  <div class="variant-card v1" onclick="zoom(this, 'v1')">
+    <span class="variant-label">1 · Bloomberg Noir</span>
+    <!-- Live bar -->
+    <div class="v1-bar">
+      <div class="v1-tick">ת"א 35 <span class="up">↑ 2,147.3 +0.8%</span></div>
+      <div class="v1-tick" style="margin-right:10px">NVDA <span class="up">$891.2 +1.4%</span></div>
+      <div class="v1-tick" style="margin-right:10px">TEVA <span class="dn">$16.3 −0.6%</span></div>
+      <div class="v1-tick" style="margin-right:10px">USD/ILS <span class="dn">3.72 −0.2%</span></div>
+    </div>
+    <!-- Navbar -->
+    <div class="v1-nav">
+      <div class="logo">תשואה</div>
+      <div class="search">🔍 חפש מניה...</div>
+    </div>
+    <!-- Body -->
+    <div class="v1-body">
+      <!-- Sidebar -->
+      <div class="v1-sidebar">
+        <div class="v1-sitem act"><div class="dot"></div>פיד</div>
+        <div class="v1-sitem"><div class="dot"></div>שווקים</div>
+        <div class="v1-sitem"><div class="dot"></div>מגזרים</div>
+        <div class="v1-sitem"><div class="dot"></div>חדשות</div>
+        <div class="v1-sitem"><div class="dot"></div>לידרבורד</div>
+        <div class="v1-sitem"><div class="dot"></div>התראות</div>
+        <div style="margin-top:8px">
+          <div class="v1-widget">
+            <div class="v1-widget-title">🔥 חמות</div>
+            <div class="v1-wrow"><span class="sym">NVDA</span><div class="bar"><div class="fill" style="width:85%"></div></div><span class="pct" style="color:#00e5b0;font-size:10px">+1.4%</span></div>
+            <div class="v1-wrow"><span class="sym">TEVA</span><div class="bar"><div class="fill" style="width:62%;background:#ff4d6a"></div></div><span class="pct" style="color:#ff4d6a;font-size:10px">−0.6%</span></div>
+            <div class="v1-wrow"><span class="sym">TSLA</span><div class="bar"><div class="fill" style="width:90%"></div></div><span class="pct" style="color:#00e5b0;font-size:10px">+3.1%</span></div>
+          </div>
+        </div>
+      </div>
+      <!-- Feed -->
+      <div class="v1-feed">
+        <div class="v1-post">
+          <div class="v1-post-head">
+            <div class="v1-avatar">A</div>
+            <div>
+              <div class="v1-uname">@avi_trades</div>
+            </div>
+            <span class="v1-time">לפני 3 דק'</span>
+            <span class="v1-bull">BULL</span>
+          </div>
+          <div class="v1-text">
+            <span class="v1-ticker-chip">$NVDA</span> שוברת שיאים — כניסה ל-900 נראית ריאלית עוד השבוע. ביג מאניי נכנס.
+          </div>
+          <div class="v1-actions">
+            <span class="v1-action">❤️ 24</span>
+            <span class="v1-action">💬 7</span>
+            <span class="v1-action">🔁 3</span>
+          </div>
+        </div>
+        <div class="v1-post">
+          <div class="v1-post-head">
+            <div class="v1-avatar" style="background:linear-gradient(135deg,#1a3050,#3b82f6)">M</div>
+            <div>
+              <div class="v1-uname">@moshe_investor</div>
+            </div>
+            <span class="v1-time">לפני 12 דק'</span>
+            <span class="v1-bear">BEAR</span>
+          </div>
+          <div class="v1-text">
+            <span class="v1-ticker-chip">$TEVA</span> דוח Q3 מאכזב — שיפור מרווחים איטי מהצפי. מחכה לרמת 15.
+          </div>
+          <div class="v1-actions">
+            <span class="v1-action">❤️ 11</span>
+            <span class="v1-action">💬 4</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── V2: Robinhood Clean ─── -->
+  <div class="variant-card v2" onclick="zoom(this, 'v2')">
+    <span class="variant-label">2 · Robinhood Clean</span>
+    <div class="v2-nav">
+      <div class="logo">תשואה</div>
+      <div class="search">🔍 חפש...</div>
+    </div>
+    <div class="v2-tabs">
+      <div class="v2-tab act">פיד</div>
+      <div class="v2-tab">שווקים</div>
+      <div class="v2-tab">חדשות</div>
+      <div class="v2-tab">לי</div>
+    </div>
+    <div class="v2-body">
+      <div class="v2-feed">
+        <!-- Market summary -->
+        <div class="v2-summary">
+          <div class="v2-sum-title">שוק היום</div>
+          <div class="v2-sum-row"><span class="v2-sum-idx">ת"א 35</span><span class="v2-sum-val grn">+0.83%</span></div>
+          <div class="v2-sum-row"><span class="v2-sum-idx">S&amp;P 500</span><span class="v2-sum-val grn">+0.41%</span></div>
+          <div class="v2-sum-row"><span class="v2-sum-idx">נאסד"ק</span><span class="v2-sum-val red">−0.12%</span></div>
+        </div>
+        <div class="v2-post">
+          <div class="v2-post-head">
+            <div class="v2-avatar">A</div>
+            <div>
+              <div class="v2-uname">avi_trades</div>
+            </div>
+            <span class="v2-time">לפני 3 דקות</span>
+            <span class="v2-bull">BULL</span>
+          </div>
+          <div class="v2-text">
+            <span class="v2-ticker-chip">$NVDA</span> שוברת שיאים — כניסה ל-900 נראית ריאלית עוד השבוע. ביג מאניי נכנס.
+          </div>
+          <div class="v2-actions">
+            <span class="v2-action liked">♥ 24</span>
+            <span class="v2-action">💬 7</span>
+            <span class="v2-action">↗ שתף</span>
+          </div>
+        </div>
+        <div class="v2-post">
+          <div class="v2-post-head">
+            <div class="v2-avatar" style="background:linear-gradient(135deg,#dbeafe,#3b82f6);color:#1e3a8a">M</div>
+            <div>
+              <div class="v2-uname">moshe_investor</div>
+            </div>
+            <span class="v2-time">לפני 12 דקות</span>
+            <span class="v2-bear">BEAR</span>
+          </div>
+          <div class="v2-text">
+            <span class="v2-ticker-chip">$TEVA</span> דוח Q3 מאכזב — שיפור מרווחים איטי מהצפי. מחכה לרמת 15.
+          </div>
+          <div class="v2-actions">
+            <span class="v2-action">♥ 11</span>
+            <span class="v2-action">💬 4</span>
+            <span class="v2-action">↗ שתף</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── V3: Glass ─── -->
+  <div class="variant-card v3" onclick="zoom(this, 'v3')">
+    <span class="variant-label">3 · Glass Morphism</span>
+    <div class="v3-glow" style="background:#7c3aed;top:0;right:20px"></div>
+    <div class="v3-glow" style="background:#2563eb;bottom:20px;left:10px"></div>
+    <div class="v3-nav">
+      <div class="logo">תשואה</div>
+      <div class="search">🔍 חפש...</div>
+    </div>
+    <div class="v3-body">
+      <div class="v3-feed">
+        <div class="v3-card">
+          <div class="v3-card-title">שוק בזמן אמת</div>
+          <div class="v3-idx-row"><span class="v3-idx-name">ת"א 35</span><span class="v3-idx-val grn3">+0.83%</span></div>
+          <div class="v3-idx-row"><span class="v3-idx-name">NVDA</span><span class="v3-idx-val grn3">$891.20</span></div>
+          <div class="v3-idx-row"><span class="v3-idx-name">BTC</span><span class="v3-idx-val grn3">$67,400</span></div>
+        </div>
+        <div class="v3-post">
+          <div class="v3-post-head">
+            <div class="v3-avatar">A</div>
+            <div>
+              <div class="v3-uname">@avi_trades</div>
+            </div>
+            <span class="v3-time">3 דק'</span>
+            <span class="v3-bull">BULL</span>
+          </div>
+          <div class="v3-text">
+            <span class="v3-ticker-chip">$NVDA</span> שוברת שיאים — כניסה ל-900 נראית ריאלית עוד השבוע.
+          </div>
+          <div class="v3-actions">
+            <span class="v3-action">♥ 24</span>
+            <span class="v3-action">💬 7</span>
+            <span class="v3-action">🔁 3</span>
+          </div>
+        </div>
+        <div class="v3-post" style="margin-top:0">
+          <div class="v3-post-head">
+            <div class="v3-avatar" style="background:linear-gradient(135deg,#0369a1,#0ea5e9);box-shadow:0 0 12px rgba(14,165,233,0.4)">M</div>
+            <div>
+              <div class="v3-uname">@moshe_investor</div>
+            </div>
+            <span class="v3-time">12 דק'</span>
+            <span class="v3-bear">BEAR</span>
+          </div>
+          <div class="v3-text">
+            <span class="v3-ticker-chip" style="background:rgba(139,92,246,0.15);color:#c4b5fd">$TEVA</span> דוח Q3 מאכזב — שיפור מרווחים איטי מהצפי.
+          </div>
+          <div class="v3-actions">
+            <span class="v3-action">♥ 11</span>
+            <span class="v3-action">💬 4</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── V4: Editorial ─── -->
+  <div class="variant-card v4" onclick="zoom(this, 'v4')">
+    <span class="variant-label">4 · Print Editorial</span>
+    <div class="v4-top-bar">
+      <span class="date">ראשון · כ׳ בניסן תשפ״ו · 20.4.2026</span>
+      <span class="markets">ת״א: 2,147.3 ▲ · S&P: 5,204 ▲</span>
+    </div>
+    <div class="v4-nav">
+      <div class="logo">ת<span>שואה</span></div>
+      <div style="font-size:10px;color:#78716c">כלכלה · שוק הון · השקעות</div>
+    </div>
+    <div class="v4-sub-nav">
+      <div class="v4-sub-item act">ראשי</div>
+      <div class="v4-sub-item">שווקים</div>
+      <div class="v4-sub-item">ניתוחים</div>
+      <div class="v4-sub-item">חדשות</div>
+    </div>
+    <div class="v4-body">
+      <div class="v4-main">
+        <div class="v4-headline">נבידיה מתקרבת ל-900 דולר: "ביג מאניי נכנס"</div>
+        <div class="v4-byline">
+          <strong>@avi_trades</strong> · לפני 3 דקות
+          <span class="v4-bull">שורי</span>
+          <span class="v4-ticker">$NVDA</span>
+        </div>
+        <div class="v4-text">
+          שוברת שיאים — כניסה ל-900 נראית ריאלית עוד השבוע. ה-GPU demand מ-AI לא מאט, ו-Jensen רמז על הכפלת קיבולת ב-2025.
+        </div>
+        <div class="v4-actions">
+          <span class="v4-action">♥ 24 לייקים</span> &nbsp;·&nbsp;
+          <span class="v4-action">💬 7 תגובות</span>
+        </div>
+        <hr class="v4-divider">
+        <div class="v4-byline">
+          <strong>@moshe_investor</strong> · לפני 12 דקות
+          <span class="v4-bear">דובי</span>
+          <span class="v4-ticker">$TEVA</span>
+        </div>
+        <div class="v4-text">
+          דוח Q3 מאכזב — שיפור מרווחים איטי מהצפי. מחכה לרמת 15 לפני כניסה.
+        </div>
+        <div class="v4-actions">
+          <span class="v4-action">♥ 11 לייקים</span> &nbsp;·&nbsp;
+          <span class="v4-action">💬 4 תגובות</span>
+        </div>
+      </div>
+      <div class="v4-aside">
+        <div class="v4-aside-title">מניות</div>
+        <div class="v4-idx"><div class="v4-idx-name">NVDA</div><div class="v4-idx-val v4grn">+1.4%</div></div>
+        <div class="v4-idx"><div class="v4-idx-name">TEVA</div><div class="v4-idx-val v4red">−0.6%</div></div>
+        <div class="v4-idx"><div class="v4-idx-name">TSLA</div><div class="v4-idx-val v4grn">+3.1%</div></div>
+        <div class="v4-idx"><div class="v4-idx-name">AAPL</div><div class="v4-idx-val v4grn">+0.9%</div></div>
+        <div class="v4-idx"><div class="v4-idx-name">CHKP</div><div class="v4-idx-val v4red">−0.3%</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Vote Section -->
+<div class="vote-section">
+  <h3>🗳️ איזה כיוון הכי מדבר אליך?</h3>
+  <p>זה לא מחייב — שאלה להבנת הכיוון שנמשיך</p>
+  <div class="vote-btns">
+    <button class="vote-btn v-1" onclick="vote(1)">1 · Bloomberg Noir 🌑</button>
+    <button class="vote-btn v-2" onclick="vote(2)">2 · Robinhood Clean 🌿</button>
+    <button class="vote-btn v-3" onclick="vote(3)">3 · Glass Morphism 💜</button>
+    <button class="vote-btn v-4" onclick="vote(4)">4 · Print Editorial 📰</button>
+    <button class="vote-btn v-mix" onclick="vote('mix')">🎨 מיקס — אסביר בצ'אט</button>
+  </div>
+  <div id="vote-result" style="margin-top:20px;font-size:14px;color:#00e5b0;font-weight:800;min-height:24px"></div>
+</div>
+
+<script>
+function zoom(el, id) {
+  document.querySelectorAll('.variant-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function vote(v) {
+  const labels = {
+    1: '1 · Bloomberg Noir — כהה, חד, טרמינל פיננסי',
+    2: '2 · Robinhood Clean — נקי, בהיר, mass market',
+    3: '3 · Glass Morphism — שקיפויות, גראדיאנטים, 2024',
+    4: '4 · Print Editorial — מגזין, סריפים, פרימיום',
+    mix: '🎨 מיקס — ספר לי בצ\'אט מה שאהבת מכל אחד'
+  };
+  document.getElementById('vote-result').textContent = '✓ בחרת: ' + labels[v];
+  document.querySelectorAll('.vote-btn').forEach(b => b.style.opacity = '0.5');
+  event.target.style.opacity = '1';
+  event.target.style.transform = 'scale(1.05)';
+}
+</script>
+</body>
+</html>
