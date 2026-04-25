@@ -51,12 +51,51 @@ const MOCK_POSTS: Post[] = [
 interface FeedStreamProps {
   ticker?: string;
   onPostsLoaded?: (count: number) => void;
+  /** Show the sentiment/language filter bar above the feed. Default: true on home, false on stock pages */
+  showFilters?: boolean;
 }
 
-export function FeedStream({ ticker, onPostsLoaded }: FeedStreamProps) {
+type SentimentFilter = 'all' | 'bullish' | 'bearish' | 'neutral';
+type LangFilter = 'all' | 'he' | 'en';
+
+// Filter chip — small toggleable pill used in the filter bar
+function FilterChip({
+  active,
+  onClick,
+  label,
+  activeColor = '#00e5b0',
+  title,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+  activeColor?: string;
+  title?: string;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      title={title}
+      className="text-[11px] font-bold px-3 py-1.5 rounded-lg transition-all"
+      style={{
+        background: active ? `${activeColor}1f` : 'transparent',
+        color: active ? activeColor : '#5a7090',
+        border: `1px solid ${active ? `${activeColor}66` : 'rgba(26,40,64,0.7)'}`,
+      }}
+    >
+      {label}
+    </button>
+  );
+}
+
+export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedStreamProps) {
   const supabase = createClient();
 
+  const [sentimentFilter, setSentimentFilter] = useState<SentimentFilter>('all');
+  const [langFilter, setLangFilter] = useState<LangFilter>('all');
+
   const [posts, setPosts] = useState<Post[]>([]);
+  const [pendingPosts, setPendingPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [usingMock, setUsingMock] = useState(false);
   const [cursor, setCursor] = useState<string | null>(null);
@@ -117,6 +156,7 @@ export function FeedStream({ ticker, onPostsLoaded }: FeedStreamProps) {
     setCursor(null);
     setHasMore(true);
     setPosts([]);
+    setPendingPosts([]);
     fetchPosts();
 
     // Supabase Realtime — new posts appear instantly.
@@ -144,12 +184,25 @@ export function FeedStream({ ticker, onPostsLoaded }: FeedStreamProps) {
             const res = await fetch(`/api/posts?limit=1`, { cache: 'no-store' });
             if (!res.ok || cancelled) return;
             const [freshPost] = await res.json();
-            if (freshPost?.id === payload.new.id) {
+            if (!freshPost || freshPost.id !== payload.new.id) return;
+
+            // If user is at the top of the feed (scrolled within 200px), insert
+            // immediately. Otherwise queue into pendingPosts so they don't get
+            // bumped while reading. Mock posts always get cleared the moment
+            // a real post arrives.
+            const nearTop = typeof window !== 'undefined' && window.scrollY < 200;
+
+            if (nearTop) {
               setPosts(prev => {
                 if (prev[0]?.id === freshPost.id) return prev;
                 return [freshPost, ...prev.filter(p => !p.id.startsWith('mock-'))];
               });
               setUsingMock(false);
+            } else {
+              setPendingPosts(prev => {
+                if (prev.some(p => p.id === freshPost.id)) return prev;
+                return [freshPost, ...prev];
+              });
             }
           }
         )
@@ -192,8 +245,129 @@ export function FeedStream({ ticker, onPostsLoaded }: FeedStreamProps) {
     );
   }
 
+  function showPending() {
+    if (pendingPosts.length === 0) return;
+    setPosts(prev => {
+      const merged = [...pendingPosts, ...prev.filter(p => !p.id.startsWith('mock-'))];
+      // Dedupe by id, preserving order
+      const seen = new Set<string>();
+      return merged.filter(p => (seen.has(p.id) ? false : (seen.add(p.id), true)));
+    });
+    setPendingPosts([]);
+    setUsingMock(false);
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  // Apply client-side filters
+  const filteredPosts = posts.filter(p => {
+    if (sentimentFilter !== 'all') {
+      const s = p.sentiment ?? 'neutral';
+      if (s !== sentimentFilter) return false;
+    }
+    if (langFilter !== 'all' && p.lang !== langFilter) return false;
+    return true;
+  });
+
+  const filtersActive = sentimentFilter !== 'all' || langFilter !== 'all';
+
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 relative">
+      {/* Filter bar */}
+      {showFilters && !loading && posts.length > 0 && (
+        <div
+          className="flex flex-wrap items-center gap-2 p-2.5 rounded-xl"
+          style={{ background: 'rgba(13,20,36,0.5)', border: '1px solid rgba(26,40,64,0.5)' }}
+        >
+          {/* Sentiment filters */}
+          <FilterChip
+            active={sentimentFilter === 'all'}
+            onClick={() => setSentimentFilter('all')}
+            label="הכל"
+          />
+          <FilterChip
+            active={sentimentFilter === 'bullish'}
+            onClick={() => setSentimentFilter('bullish')}
+            label="📈 שורי"
+            activeColor="#00e5b0"
+          />
+          <FilterChip
+            active={sentimentFilter === 'bearish'}
+            onClick={() => setSentimentFilter('bearish')}
+            label="📉 דובי"
+            activeColor="#ff4d6a"
+          />
+          <FilterChip
+            active={sentimentFilter === 'neutral'}
+            onClick={() => setSentimentFilter('neutral')}
+            label="◯ נייטרלי"
+            activeColor="#5a7090"
+          />
+
+          <div className="mx-1 h-5 w-px" style={{ background: 'rgba(26,40,64,0.7)' }} />
+
+          {/* Language filters */}
+          <FilterChip
+            active={langFilter === 'all'}
+            onClick={() => setLangFilter('all')}
+            label="🌐"
+            title="כל השפות"
+          />
+          <FilterChip
+            active={langFilter === 'he'}
+            onClick={() => setLangFilter('he')}
+            label="עב"
+            title="עברית בלבד"
+          />
+          <FilterChip
+            active={langFilter === 'en'}
+            onClick={() => setLangFilter('en')}
+            label="EN"
+            title="אנגלית בלבד"
+          />
+
+          {filtersActive && (
+            <button
+              onClick={() => { setSentimentFilter('all'); setLangFilter('all'); }}
+              className="ms-auto text-[11px] font-bold transition-colors"
+              style={{ color: '#5a7090' }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#e5ecf5'}
+              onMouseLeave={(e) => e.currentTarget.style.color = '#5a7090'}
+            >
+              נקה ✕
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* New-posts pill — shown when realtime delivers posts while user is reading */}
+      {pendingPosts.length > 0 && (
+        <button
+          onClick={showPending}
+          className="sticky top-4 z-30 mx-auto flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all hover:scale-105 active:scale-95"
+          style={{
+            background: 'linear-gradient(135deg, #00e5b0, #00a884)',
+            color: '#060b16',
+            boxShadow: '0 8px 24px rgba(0, 229, 176, 0.35), 0 0 0 1px rgba(0, 229, 176, 0.4)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 'fit-content',
+            position: 'sticky',
+            insetInlineStart: '50%',
+            transform: 'translateX(-50%)',
+          }}
+        >
+          <span style={{ fontSize: '14px' }}>↑</span>
+          <span>
+            {pendingPosts.length === 1
+              ? 'פוסט חדש'
+              : `${pendingPosts.length} פוסטים חדשים`}
+          </span>
+        </button>
+      )}
+
       {/* Mock data notice */}
       {usingMock && (
         <div
@@ -204,11 +378,11 @@ export function FeedStream({ ticker, onPostsLoaded }: FeedStreamProps) {
         </div>
       )}
 
-      {posts.map(post => (
+      {filteredPosts.map(post => (
         <PostCard key={post.id} post={post} onLikeToggle={handleLikeToggle} />
       ))}
 
-      {/* Empty */}
+      {/* Empty — no posts at all */}
       {posts.length === 0 && (
         <div
           className="text-center py-16 rounded-2xl"
@@ -221,8 +395,28 @@ export function FeedStream({ ticker, onPostsLoaded }: FeedStreamProps) {
         </div>
       )}
 
+      {/* Empty — filters active but nothing matches */}
+      {posts.length > 0 && filteredPosts.length === 0 && (
+        <div
+          className="text-center py-12 rounded-2xl"
+          style={{ background: 'rgba(13,20,36,0.5)', border: '1px solid rgba(26,40,64,0.5)' }}
+        >
+          <div className="text-3xl mb-2">🔍</div>
+          <div className="text-tsua-muted text-sm font-medium mb-3">
+            {'אין פוסטים שתואמים לסינון'}
+          </div>
+          <button
+            onClick={() => { setSentimentFilter('all'); setLangFilter('all'); }}
+            className="text-xs font-bold px-4 py-2 rounded-lg transition-colors"
+            style={{ background: 'rgba(0,229,176,0.1)', color: '#00e5b0', border: '1px solid rgba(0,229,176,0.3)' }}
+          >
+            נקה סינון
+          </button>
+        </div>
+      )}
+
       {/* Load more */}
-      {hasMore && !usingMock && posts.length > 0 && (
+      {hasMore && !usingMock && filteredPosts.length > 0 && (
         <button
           onClick={loadMore}
           disabled={loadingMore}
