@@ -63,6 +63,7 @@ export async function GET() {
       id: p.id, body: p.body, lang: p.lang, sentiment: p.sentiment,
       imageUrls: [], likeCount: p.like_count, replyCount: p.reply_count,
       repostCount: p.repost_count, createdAt: p.created_at, isLiked: false,
+      isBookmarked: true,
       stockMentions: (p.stock_mentions ?? []).map((t: string) => ({ ticker: t, nameEn: t, nameHe: t, exchange: 'NASDAQ' })),
       author: {
         id: p.profiles?.id, username: p.profiles?.username,

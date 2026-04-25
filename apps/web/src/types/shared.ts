@@ -36,6 +36,7 @@ export interface Post {
   stockMentions: PostStockMention[];
   isLiked?: boolean;
   isReposted?: boolean;
+  isBookmarked?: boolean;
   parentId?: string;
   createdAt: string;
 }

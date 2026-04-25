@@ -183,7 +183,7 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
   const [repliesLoaded, setRepliesLoaded] = useState(false);
   const [showComposer, setShowComposer] = useState(false);
   const [replyCount, setReplyCount] = useState(post.replyCount);
-  const [bookmarked, setBookmarked] = useState(false);
+  const [bookmarked, setBookmarked] = useState(post.isBookmarked ?? false);
   const [reposted, setReposted] = useState(false);
   const [repostCount, setRepostCount] = useState(post.repostCount);
   const [shareToast, setShareToast] = useState(false);

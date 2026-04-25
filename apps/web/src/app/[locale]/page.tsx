@@ -3,6 +3,7 @@
 import { FeedStream } from '@/components/feed/FeedStream';
 import { PostComposer } from '@/components/feed/PostComposer';
 import { TrendingStocks } from '@/components/stocks/TrendingStocks';
+import { TrendingDiscussions } from '@/components/stocks/TrendingDiscussions';
 import { MarketSummary } from '@/components/stocks/MarketSummary';
 import { HotStocksWidget } from '@/components/stocks/HotStocksWidget';
 import { LiveStream } from '@/components/stream/LiveStream';
@@ -30,6 +31,7 @@ export default function HomePage() {
 
       {/* ── Right rail ── */}
       <aside className="hidden xl:flex flex-col gap-4 w-72 shrink-0 sticky top-[calc(56px+40px)]">
+        <TrendingDiscussions />
         <TrendingStocks />
 
         {/* Live discussion panel */}
