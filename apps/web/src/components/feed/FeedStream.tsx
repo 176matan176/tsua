@@ -96,6 +96,7 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
 
   const [posts, setPosts] = useState<Post[]>([]);
   const [pendingPosts, setPendingPosts] = useState<Post[]>([]);
+  const [freshIds, setFreshIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [usingMock, setUsingMock] = useState(false);
   const [cursor, setCursor] = useState<string | null>(null);
@@ -197,6 +198,15 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
                 if (prev[0]?.id === freshPost.id) return prev;
                 return [freshPost, ...prev.filter(p => !p.id.startsWith('mock-'))];
               });
+              setFreshIds(prev => new Set([...prev, freshPost.id]));
+              // Strip "fresh" flag after animation completes
+              setTimeout(() => {
+                setFreshIds(prev => {
+                  const next = new Set(prev);
+                  next.delete(freshPost.id);
+                  return next;
+                });
+              }, 1200);
               setUsingMock(false);
             } else {
               setPendingPosts(prev => {
@@ -247,12 +257,22 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
 
   function showPending() {
     if (pendingPosts.length === 0) return;
+    const flushedIds = pendingPosts.map(p => p.id);
     setPosts(prev => {
       const merged = [...pendingPosts, ...prev.filter(p => !p.id.startsWith('mock-'))];
       // Dedupe by id, preserving order
       const seen = new Set<string>();
       return merged.filter(p => (seen.has(p.id) ? false : (seen.add(p.id), true)));
     });
+    setFreshIds(prev => new Set([...prev, ...flushedIds]));
+    // Strip "fresh" flag after animation completes
+    setTimeout(() => {
+      setFreshIds(prev => {
+        const next = new Set(prev);
+        flushedIds.forEach(id => next.delete(id));
+        return next;
+      });
+    }, 1200);
     setPendingPosts([]);
     setUsingMock(false);
     if (typeof window !== 'undefined') {
@@ -379,7 +399,12 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
       )}
 
       {filteredPosts.map(post => (
-        <PostCard key={post.id} post={post} onLikeToggle={handleLikeToggle} />
+        <PostCard
+          key={post.id}
+          post={post}
+          onLikeToggle={handleLikeToggle}
+          isFresh={freshIds.has(post.id)}
+        />
       ))}
 
       {/* Empty — no posts at all */}

@@ -11,11 +11,14 @@ import { HeartIcon as HeartSolid, BookmarkIcon as BookmarkSolid, ArrowPathIcon a
 import { HeartIcon } from '@heroicons/react/24/outline';
 import { useLivePrice } from '@/contexts/PriceContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { renderPostBody } from './renderPostBody';
 
 interface PostCardProps {
   post: Post;
   onLikeToggle?: (postId: string) => void;
   isReply?: boolean;
+  /** Highlight new posts that just slid in from realtime — gets the slide-in animation */
+  isFresh?: boolean;
 }
 
 function StockPill({ ticker, exchange }: { ticker: string; exchange: string }) {
@@ -168,7 +171,7 @@ function ReplyComposer({
   );
 }
 
-export function PostCard({ post, onLikeToggle, isReply = false }: PostCardProps) {
+export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false }: PostCardProps) {
   const locale = useLocale();
   const { user } = useAuth();
   const [liked, setLiked] = useState(post.isLiked ?? false);
@@ -283,7 +286,7 @@ export function PostCard({ post, onLikeToggle, isReply = false }: PostCardProps)
 
   return (
     <article
-      className={`group relative transition-all duration-200 ${!isReply ? 'hover:-translate-y-px' : ''}`}
+      className={`group relative transition-all duration-200 ${!isReply ? 'hover:-translate-y-px' : ''} ${isFresh ? 'tsua-fresh-post' : ''}`}
       style={{
         background: isReply
           ? 'rgba(8,13,24,0.6)'
@@ -412,7 +415,7 @@ export function PostCard({ post, onLikeToggle, isReply = false }: PostCardProps)
             {/* Body */}
             <p
               dir="auto"
-              className="break-words"
+              className="break-words whitespace-pre-wrap"
               style={{
                 color: '#c0d4ee',
                 fontSize: '14.5px',
@@ -420,7 +423,7 @@ export function PostCard({ post, onLikeToggle, isReply = false }: PostCardProps)
                 fontWeight: 400,
               }}
             >
-              {post.body}
+              {renderPostBody(post.body, { locale })}
             </p>
 
             {/* Post images */}

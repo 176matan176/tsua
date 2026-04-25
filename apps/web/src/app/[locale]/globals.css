@@ -510,3 +510,31 @@ main { animation: fade-in 0.3s ease-out; }
 .market-bar-wrap:hover .market-scroll {
   animation-play-state: paused;
 }
+
+/* ─── Fresh Post Slide-In ──────────────────────────────────────────────
+   Applied to <article class="tsua-fresh-post"> when a post arrives via
+   realtime or the user clicks the "X new posts" pill. Brief slide+fade
+   plus a soft accent flash so the eye lands on what changed.
+*/
+@keyframes tsuaPostSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-14px);
+    box-shadow: 0 0 0 1px rgba(0, 229, 176, 0.6), 0 8px 28px rgba(0, 229, 176, 0.18);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.02);
+  }
+}
+.tsua-fresh-post {
+  animation: tsuaPostSlideIn 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .tsua-fresh-post { animation: none; }
+}
