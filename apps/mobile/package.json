@@ -1,0 +1,32 @@
+{
+  "name": "@tsua/mobile",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Native iOS/Android shell for the Tsua web app via Capacitor",
+  "scripts": {
+    "sync":          "cap sync",
+    "open:ios":      "cap open ios",
+    "open:android":  "cap open android",
+    "add:ios":       "cap add ios",
+    "add:android":   "cap add android",
+    "run:ios":       "cap run ios",
+    "run:android":   "cap run android",
+    "build:ios":     "cap sync ios && cap open ios",
+    "build:android": "cap sync android && cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/app": "^6.0.1",
+    "@capacitor/browser": "^6.0.3",
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/haptics": "^6.0.1",
+    "@capacitor/ios": "^6.1.2",
+    "@capacitor/keyboard": "^6.0.2",
+    "@capacitor/push-notifications": "^6.0.2",
+    "@capacitor/splash-screen": "^6.0.2",
+    "@capacitor/status-bar": "^6.0.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.2"
+  }
+}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { isNative } from '@/lib/platform';
 
 /**
  * App install prompt.
@@ -50,6 +51,7 @@ export function PWAInstallPrompt() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    if (isNative()) return;            // already inside the native shell
     if (isStandalone()) return;
     if (wasRecentlyDismissed()) return;
 

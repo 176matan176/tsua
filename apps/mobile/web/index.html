@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>תשואה</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: #060b16;
+      color: #e8f0ff;
+      font-family: system-ui, -apple-system, "Heebo", sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .wrap { text-align: center; padding: 1rem; }
+    .ring {
+      width: 32px;
+      height: 32px;
+      margin: 0 auto 1rem;
+      border: 3px solid rgba(0, 229, 176, 0.2);
+      border-top-color: #00e5b0;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <!--
+    This file is the local fallback Capacitor uses if `server.url`
+    can't be reached. In normal operation users see the live site
+    at https://tsua-rho.vercel.app (configured in capacitor.config.ts).
+  -->
+  <div class="wrap">
+    <div class="ring"></div>
+    <div style="font-weight: 800; font-size: 18px; margin-bottom: 4px;">תשואה</div>
+    <div style="color: #5a7090; font-size: 13px;">טוען…</div>
+  </div>
+  <script>
+    // If the live site comes back online while the user is sitting on this
+    // splash, navigate over to it so they don't have to manually retry.
+    setTimeout(function tryReconnect() {
+      fetch('https://tsua-rho.vercel.app/manifest.json', { mode: 'no-cors' })
+        .then(function () {
+          window.location.replace('https://tsua-rho.vercel.app');
+        })
+        .catch(function () {
+          setTimeout(tryReconnect, 3000);
+        });
+    }, 1500);
+  </script>
+</body>
+</html>
