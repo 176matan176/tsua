@@ -108,6 +108,11 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
   const [showShortcutsHelp, setShowShortcutsHelp] = useState(false);
   const postRefs = useRef<(HTMLDivElement | null)[]>([]);
 
+  // Pull-to-refresh state (mobile only)
+  const [pullY, setPullY] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
+  const pullStartY = useRef<number | null>(null);
+
   const fetchPosts = useCallback(async (cursorDate?: string) => {
     try {
       const url = new URL('/api/posts', window.location.origin);
@@ -324,6 +329,94 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focusedIndex, filteredPostsForKbd.length, pendingPosts.length, showShortcutsHelp]);
 
+  // Pull-to-refresh — touch gestures on mobile.
+  // Only engages when the user is at the top of the page AND drags down.
+  // Threshold: 70px. Resistance: 0.5 (drag 140px to get 70px of pull).
+  useEffect(() => {
+    const PULL_THRESHOLD = 70;
+    const MAX_PULL = 110;
+    const RESISTANCE = 0.5;
+
+    function handleTouchStart(e: TouchEvent) {
+      // Only capture if scrolled to the very top
+      if (window.scrollY > 4) return;
+      // Ignore multi-touch
+      if (e.touches.length !== 1) return;
+      pullStartY.current = e.touches[0].clientY;
+    }
+
+    function handleTouchMove(e: TouchEvent) {
+      if (pullStartY.current === null) return;
+      if (refreshing) return;
+      const delta = e.touches[0].clientY - pullStartY.current;
+      if (delta <= 0) {
+        setPullY(0);
+        return;
+      }
+      // Only kick in if we're still at scroll 0 (cancels if user scrolled up
+      // from below — handlers fire before scroll completes)
+      if (window.scrollY > 4) {
+        pullStartY.current = null;
+        setPullY(0);
+        return;
+      }
+      const pulled = Math.min(MAX_PULL, delta * RESISTANCE);
+      setPullY(pulled);
+      // Prevent native overscroll bounce on iOS once we've engaged
+      if (pulled > 8 && e.cancelable) e.preventDefault();
+    }
+
+    async function handleTouchEnd() {
+      const wasPulling = pullStartY.current !== null;
+      pullStartY.current = null;
+      if (!wasPulling) return;
+
+      if (pullY >= PULL_THRESHOLD && !refreshing) {
+        setRefreshing(true);
+        setPullY(60); // hold the spinner in place during refresh
+        try {
+          // Pending posts get flushed first (no point keeping them)
+          if (pendingPosts.length > 0) {
+            const flushedIds = pendingPosts.map(p => p.id);
+            setPosts(prev => {
+              const merged = [...pendingPosts, ...prev.filter(p => !p.id.startsWith('mock-'))];
+              const seen = new Set<string>();
+              return merged.filter(p => (seen.has(p.id) ? false : (seen.add(p.id), true)));
+            });
+            setFreshIds(prev => new Set([...prev, ...flushedIds]));
+            setPendingPosts([]);
+            setTimeout(() => {
+              setFreshIds(prev => {
+                const next = new Set(prev);
+                flushedIds.forEach(id => next.delete(id));
+                return next;
+              });
+            }, 1200);
+          }
+          await fetchPosts();
+        } finally {
+          setRefreshing(false);
+          setPullY(0);
+        }
+      } else {
+        setPullY(0);
+      }
+    }
+
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchmove',  handleTouchMove,  { passive: false });
+    window.addEventListener('touchend',   handleTouchEnd,   { passive: true });
+    window.addEventListener('touchcancel', handleTouchEnd,  { passive: true });
+
+    return () => {
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove',  handleTouchMove);
+      window.removeEventListener('touchend',   handleTouchEnd);
+      window.removeEventListener('touchcancel', handleTouchEnd);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pullY, refreshing, pendingPosts.length]);
+
   if (loading) {
     return (
       <div className="space-y-3">
@@ -380,8 +473,58 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
 
   const filtersActive = sentimentFilter !== 'all' || langFilter !== 'all';
 
+  // Pull-to-refresh visuals
+  const pullProgress = Math.min(1, pullY / 70);
+  const pullActive = pullY > 0 || refreshing;
+
   return (
-    <div className="space-y-3 relative">
+    <div
+      className="space-y-3 relative"
+      style={{
+        transform: pullActive ? `translateY(${pullY}px)` : undefined,
+        transition: pullStartY.current === null ? 'transform 0.25s cubic-bezier(0.22, 1, 0.36, 1)' : undefined,
+      }}
+    >
+      {/* Pull-to-refresh indicator (mobile only — desktop never triggers it) */}
+      {pullActive && (
+        <div
+          className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center pointer-events-none"
+          style={{
+            top: `-${Math.max(40, pullY)}px`,
+            width: '36px',
+            height: '36px',
+            borderRadius: '50%',
+            background: 'rgba(13,20,36,0.95)',
+            border: `1px solid rgba(0,229,176,${0.2 + pullProgress * 0.4})`,
+            boxShadow: `0 4px 16px rgba(0,229,176,${0.15 + pullProgress * 0.25})`,
+            opacity: pullProgress,
+          }}
+        >
+          {refreshing ? (
+            <span
+              className="block w-4 h-4 rounded-full border-2 animate-spin"
+              style={{
+                borderColor: 'rgba(0,229,176,0.25)',
+                borderTopColor: '#00e5b0',
+              }}
+            />
+          ) : (
+            <span
+              style={{
+                fontSize: '16px',
+                color: '#00e5b0',
+                transform: `rotate(${pullProgress * 180}deg)`,
+                transition: 'transform 0.15s linear',
+                display: 'inline-block',
+                lineHeight: 1,
+              }}
+            >
+              ↓
+            </span>
+          )}
+        </div>
+      )}
+
       {/* Keyboard shortcuts help modal */}
       {showShortcutsHelp && (
         <div
