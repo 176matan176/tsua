@@ -72,14 +72,15 @@ export function MobileComposeSheet({ isOpen, onClose, onPost }: Props) {
           </span>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg transition-all hover:opacity-70 active:scale-90"
+            aria-label="סגור"
+            className="p-2.5 rounded-lg transition-all hover:opacity-70 active:scale-90"
             style={{
               color: 'var(--muted)',
               border: '1px solid var(--border)',
               background: 'var(--surface2)',
             }}
           >
-            <XMarkIcon className="w-4 h-4" />
+            <XMarkIcon className="w-5 h-5" />
           </button>
         </div>
 

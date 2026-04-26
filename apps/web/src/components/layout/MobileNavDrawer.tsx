@@ -232,7 +232,7 @@ export function MobileNavDrawer({ isOpen, onClose }: Props) {
             </Link>
             <button
               onClick={close}
-              className="p-1.5 rounded-lg transition-all active:scale-90"
+              className="p-2.5 rounded-lg transition-all active:scale-90"
               style={{
                 color: 'var(--muted, #5a7090)',
                 border: '1px solid var(--border, rgba(26,40,64,0.7))',
@@ -240,7 +240,7 @@ export function MobileNavDrawer({ isOpen, onClose }: Props) {
               }}
               aria-label="סגור"
             >
-              <XMarkIcon className="w-4 h-4" />
+              <XMarkIcon className="w-5 h-5" />
             </button>
           </div>
 

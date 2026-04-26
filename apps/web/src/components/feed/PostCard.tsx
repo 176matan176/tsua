@@ -564,7 +564,8 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
               <div className="relative">
                 <button
                   onClick={handleShare}
-                  className="p-1.5 rounded-lg transition-all duration-200 hover:bg-white/5"
+                  aria-label="שתף"
+                  className="p-2.5 rounded-lg transition-all duration-200 hover:bg-white/5 active:scale-95"
                   style={{ color: shareOpen ? '#00e5b0' : 'rgba(90,112,144,0.7)' }}
                 >
                   <ArrowUpTrayIcon className="w-[17px] h-[17px]" />
@@ -579,7 +580,7 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
                       onClick={() => setShareOpen(false)}
                     />
                     <div
-                      className="absolute bottom-full mb-2 end-0 z-50 rounded-xl overflow-hidden min-w-[180px]"
+                      className="absolute bottom-full mb-2 end-0 z-50 rounded-xl overflow-hidden min-w-[180px] max-w-[calc(100vw-32px)]"
                       style={{
                         background: 'rgba(13,20,36,0.98)',
                         border: '1px solid rgba(26,40,64,0.8)',
@@ -654,7 +655,8 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
               {/* Bookmark */}
               <button
                 onClick={toggleBookmark}
-                className="p-1.5 rounded-lg transition-all duration-200 hover:bg-yellow-500/8"
+                aria-label={bookmarked ? 'הסר סימניה' : 'שמור סימניה'}
+                className="p-2.5 rounded-lg transition-all duration-200 hover:bg-yellow-500/8 active:scale-95"
               >
                 {bookmarked
                   ? <BookmarkSolid className="w-[17px] h-[17px]" style={{ color: '#f5b942', filter: 'drop-shadow(0 0 4px rgba(245,185,66,0.4))' }} />
