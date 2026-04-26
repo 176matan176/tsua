@@ -445,9 +445,16 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
                 @{post.author.username}
               </span>
               <span style={{ color: 'rgba(26,40,64,0.8)' }}>·</span>
-              <span className="text-[11px] font-mono" style={{ color: 'rgba(90,112,144,0.7)' }}>
+              <Link
+                href={`/${locale}/posts/${post.id}`}
+                className="text-[11px] font-mono transition-colors hover:underline"
+                style={{ color: 'rgba(90,112,144,0.7)' }}
+                onMouseEnter={e => (e.currentTarget.style.color = '#a0b4cc')}
+                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(90,112,144,0.7)')}
+                onClick={e => e.stopPropagation()}
+              >
                 {timeAgo}
-              </span>
+              </Link>
             </div>
 
             {/* Body */}

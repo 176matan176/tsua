@@ -62,10 +62,18 @@ export function NotificationsDropdown({ userId }: { userId: string }) {
     }
   }, []);
 
-  // Open → fetch if not loaded
+  // Initial fetch on mount — so the unread badge hydrates without needing
+  // the user to open the dropdown first. GET is read-only (PATCH marks read),
+  // so this is safe.
   useEffect(() => {
-    if (open && !loaded) fetchNotifications();
-  }, [open, loaded, fetchNotifications]);
+    if (!loaded) fetchNotifications();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Refresh when dropdown opens (catches anything missed since mount)
+  useEffect(() => {
+    if (open) fetchNotifications();
+  }, [open, fetchNotifications]);
 
   // Realtime subscription — new notifications.
   //
