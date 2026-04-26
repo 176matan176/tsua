@@ -103,6 +103,11 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
 
+  // Keyboard shortcuts state
+  const [focusedIndex, setFocusedIndex] = useState<number>(-1);
+  const [showShortcutsHelp, setShowShortcutsHelp] = useState(false);
+  const postRefs = useRef<(HTMLDivElement | null)[]>([]);
+
   const fetchPosts = useCallback(async (cursorDate?: string) => {
     try {
       const url = new URL('/api/posts', window.location.origin);
@@ -229,6 +234,96 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
     };
   }, [ticker]);
 
+  // Apply client-side filters (computed early so keyboard handler can read it)
+  const filteredPostsForKbd = posts.filter(p => {
+    if (sentimentFilter !== 'all') {
+      const s = p.sentiment ?? 'neutral';
+      if (s !== sentimentFilter) return false;
+    }
+    if (langFilter !== 'all' && p.lang !== langFilter) return false;
+    return true;
+  });
+
+  // Keyboard shortcuts: j/k navigate · l like · b bookmark · ? help · Esc clear
+  useEffect(() => {
+    function handleKey(e: KeyboardEvent) {
+      // Skip when typing in inputs/textareas/contenteditable
+      const target = e.target as HTMLElement;
+      if (
+        target?.tagName === 'INPUT' ||
+        target?.tagName === 'TEXTAREA' ||
+        target?.isContentEditable
+      ) return;
+
+      // Modifier keys → bail (don't hijack ctrl-l etc.)
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+      const list = filteredPostsForKbd;
+      if (list.length === 0 && e.key !== '?') return;
+
+      switch (e.key) {
+        case 'j': {
+          e.preventDefault();
+          const next = Math.min(list.length - 1, focusedIndex < 0 ? 0 : focusedIndex + 1);
+          setFocusedIndex(next);
+          postRefs.current[next]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          break;
+        }
+        case 'k': {
+          e.preventDefault();
+          const prev = Math.max(0, focusedIndex < 0 ? 0 : focusedIndex - 1);
+          setFocusedIndex(prev);
+          postRefs.current[prev]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          break;
+        }
+        case 'l': {
+          if (focusedIndex < 0) return;
+          e.preventDefault();
+          const post = list[focusedIndex];
+          if (post) handleLikeToggle(post.id);
+          break;
+        }
+        case 'b': {
+          if (focusedIndex < 0) return;
+          e.preventDefault();
+          const post = list[focusedIndex];
+          if (!post || post.id.startsWith('mock-')) return;
+          fetch('/api/bookmarks', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ postId: post.id }),
+          }).catch(() => {});
+          // Optimistic toggle
+          setPosts(prev => prev.map(p =>
+            p.id === post.id ? { ...p, isBookmarked: !p.isBookmarked } : p
+          ));
+          break;
+        }
+        case '?': {
+          e.preventDefault();
+          setShowShortcutsHelp(s => !s);
+          break;
+        }
+        case 'Escape': {
+          if (showShortcutsHelp) setShowShortcutsHelp(false);
+          else if (focusedIndex >= 0) setFocusedIndex(-1);
+          break;
+        }
+        case '.': {
+          // "." — TweetDeck-style refresh / show pending
+          if (pendingPosts.length > 0) {
+            e.preventDefault();
+            showPending();
+          }
+          break;
+        }
+      }
+    }
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusedIndex, filteredPostsForKbd.length, pendingPosts.length, showShortcutsHelp]);
+
   if (loading) {
     return (
       <div className="space-y-3">
@@ -280,20 +375,77 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
     }
   }
 
-  // Apply client-side filters
-  const filteredPosts = posts.filter(p => {
-    if (sentimentFilter !== 'all') {
-      const s = p.sentiment ?? 'neutral';
-      if (s !== sentimentFilter) return false;
-    }
-    if (langFilter !== 'all' && p.lang !== langFilter) return false;
-    return true;
-  });
+  // Apply client-side filters (re-using the same predicate as the keyboard handler)
+  const filteredPosts = filteredPostsForKbd;
 
   const filtersActive = sentimentFilter !== 'all' || langFilter !== 'all';
 
   return (
     <div className="space-y-3 relative">
+      {/* Keyboard shortcuts help modal */}
+      {showShortcutsHelp && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ background: 'rgba(6,11,22,0.85)', backdropFilter: 'blur(6px)' }}
+          onClick={() => setShowShortcutsHelp(false)}
+        >
+          <div
+            className="rounded-2xl max-w-sm w-full mx-4 p-6"
+            style={{
+              background: 'rgba(13,20,36,0.98)',
+              border: '1px solid rgba(0,229,176,0.25)',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,229,176,0.15)',
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-[15px] font-black" style={{ color: '#e8f0ff' }}>
+                ⌨️  קיצורי מקלדת
+              </span>
+              <button
+                onClick={() => setShowShortcutsHelp(false)}
+                className="text-[13px] font-bold transition-colors"
+                style={{ color: '#5a7090' }}
+                onMouseEnter={e => (e.currentTarget.style.color = '#e8f0ff')}
+                onMouseLeave={e => (e.currentTarget.style.color = '#5a7090')}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="space-y-2.5">
+              {[
+                { keys: ['J'], desc: 'הפוסט הבא' },
+                { keys: ['K'], desc: 'הפוסט הקודם' },
+                { keys: ['L'], desc: 'לייק לפוסט הממוקד' },
+                { keys: ['B'], desc: 'שמור לסימניות' },
+                { keys: ['.'], desc: 'הצג פוסטים חדשים' },
+                { keys: ['Esc'], desc: 'בטל בחירה' },
+                { keys: ['?'], desc: 'הצג עזרה זו' },
+              ].map(row => (
+                <div key={row.desc} className="flex items-center justify-between">
+                  <span className="text-[12px]" style={{ color: '#a0b4cc' }}>{row.desc}</span>
+                  <div className="flex gap-1">
+                    {row.keys.map(k => (
+                      <kbd
+                        key={k}
+                        className="text-[11px] font-mono font-bold px-2 py-1 rounded-md min-w-[28px] text-center"
+                        style={{
+                          background: 'rgba(0,229,176,0.12)',
+                          color: '#00e5b0',
+                          border: '1px solid rgba(0,229,176,0.3)',
+                        }}
+                      >
+                        {k}
+                      </kbd>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Filter bar */}
       {showFilters && !loading && posts.length > 0 && (
         <div
@@ -398,14 +550,26 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
         </div>
       )}
 
-      {filteredPosts.map(post => (
-        <PostCard
-          key={post.id}
-          post={post}
-          onLikeToggle={handleLikeToggle}
-          isFresh={freshIds.has(post.id)}
-        />
-      ))}
+      {filteredPosts.map((post, i) => {
+        const isFocused = i === focusedIndex;
+        return (
+          <div
+            key={post.id}
+            ref={el => { postRefs.current[i] = el; }}
+            className="rounded-2xl transition-shadow"
+            style={isFocused ? {
+              boxShadow: '0 0 0 2px rgba(0,229,176,0.55), 0 8px 28px rgba(0,229,176,0.18)',
+              borderRadius: '18px',
+            } : undefined}
+          >
+            <PostCard
+              post={post}
+              onLikeToggle={handleLikeToggle}
+              isFresh={freshIds.has(post.id)}
+            />
+          </div>
+        );
+      })}
 
       {/* Empty — no posts at all */}
       {posts.length === 0 && (
