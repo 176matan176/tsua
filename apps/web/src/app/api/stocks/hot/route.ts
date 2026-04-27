@@ -5,36 +5,9 @@ import {
   IL_UNIVERSE, US_UNIVERSE, computeHotScore,
   type UniverseStock, type StockScore,
 } from '@/lib/hotStocks';
+import { fetchQuotes } from '@/lib/quotes';
 
 export const revalidate = 120; // 2-minute ISR cache
-
-const FINNHUB_KEY = process.env.FINNHUB_API_KEY;
-
-interface FinnhubQuote {
-  c: number;   // current price
-  d: number;   // change
-  dp: number;  // change %
-  o: number;   // open
-  h: number;   // high
-  l: number;   // low
-  pc: number;  // previous close
-  v: number;   // volume
-}
-
-async function fetchQuote(ticker: string): Promise<FinnhubQuote | null> {
-  if (!FINNHUB_KEY) return null;
-  try {
-    const res = await fetch(
-      `https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${FINNHUB_KEY}`,
-      { next: { revalidate: 120 } },
-    );
-    if (!res.ok) return null;
-    const q: FinnhubQuote = await res.json();
-    return q.c && q.c !== 0 ? q : null;
-  } catch {
-    return null;
-  }
-}
 
 function getSentiment(posts: { sentiment: string | null }[]) {
   const c = { bullish: 0, bearish: 0, neutral: 0 };
@@ -79,8 +52,8 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  // ── 2. Fetch Finnhub quotes in parallel ─────────────────────────────────
-  const quotes = await Promise.all(tickers.map(t => fetchQuote(t)));
+  // ── 2. Fetch quotes in parallel (Finnhub primary, Yahoo fallback) ───────
+  const quotes = await fetchQuotes(tickers, 120);
 
   // ── 3. Rank by volume (for volume_score) ────────────────────────────────
   const volumeRankMap: Record<string, number> = {};
@@ -94,22 +67,23 @@ export async function GET(req: NextRequest) {
   const scored: StockScore[] = universe.map((stock, i) => {
     const q = quotes[i];
     const { count: mentions24h, posts: stockPosts } = mentionsMap[stock.ticker];
+    const hasQuote = (q?.c ?? 0) > 0;
     const { hotScore, buzzScore, volatilityScore, volumeScore, reason } = computeHotScore(
       mentions24h,
-      q?.dp ?? null,
+      hasQuote ? q.dp : null,
       volumeRankMap[stock.ticker] ?? 0,
       universe.length,
     );
     return {
       ...stock,
       rank: 0, // assigned below
-      price:         q?.c  ?? null,
-      changePercent: q?.dp ?? null,
-      volume:        q?.v  ?? null,
-      open:          q?.o  ?? null,
-      high:          q?.h  ?? null,
-      low:           q?.l  ?? null,
-      prevClose:     q?.pc ?? null,
+      price:         hasQuote ? q.c  : null,
+      changePercent: hasQuote ? q.dp : null,
+      volume:        hasQuote ? q.v  : null,
+      open:          hasQuote ? q.o  : null,
+      high:          hasQuote ? q.h  : null,
+      low:           hasQuote ? q.l  : null,
+      prevClose:     hasQuote ? q.pc : null,
       hotScore,
       buzzScore,
       volatilityScore,

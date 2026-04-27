@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { fetchQuote } from '@/lib/quotes';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,39 +15,35 @@ export async function GET(
   req: NextRequest,
   { params }: { params: { ticker: string } }
 ) {
-  if (!FINNHUB_KEY) {
-    return NextResponse.json({ error: 'FINNHUB_API_KEY not set' }, { status: 500 });
-  }
-
   const ticker = params.ticker.toUpperCase().replace('$', '');
   const symbol = toFinnhubSymbol(ticker);
 
   try {
-    // Fetch quote + profile + basic metrics in parallel
-    // Quote cached 60s, profile/metrics cached 1hr to avoid Finnhub 429
-    const [quoteRes, profileRes, metricsRes] = await Promise.all([
-      fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${FINNHUB_KEY}`, {
-        next: { revalidate: 60 },
-      }),
-      fetch(`https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=${FINNHUB_KEY}`, {
-        next: { revalidate: 3600 },
-      }),
-      fetch(`https://finnhub.io/api/v1/stock/metric?symbol=${symbol}&metric=all&token=${FINNHUB_KEY}`, {
-        next: { revalidate: 3600 },
-      }),
+    // Quote: Finnhub primary + Yahoo fallback (handles 429 and delisted tickers).
+    // Profile + metrics: Finnhub-only (Yahoo doesn't expose these on the public chart API).
+    // Profile/metrics may return empty for symbols Finnhub doesn't support — that's fine,
+    // the page still renders with the quote.
+    const [quote, profileRes, metricsRes] = await Promise.all([
+      fetchQuote(symbol),
+      FINNHUB_KEY
+        ? fetch(`https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=${FINNHUB_KEY}`, {
+            next: { revalidate: 3600 },
+          }).catch(() => null)
+        : null,
+      FINNHUB_KEY
+        ? fetch(`https://finnhub.io/api/v1/stock/metric?symbol=${symbol}&metric=all&token=${FINNHUB_KEY}`, {
+            next: { revalidate: 3600 },
+          }).catch(() => null)
+        : null,
     ]);
 
-    if (!quoteRes.ok) throw new Error(`Finnhub error: ${quoteRes.status}`);
-
-    const quote = await quoteRes.json();
-    const profile = profileRes.ok ? await profileRes.json() : {};
-    const metricsData = metricsRes.ok ? await metricsRes.json() : {};
-    const m = metricsData?.metric ?? {};
-
-    // quote.c = current price, quote.d = change, quote.dp = change percent
-    if (!quote.c || quote.c === 0) {
-      throw new Error('No price data returned');
+    if (!quote.c) {
+      return NextResponse.json({ error: 'No price data returned' }, { status: 404 });
     }
+
+    const profile = profileRes && profileRes.ok ? await profileRes.json() : {};
+    const metricsData = metricsRes && metricsRes.ok ? await metricsRes.json() : {};
+    const m = metricsData?.metric ?? {};
 
     return NextResponse.json({
       ticker,

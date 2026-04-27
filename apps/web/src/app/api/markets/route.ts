@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
+import { fetchQuote, fetchYahooQuote } from '@/lib/quotes';
 
 export const dynamic = 'force-dynamic';
-
-const FINNHUB_KEY = process.env.FINNHUB_API_KEY;
 
 const INDICES = [
   { symbol: 'SPY',  nameHe: 'S&P 500',   nameEn: 'S&P 500',    flag: '🇺🇸', currency: 'USD' },
@@ -34,55 +33,20 @@ const WATCH_LIST = [
 // Forex pairs — Yahoo Finance uses `USDILS=X`-style symbols.
 // Finnhub's `OANDA:*` feed requires a paid plan; free tier returns empty.
 const FOREX = [
-  { symbol: 'USDILS=X', pair: 'USD/ILS', base: '🇺🇸', quote: '🇮🇱', source: 'yahoo' as const },
-  { symbol: 'EURILS=X', pair: 'EUR/ILS', base: '🇪🇺', quote: '🇮🇱', source: 'yahoo' as const },
-  { symbol: 'GBPILS=X', pair: 'GBP/ILS', base: '🇬🇧', quote: '🇮🇱', source: 'yahoo' as const },
-  { symbol: 'BTC-USD',  pair: 'BTC/USD', base: '₿',   quote: '🇺🇸', source: 'yahoo' as const },
+  { symbol: 'USDILS=X', pair: 'USD/ILS', base: '🇺🇸', quote: '🇮🇱' },
+  { symbol: 'EURILS=X', pair: 'EUR/ILS', base: '🇪🇺', quote: '🇮🇱' },
+  { symbol: 'GBPILS=X', pair: 'GBP/ILS', base: '🇬🇧', quote: '🇮🇱' },
+  { symbol: 'BTC-USD',  pair: 'BTC/USD', base: '₿',   quote: '🇺🇸' },
 ];
 
-async function getQuote(symbol: string) {
-  const r = await fetch(
-    `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${FINNHUB_KEY}`,
-    { next: { revalidate: 60 } }
-  );
-  return r.json();
-}
-
-// Pull live FX / crypto from Yahoo Finance chart API (no paid tier needed).
-async function getYahooQuote(symbol: string): Promise<{ c: number; d: number; dp: number }> {
-  try {
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=2d`;
-    const r = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; TsuaBot/1.0; +https://tsua-rho.vercel.app)',
-        'Accept': 'application/json',
-      },
-      next: { revalidate: 60 },
-    });
-    if (!r.ok) return { c: 0, d: 0, dp: 0 };
-    const data = await r.json();
-    const meta = data?.chart?.result?.[0]?.meta;
-    const price = Number(meta?.regularMarketPrice) || 0;
-    const prev = Number(meta?.chartPreviousClose ?? meta?.previousClose ?? price) || price;
-    const d = price - prev;
-    const dp = prev ? (d / prev) * 100 : 0;
-    return { c: price, d, dp };
-  } catch {
-    return { c: 0, d: 0, dp: 0 };
-  }
-}
-
 export async function GET() {
-  if (!FINNHUB_KEY) return NextResponse.json({ error: 'No API key' }, { status: 500 });
-
   try {
-    // Fetch all quotes in parallel.
-    // Indices + stocks come from Finnhub; forex/crypto come from Yahoo
-    // (Finnhub's free tier returns 0 for OANDA/BINANCE symbols).
+    // Indices + watch-list go through fetchQuote (Finnhub primary, Yahoo fallback).
+    // Forex/crypto go straight to Yahoo since Finnhub free returns empty.
     const [indexQuotes, watchQuotes, forexQuotes] = await Promise.all([
-      Promise.all(INDICES.map(i => getQuote(i.symbol))),
-      Promise.all(WATCH_LIST.map(s => getQuote(s.symbol))),
-      Promise.all(FOREX.map(f => getYahooQuote(f.symbol))),
+      Promise.all(INDICES.map(i => fetchQuote(i.symbol))),
+      Promise.all(WATCH_LIST.map(s => fetchQuote(s.symbol))),
+      Promise.all(FOREX.map(f => fetchYahooQuote(f.symbol))),
     ]);
 
     const indices = INDICES.map((idx, i) => ({

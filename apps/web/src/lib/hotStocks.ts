@@ -39,13 +39,13 @@ export const IL_UNIVERSE: UniverseStock[] = [
   { ticker: 'ESLT', nameHe: 'אלביט',            nameEn: 'Elbit Systems',  exchange: 'NASDAQ' },
   { ticker: 'NNDM', nameHe: 'ננו-דיימנשן',     nameEn: 'Nano Dimension', exchange: 'NASDAQ' },
   { ticker: 'INMD', nameHe: 'אינמד',            nameEn: 'InMode',         exchange: 'NASDAQ' },
-  { ticker: 'SPNS', nameHe: 'ספיינס',           nameEn: 'Sapiens',        exchange: 'NASDAQ' },
+  { ticker: 'CYBR', nameHe: 'סייברארק',         nameEn: 'CyberArk',       exchange: 'NASDAQ' },
   { ticker: 'CLBT', nameHe: 'סלברייט',          nameEn: 'Cellebrite',     exchange: 'NASDAQ' },
   { ticker: 'RDWR', nameHe: 'רדוור',            nameEn: 'Radware',        exchange: 'NASDAQ' },
-  { ticker: 'CRNT', nameHe: 'סיירגון',          nameEn: 'Ceragon',        exchange: 'NASDAQ' },
+  { ticker: 'CRNT', nameHe: 'סראגון',           nameEn: 'Ceragon',        exchange: 'NASDAQ' },
   { ticker: 'GILT', nameHe: 'גילת',             nameEn: 'Gilat',          exchange: 'NASDAQ' },
-  { ticker: 'BVS',  nameHe: 'ביקום',            nameEn: 'Bycom',          exchange: 'NYSE'   },
-  { ticker: 'SMFR', nameHe: 'סמארטפרנד',       nameEn: 'SmartFriend',    exchange: 'NASDAQ' },
+  { ticker: 'NVMI', nameHe: 'נובה',             nameEn: 'Nova',           exchange: 'NASDAQ' },
+  { ticker: 'ZIM',  nameHe: 'צים',              nameEn: 'ZIM Shipping',   exchange: 'NYSE'   },
 ];
 
 export const US_UNIVERSE: UniverseStock[] = [
@@ -65,7 +65,7 @@ export const US_UNIVERSE: UniverseStock[] = [
   { ticker: 'COIN', nameHe: 'קוינבייס',         nameEn: 'Coinbase',       exchange: 'NASDAQ' },
   { ticker: 'PLTR', nameHe: 'פאלנטיר',          nameEn: 'Palantir',       exchange: 'NYSE'   },
   { ticker: 'PYPL', nameHe: 'פייפאל',           nameEn: 'PayPal',         exchange: 'NASDAQ' },
-  { ticker: 'SQ',   nameHe: 'בלוק',             nameEn: 'Block',          exchange: 'NYSE'   },
+  { ticker: 'XYZ',  nameHe: 'בלוק',             nameEn: 'Block',          exchange: 'NYSE'   },
   { ticker: 'V',    nameHe: 'ויזה',              nameEn: 'Visa',           exchange: 'NYSE'   },
   { ticker: 'MA',   nameHe: 'מסטרקארד',        nameEn: 'Mastercard',     exchange: 'NYSE'   },
   { ticker: 'JPM',  nameHe: "ג'י-פי-מורגן",   nameEn: 'JPMorgan',       exchange: 'NYSE'   },
