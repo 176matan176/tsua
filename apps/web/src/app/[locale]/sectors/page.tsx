@@ -1,22 +1,23 @@
 import { SectorHeatmap } from '@/components/markets/SectorHeatmap';
+import { SectorTreemap } from '@/components/markets/SectorTreemap';
 import { InfoTooltip } from '@/components/ui/InfoTooltip';
 import { DICTIONARY } from '@/lib/financialDictionary';
 
 export const metadata = {
   title: 'מגזרים | תשואה',
-  description: 'heatmap חי של 11 מגזרי GICS הראשיים בשוק האמריקאי',
+  description: 'מפת שוק חיה בסגנון Finviz — 11 מגזרי GICS עם מניות בגודל לפי שווי שוק וצבע לפי תנועה יומית',
 };
 
 export default function SectorsPage() {
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
+    <div className="max-w-6xl mx-auto space-y-6" dir="rtl">
       <header className="rounded-2xl p-6" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div>
-            <h1 className="text-2xl font-black text-tsua-text mb-2">🗺️ מגזרים</h1>
+            <h1 className="text-2xl font-black text-tsua-text mb-2">🗺️ מפת השוק</h1>
             <p className="text-sm text-tsua-muted leading-relaxed max-w-2xl">
-              ביצועי 11 מגזרי GICS הראשיים בשוק האמריקאי — נתונים חיים, מתעדכנים כל דקה.
-              צבע ירוק = המגזר עולה היום, צבע אדום = יורד. הלחיצה על מגזר פותחת את רשימת המניות הבולטות בו.
+              כל מניה כריבוע — גודל לפי שווי שוק, צבע לפי תנועה יומית. ירוק = עלייה, אדום = ירידה.
+              לחיצה על ריבוע פותחת את דף המניה. הנתונים מתעדכנים כל דקה.
             </p>
           </div>
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg shrink-0"
@@ -28,14 +29,22 @@ export default function SectorsPage() {
         </div>
 
         <div className="mt-4 flex items-center text-xs text-tsua-muted">
-          מייצג את המגזר באמצעות
-          <span className="mx-1 font-mono" dir="ltr">SPDR Sector ETFs</span>
-          (XLK, XLV, וכו')
+          11 מגזרי GICS, ~140 מניות גדולות מהשוק האמריקאי
           <InfoTooltip term={DICTIONARY.sector} />
         </div>
       </header>
 
+      {/* Main Finviz-style treemap */}
       <section>
+        <SectorTreemap />
+      </section>
+
+      {/* Sector-level heatmap (ETF performance per sector) — secondary view */}
+      <section className="space-y-3">
+        <h2 className="text-base font-black text-tsua-text">מבט-על מגזרי</h2>
+        <p className="text-xs text-tsua-muted">
+          ביצוע ה-ETF המייצג כל מגזר (XLK, XLV, וכו'). שימושי לקריאה מהירה של היום בשוק.
+        </p>
         <SectorHeatmap variant="full" />
       </section>
     </div>

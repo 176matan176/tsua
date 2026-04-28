@@ -29,7 +29,7 @@ export const SECTORS: Sector[] = [
     etf: 'XLK',
     color: '#3b82f6',
     description: 'ענקיות התוכנה, המוליכים למחצה והמחשוב הענני — השחקן הדומיננטי בשוק.',
-    top: ['AAPL', 'MSFT', 'NVDA', 'AVGO', 'ORCL', 'CRM', 'AMD', 'ADBE'],
+    top: ['AAPL', 'MSFT', 'NVDA', 'AVGO', 'ORCL', 'CRM', 'AMD', 'ADBE', 'CSCO', 'ACN', 'IBM', 'INTU', 'NOW', 'QCOM', 'TXN', 'AMAT'],
   },
   {
     key: 'health',
@@ -39,7 +39,7 @@ export const SECTORS: Sector[] = [
     etf: 'XLV',
     color: '#10b981',
     description: 'חברות תרופות, ביוטכנולוגיה, ציוד רפואי וביטוחי בריאות.',
-    top: ['LLY', 'UNH', 'JNJ', 'ABBV', 'MRK', 'TMO', 'PFE', 'ABT'],
+    top: ['LLY', 'UNH', 'JNJ', 'ABBV', 'MRK', 'TMO', 'PFE', 'ABT', 'DHR', 'ISRG', 'AMGN', 'GILD', 'BMY', 'CVS'],
   },
   {
     key: 'finance',
@@ -49,7 +49,7 @@ export const SECTORS: Sector[] = [
     etf: 'XLF',
     color: '#f59e0b',
     description: 'בנקים, חברות ביטוח, שוקי הון ונדל"ן פיננסי.',
-    top: ['JPM', 'V', 'BAC', 'MA', 'WFC', 'GS', 'MS', 'BLK'],
+    top: ['JPM', 'V', 'BAC', 'MA', 'WFC', 'GS', 'MS', 'BLK', 'AXP', 'C', 'SCHW', 'PGR', 'USB', 'PYPL', 'COF'],
   },
   {
     key: 'discretionary',
@@ -59,7 +59,7 @@ export const SECTORS: Sector[] = [
     etf: 'XLY',
     color: '#ec4899',
     description: 'רכב, אופנה, בידור, מלונות — מה שצרכנים קונים כשכלכלית להם טוב.',
-    top: ['AMZN', 'TSLA', 'HD', 'MCD', 'NKE', 'SBUX', 'LOW', 'BKNG'],
+    top: ['AMZN', 'TSLA', 'HD', 'MCD', 'NKE', 'SBUX', 'LOW', 'BKNG', 'TJX', 'MAR', 'ABNB', 'CMG', 'GM', 'F'],
   },
   {
     key: 'staples',
@@ -69,7 +69,7 @@ export const SECTORS: Sector[] = [
     etf: 'XLP',
     color: '#8b5cf6',
     description: 'מזון, משקאות, תרופות ללא מרשם — מוצרים שקונים גם במיתון.',
-    top: ['WMT', 'PG', 'COST', 'KO', 'PEP', 'PM', 'MDLZ', 'CL'],
+    top: ['WMT', 'PG', 'COST', 'KO', 'PEP', 'PM', 'MDLZ', 'CL', 'MO', 'TGT', 'KMB', 'EL'],
   },
   {
     key: 'energy',
@@ -79,7 +79,7 @@ export const SECTORS: Sector[] = [
     etf: 'XLE',
     color: '#ef4444',
     description: 'נפט, גז טבעי, אנרגיה מתחדשת — תלוי במחירי חומרי גלם גלובליים.',
-    top: ['XOM', 'CVX', 'COP', 'EOG', 'SLB', 'MPC', 'PSX', 'OXY'],
+    top: ['XOM', 'CVX', 'COP', 'EOG', 'SLB', 'MPC', 'PSX', 'OXY', 'VLO', 'WMB', 'KMI', 'ENB'],
   },
   {
     key: 'industrials',
@@ -89,7 +89,7 @@ export const SECTORS: Sector[] = [
     etf: 'XLI',
     color: '#64748b',
     description: 'תעופה, ביטחון, מכונות, הובלה — מצב הכלכלה בגדול.',
-    top: ['GE', 'CAT', 'UBER', 'RTX', 'HON', 'BA', 'UNP', 'LMT'],
+    top: ['GE', 'CAT', 'UBER', 'RTX', 'HON', 'BA', 'UNP', 'LMT', 'DE', 'UPS', 'FDX', 'NOC'],
   },
   {
     key: 'materials',
@@ -99,7 +99,7 @@ export const SECTORS: Sector[] = [
     etf: 'XLB',
     color: '#a3a3a3',
     description: 'כימיקלים, מתכות, חומרי בנייה — מדד למצב התעשייה הגלובלית.',
-    top: ['LIN', 'SHW', 'APD', 'ECL', 'FCX', 'NEM', 'DD', 'DOW'],
+    top: ['LIN', 'SHW', 'APD', 'ECL', 'FCX', 'NEM', 'DD', 'DOW', 'CTVA', 'NUE', 'VMC'],
   },
   {
     key: 'utilities',
@@ -109,7 +109,7 @@ export const SECTORS: Sector[] = [
     etf: 'XLU',
     color: '#14b8a6',
     description: 'חשמל, מים, גז — מניות דיבידנד יציבות ("אג"ח דמויות מניות").',
-    top: ['NEE', 'SO', 'DUK', 'CEG', 'AEP', 'SRE', 'D', 'PCG'],
+    top: ['NEE', 'SO', 'DUK', 'CEG', 'AEP', 'SRE', 'D', 'PCG', 'EXC', 'XEL', 'ED'],
   },
   {
     key: 'realestate',
@@ -119,7 +119,7 @@ export const SECTORS: Sector[] = [
     etf: 'XLRE',
     color: '#f97316',
     description: 'REITs — נדל"ן מסחרי, משרדים, מרכזים לוגיסטיים, דיור.',
-    top: ['PLD', 'AMT', 'EQIX', 'WELL', 'SPG', 'PSA', 'O', 'CCI'],
+    top: ['PLD', 'AMT', 'EQIX', 'WELL', 'SPG', 'PSA', 'O', 'CCI', 'DLR', 'EXR'],
   },
   {
     key: 'communication',
@@ -129,7 +129,7 @@ export const SECTORS: Sector[] = [
     etf: 'XLC',
     color: '#06b6d4',
     description: 'מדיה, רשתות חברתיות, טלקום — מ-Google ועד Netflix.',
-    top: ['META', 'GOOGL', 'NFLX', 'DIS', 'T', 'TMUS', 'VZ', 'CMCSA'],
+    top: ['META', 'GOOGL', 'NFLX', 'DIS', 'T', 'TMUS', 'VZ', 'CMCSA', 'CHTR', 'EA', 'TTWO'],
   },
 ];
 
