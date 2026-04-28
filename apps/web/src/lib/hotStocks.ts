@@ -39,7 +39,7 @@ export const IL_UNIVERSE: UniverseStock[] = [
   { ticker: 'ESLT', nameHe: 'אלביט',            nameEn: 'Elbit Systems',  exchange: 'NASDAQ' },
   { ticker: 'NNDM', nameHe: 'ננו-דיימנשן',     nameEn: 'Nano Dimension', exchange: 'NASDAQ' },
   { ticker: 'INMD', nameHe: 'אינמד',            nameEn: 'InMode',         exchange: 'NASDAQ' },
-  { ticker: 'CYBR', nameHe: 'סייברארק',         nameEn: 'CyberArk',       exchange: 'NASDAQ' },
+  { ticker: 'CAMT', nameHe: 'קמטק',             nameEn: 'Camtek',         exchange: 'NASDAQ' },
   { ticker: 'CLBT', nameHe: 'סלברייט',          nameEn: 'Cellebrite',     exchange: 'NASDAQ' },
   { ticker: 'RDWR', nameHe: 'רדוור',            nameEn: 'Radware',        exchange: 'NASDAQ' },
   { ticker: 'CRNT', nameHe: 'סראגון',           nameEn: 'Ceragon',        exchange: 'NASDAQ' },
