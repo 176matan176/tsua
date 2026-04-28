@@ -108,23 +108,38 @@ body {
   box-shadow: 0 4px 20px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,122,92,0.1) !important;
 }
 
-/* ─── Override hardcoded dark backgrounds (inline style selectors) ── */
+/* ─── Override hardcoded dark backgrounds (inline style selectors) ──
+ * Many components were authored against dark-mode hex values inlined in
+ * style="…". The substring matchers below catch the full family of dark
+ * navy/slate panels and rewrite them to the cream card surface. New
+ * patterns should be added here when found.
+ */
 
 /* Dark solid card/panel backgrounds */
 [data-theme="light"] [style*="background: rgba(15,25,41"],
 [data-theme="light"] [style*="background:rgba(15,25,41"],
 [data-theme="light"] [style*="background: rgba(10,16,30"],
 [data-theme="light"] [style*="background:rgba(10,16,30"],
+[data-theme="light"] [style*="background: rgba(10,20,40"],
+[data-theme="light"] [style*="background:rgba(10,20,40"],
 [data-theme="light"] [style*="background: rgba(8,13,24"],
 [data-theme="light"] [style*="background:rgba(8,13,24"],
 [data-theme="light"] [style*="background: rgba(8,14,26"],
 [data-theme="light"] [style*="background:rgba(8,14,26"],
+[data-theme="light"] [style*="background: rgba(8,13,26"],
+[data-theme="light"] [style*="background:rgba(8,13,26"],
 [data-theme="light"] [style*="background: rgba(6,11,22"],
 [data-theme="light"] [style*="background:rgba(6,11,22"],
+[data-theme="light"] [style*="background: rgba(5,9,18"],
+[data-theme="light"] [style*="background:rgba(5,9,18"],
 [data-theme="light"] [style*="background: rgba(12,18,32"],
 [data-theme="light"] [style*="background:rgba(12,18,32"],
+[data-theme="light"] [style*="background: rgba(12,20,36"],
+[data-theme="light"] [style*="background:rgba(12,20,36"],
 [data-theme="light"] [style*="background: rgba(13,20,36"],
-[data-theme="light"] [style*="background:rgba(13,20,36"] {
+[data-theme="light"] [style*="background:rgba(13,20,36"],
+[data-theme="light"] [style*="background: rgba(20,30,50"],
+[data-theme="light"] [style*="background:rgba(20,30,50"] {
   background: var(--card) !important;
   border-color: rgba(180,155,110,0.2) !important;
 }
@@ -190,20 +205,51 @@ body {
 
 /* Hardcoded dark-theme text colors → light theme equivalents */
 [data-theme="light"] [style*="color: #e8f0ff"],
-[data-theme="light"] [style*="color:#e8f0ff"] { color: var(--text) !important; }
+[data-theme="light"] [style*="color:#e8f0ff"],
+[data-theme="light"] [style*="color: #e8f4ff"],
+[data-theme="light"] [style*="color:#e8f4ff"] { color: var(--text) !important; }
 [data-theme="light"] [style*="color: rgba(168,188,212"],
-[data-theme="light"] [style*="color:rgba(168,188,212"] { color: var(--text2) !important; }
+[data-theme="light"] [style*="color:rgba(168,188,212"],
+[data-theme="light"] [style*="color: #c8ddf4"],
+[data-theme="light"] [style*="color:#c8ddf4"],
+[data-theme="light"] [style*="color: #b3c2d6"],
+[data-theme="light"] [style*="color:#b3c2d6"],
+[data-theme="light"] [style*="color: #a8bcd4"],
+[data-theme="light"] [style*="color:#a8bcd4"],
+[data-theme="light"] [style*="color: #cbd6e3"],
+[data-theme="light"] [style*="color:#cbd6e3"],
+[data-theme="light"] [style*="color: #cbd5e1"],
+[data-theme="light"] [style*="color:#cbd5e1"],
+[data-theme="light"] [style*="color: #94a3b8"],
+[data-theme="light"] [style*="color:#94a3b8"] { color: var(--text2) !important; }
 [data-theme="light"] [style*="color: rgba(90,112,144"],
-[data-theme="light"] [style*="color:rgba(90,112,144"] { color: var(--muted) !important; }
+[data-theme="light"] [style*="color:rgba(90,112,144"],
+[data-theme="light"] [style*="color: rgba(80,100,125"],
+[data-theme="light"] [style*="color:rgba(80,100,125"] { color: var(--muted) !important; }
 [data-theme="light"] [style*="color: #00e5b0"],
 [data-theme="light"] [style*="color:#00e5b0"] { color: var(--accent) !important; }
 [data-theme="light"] [style*="fill: #00e5b0"],
 [data-theme="light"] [style*="color: #00a884"],
-[data-theme="light"] [style*="color:#00a884"] { color: var(--accent2) !important; }
+[data-theme="light"] [style*="color:#00a884"],
+[data-theme="light"] [style*="color: #00c49a"],
+[data-theme="light"] [style*="color:#00c49a"] { color: var(--accent2) !important; }
 [data-theme="light"] [style*="color: #ff4d6a"],
-[data-theme="light"] [style*="color:#ff4d6a"] { color: var(--red) !important; }
+[data-theme="light"] [style*="color:#ff4d6a"],
+[data-theme="light"] [style*="color: #ff8080"],
+[data-theme="light"] [style*="color:#ff8080"],
+[data-theme="light"] [style*="color: #ffb0b0"],
+[data-theme="light"] [style*="color:#ffb0b0"] { color: var(--red) !important; }
 [data-theme="light"] [style*="color: #f5b942"],
-[data-theme="light"] [style*="color:#f5b942"] { color: var(--gold) !important; }
+[data-theme="light"] [style*="color:#f5b942"],
+[data-theme="light"] [style*="color: #ffd166"],
+[data-theme="light"] [style*="color:#ffd166"],
+[data-theme="light"] [style*="color: #ffb84d"],
+[data-theme="light"] [style*="color:#ffb84d"] { color: var(--gold) !important; }
+/* Royal/sky blue accent (alerts, info badges) */
+[data-theme="light"] [style*="color: #3b82f6"],
+[data-theme="light"] [style*="color:#3b82f6"],
+[data-theme="light"] [style*="color: #4dabf7"],
+[data-theme="light"] [style*="color:#4dabf7"] { color: #1d4ed8 !important; }
 
 /* Neutral value text (#c8d8f0) — light gray in dark mode, dark blue-gray in light */
 [data-theme="light"] [style*="color: #c8d8f0"],
@@ -451,6 +497,119 @@ main { animation: fade-in 0.3s ease-out; }
 [data-theme="light"] .price-up   { color: #007a5c; }
 [data-theme="light"] .price-down { color: #c0182e; }
 [data-theme="light"] .price-flat { color: #6b7e96; }
+
+/* ─── Light theme — Tailwind utility-class fallbacks ───────────────────
+ * Catches Tailwind classes that compile to dark-only colors and remaps
+ * them to the warm-cream palette so a wider surface area of components
+ * becomes legible without per-file edits.
+ */
+
+/* Tailwind `text-tsua-*` tokens come from tailwind.config but we still
+ * have many hardcoded `text-white`, `text-slate-*`, `bg-slate-*`,
+ * `bg-tsua-card`, `bg-white/4`, etc. that show up in light mode. */
+
+/* White-ish text on cream → pivot to dark text */
+[data-theme="light"] .text-white,
+[data-theme="light"] .text-slate-50,
+[data-theme="light"] .text-slate-100,
+[data-theme="light"] .text-slate-200,
+[data-theme="light"] .text-gray-100,
+[data-theme="light"] .text-gray-200 { color: var(--text) !important; }
+
+/* Mid-grey text ladder → readable secondary on cream */
+[data-theme="light"] .text-slate-300,
+[data-theme="light"] .text-slate-400,
+[data-theme="light"] .text-gray-300,
+[data-theme="light"] .text-gray-400,
+[data-theme="light"] .text-zinc-400 { color: var(--text2) !important; }
+[data-theme="light"] .text-slate-500,
+[data-theme="light"] .text-gray-500,
+[data-theme="light"] .text-zinc-500 { color: var(--muted) !important; }
+
+/* `text-tsua-muted` is `rgba(90,112,144,0.8)` — too cold on cream */
+[data-theme="light"] .text-tsua-muted { color: var(--muted) !important; }
+[data-theme="light"] .text-tsua-text  { color: var(--text)  !important; }
+[data-theme="light"] .text-tsua-bg    { color: var(--bg)    !important; }
+[data-theme="light"] .text-tsua-accent { color: var(--accent) !important; }
+
+/* Solid dark Tailwind backgrounds → cream card */
+[data-theme="light"] .bg-tsua-bg,
+[data-theme="light"] .bg-tsua-bg2,
+[data-theme="light"] .bg-tsua-card,
+[data-theme="light"] .bg-tsua-card2,
+[data-theme="light"] .bg-slate-900,
+[data-theme="light"] .bg-slate-800,
+[data-theme="light"] .bg-gray-900,
+[data-theme="light"] .bg-gray-800,
+[data-theme="light"] .bg-zinc-900 {
+  background-color: var(--card) !important;
+}
+
+/* Hover utilities that assume dark base */
+[data-theme="light"] .hover\:bg-tsua-card:hover,
+[data-theme="light"] .hover\:bg-tsua-card2:hover {
+  background-color: var(--hover-bg) !important;
+}
+[data-theme="light"] .hover\:bg-white\/5:hover,
+[data-theme="light"] .hover\:bg-white\/4:hover,
+[data-theme="light"] .hover\:bg-white\/10:hover {
+  background-color: rgba(0,0,0,0.04) !important;
+}
+[data-theme="light"] .active\:bg-white\/5:active,
+[data-theme="light"] .active\:bg-white\/10:active {
+  background-color: rgba(0,0,0,0.06) !important;
+}
+
+/* Border utilities */
+[data-theme="light"] .border-tsua-border,
+[data-theme="light"] .border-tsua-border2 {
+  border-color: var(--border) !important;
+}
+
+/* Generic dark-style backdrops in style="" we haven't classified yet —
+ * any inline style mentioning a `rgba(0,0,0,0.x)` background turns into
+ * a soft cream tint instead of pure black, which is unreadable. */
+[data-theme="light"] [style*="background: rgba(0,0,0,0.4"],
+[data-theme="light"] [style*="background:rgba(0,0,0,0.4"],
+[data-theme="light"] [style*="background: rgba(0,0,0,0.5"],
+[data-theme="light"] [style*="background:rgba(0,0,0,0.5"],
+[data-theme="light"] [style*="background: rgba(0,0,0,0.6"],
+[data-theme="light"] [style*="background:rgba(0,0,0,0.6"],
+[data-theme="light"] [style*="background: rgba(0,0,0,0.7"],
+[data-theme="light"] [style*="background:rgba(0,0,0,0.7"] {
+  background: rgba(15,12,5,0.55) !important; /* warm dark veil for modals */
+}
+
+/* Text shadows tuned for dark backgrounds become unreadable smudges
+ * on cream; strip them in light mode. */
+[data-theme="light"] [style*="textShadow"],
+[data-theme="light"] [style*="text-shadow"] {
+  text-shadow: none !important;
+}
+
+/* Bright neon border (alerts/info banners that use #00e5b0 with high
+ * alpha) — soften to forest green so it doesn't vibrate against cream */
+[data-theme="light"] [style*="border: 1px solid #00e5b0"],
+[data-theme="light"] [style*="border:1px solid #00e5b0"] {
+  border-color: var(--accent) !important;
+}
+
+/* Skeleton/loading bars using slate-ish overlays */
+[data-theme="light"] [style*="background: rgba(60,80,110"],
+[data-theme="light"] [style*="background:rgba(60,80,110"],
+[data-theme="light"] [style*="background: rgba(40,60,100"],
+[data-theme="light"] [style*="background:rgba(40,60,100"] {
+  background: rgba(180,155,110,0.18) !important;
+}
+
+/* Inputs that hardcode dark surface tones — make sure value text uses
+ * the dark cream-readable color, not light-on-light. */
+[data-theme="light"] input[style*="color: #e8f0ff"],
+[data-theme="light"] input[style*="color: #c8ddf4"],
+[data-theme="light"] input[style*="color: #c8d8f0"],
+[data-theme="light"] textarea[style*="color: #e8f0ff"] {
+  color: var(--text) !important;
+}
 
 /* ─── Button press ───────────────────────────────────────────────────── */
 .btn-press { transition: transform 0.1s ease; }

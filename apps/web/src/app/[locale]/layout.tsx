@@ -66,9 +66,22 @@ export default async function RootLayout({ children, params: { locale } }: RootL
   const messages = await getMessages();
   const dir = locale === 'he' ? 'rtl' : 'ltr';
 
+  // Inline script that resolves theme BEFORE first paint to prevent FOUC.
+  // Reads localStorage → falls back to OS preference → defaults to dark.
+  // Runs synchronously in <head> so the body never flashes the wrong palette.
+  const themeBootScript = `
+(function(){try{
+  var saved = localStorage.getItem('tsua-theme');
+  var sysPref = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+  var theme = saved === 'light' || saved === 'dark' ? saved : (sysPref ? 'light' : 'dark');
+  document.documentElement.setAttribute('data-theme', theme);
+  document.documentElement.style.colorScheme = theme;
+}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();`;
+
   return (
     <html lang={locale} dir={dir}>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
