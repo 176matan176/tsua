@@ -73,22 +73,25 @@ export function FearGreedWidget() {
               <div className="text-5xl">{emoji}</div>
             </div>
 
-            {/* Gradient bar */}
+            {/* Gradient bar — fear (coral) on the LEFT, greed (mint) on the RIGHT.
+                Indicator is positioned via `left: value%` so a higher score
+                visibly slides the dot rightward, into the green zone. */}
             <div className="relative w-full h-2.5 rounded-full overflow-hidden mt-2"
-              style={{ background: 'linear-gradient(to left, #00e5b0, #06d6a0, #ffd166, #ff8c42, #ff4d6a)' }}>
+              style={{ background: 'linear-gradient(to right, #ff4d6a, #ff8c42, #ffd166, #06d6a0, #00e5b0)' }}>
               {/* Indicator */}
               <div
-                className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border-2 border-white"
+                className="absolute top-1/2 w-3 h-3 rounded-full border-2 border-white"
                 style={{
-                  right: `${data.value}%`,
+                  left: `${data.value}%`,
                   background: color,
                   boxShadow: `0 0 6px ${color}`,
-                  transform: 'translateX(50%) translateY(-50%)',
+                  transform: 'translate(-50%, -50%)',
                 }}
               />
             </div>
 
-            {/* Labels */}
+            {/* Labels — RTL container puts first child on the right.
+                Right side aligns with greed end of the bar; left with fear. */}
             <div className="flex justify-between mt-1.5">
               <span className="text-[9px] text-tsua-muted">חמדנות קיצונית</span>
               <span className="text-[9px] text-tsua-muted">פחד קיצוני</span>

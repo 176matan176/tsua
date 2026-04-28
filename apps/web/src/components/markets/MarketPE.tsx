@@ -7,23 +7,15 @@ interface PERow {
   nameHe: string;
   flag: string;
   pe: number | null;
-  forward: boolean;
+  source: 'live' | 'estimate';
 }
 
-// These update via Finnhub metrics; fallback to well-known estimates
-const INDEX_LIST: Omit<PERow, 'pe'>[] = [
-  { symbol: 'SPY',  nameHe: 'S&P 500',    flag: '🇺🇸', forward: false },
-  { symbol: 'QQQ',  nameHe: 'נאסד"ק 100', flag: '🇺🇸', forward: false },
-  { symbol: 'DIA',  nameHe: 'דאו ג\'ונס',  flag: '🇺🇸', forward: false },
-  { symbol: 'EIS',  nameHe: 'ת"א 35',     flag: '🇮🇱', forward: false },
-];
+interface PEResponse {
+  ratios: PERow[];
+  updatedAt: number;
+}
 
-const FALLBACK: Record<string, number> = {
-  SPY: 21.8,
-  QQQ: 31.5,
-  DIA: 21.2,
-  EIS: 14.3,
-};
+const REFRESH_MS = 30 * 60 * 1000; // 30 minutes — P/E moves slowly
 
 function PEBar({ pe, max = 50 }: { pe: number; max?: number }) {
   const pct = Math.min((pe / max) * 100, 100);
@@ -35,54 +27,60 @@ function PEBar({ pe, max = 50 }: { pe: number; max?: number }) {
   );
 }
 
+function fmtTime(ts: number): string {
+  return new Date(ts).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+}
+
 export function MarketPE() {
-  const [rows, setRows] = useState<PERow[]>(
-    INDEX_LIST.map(r => ({ ...r, pe: FALLBACK[r.symbol] ?? null }))
-  );
-  const [updated, setUpdated] = useState<string | null>(null);
+  const [rows, setRows] = useState<PERow[]>([]);
+  const [updated, setUpdated] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function load() {
       try {
-        const key = process.env.NEXT_PUBLIC_FINNHUB_API_KEY ?? '';
-        if (!key) throw new Error('no key');
-
-        const results = await Promise.allSettled(
-          INDEX_LIST.map(r =>
-            fetch(`https://finnhub.io/api/v1/stock/metric?symbol=${r.symbol}&metric=all&token=${key}`, {
-              next: { revalidate: 3600 },
-            }).then(res => res.json())
-          )
-        );
-
-        setRows(prev => prev.map((row, i) => {
-          const res = results[i];
-          if (res.status === 'fulfilled') {
-            const pe = res.value?.metric?.peAnnual ?? res.value?.metric?.peTTM ?? null;
-            return { ...row, pe: pe ? parseFloat(pe.toFixed(1)) : (FALLBACK[row.symbol] ?? null) };
-          }
-          return row;
-        }));
-        setUpdated(new Date().toLocaleDateString('he-IL'));
+        const res = await fetch('/api/markets/pe');
+        if (!res.ok) throw new Error('fetch failed');
+        const json = (await res.json()) as PEResponse;
+        if (cancelled) return;
+        setRows(json.ratios);
+        setUpdated(json.updatedAt);
       } catch {
-        // keep fallback values
+        // keep whatever rows we have; don't blank on transient failures
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
+
     load();
+    const int = setInterval(load, REFRESH_MS);
+    return () => {
+      cancelled = true;
+      clearInterval(int);
+    };
   }, []);
 
   return (
     <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(15,25,41,0.7)', border: '1px solid rgba(26,40,64,0.8)' }}>
       <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(26,40,64,0.6)' }}>
         <h3 className="text-sm font-bold text-tsua-text">📐 מכפיל רווח מדדים</h3>
-        {updated && <span className="text-[10px] text-tsua-muted">{updated}</span>}
+        {updated && (
+          <span className="text-[10px] text-tsua-muted tabular-nums" title={new Date(updated).toLocaleString('he-IL')}>
+            עודכן {fmtTime(updated)}
+          </span>
+        )}
       </div>
 
       <div className="divide-y" style={{ borderColor: 'rgba(26,40,64,0.35)' }} dir="rtl">
-        {rows.map(r => {
+        {(loading && rows.length === 0
+          ? [{ symbol: 'SPY', nameHe: '...', flag: '⏳', pe: null, source: 'estimate' as const },
+             { symbol: 'QQQ', nameHe: '...', flag: '⏳', pe: null, source: 'estimate' as const },
+             { symbol: 'DIA', nameHe: '...', flag: '⏳', pe: null, source: 'estimate' as const },
+             { symbol: 'EIS', nameHe: '...', flag: '⏳', pe: null, source: 'estimate' as const }]
+          : rows
+        ).map(r => {
           const color = r.pe
             ? r.pe > 35 ? '#ff4d6a' : r.pe > 25 ? '#ffd166' : r.pe > 18 ? '#00e5b0' : '#c8d8f0'
             : '#c8d8f0';
@@ -92,9 +90,18 @@ export function MarketPE() {
                 <div className="flex items-center gap-2">
                   <span className="text-sm">{r.flag}</span>
                   <span className="text-sm font-bold text-tsua-text">{r.nameHe}</span>
+                  {r.source === 'estimate' && r.pe !== null && (
+                    <span
+                      className="text-[9px] font-bold px-1.5 py-0.5 rounded"
+                      style={{ background: 'rgba(200,216,240,0.12)', color: '#8a9bb3' }}
+                      title="הנתון לא זמין דרך ה-API — מוצג ערך מקורב מעודכן רבעונית"
+                    >
+                      מקורב
+                    </span>
+                  )}
                 </div>
                 <div className="text-end">
-                  {loading || r.pe === null ? (
+                  {r.pe === null ? (
                     <div className="w-12 h-4 rounded animate-pulse" style={{ background: 'rgba(26,40,64,0.6)' }} />
                   ) : (
                     <span className="text-sm font-black font-mono" style={{ color }}>
@@ -103,7 +110,7 @@ export function MarketPE() {
                   )}
                 </div>
               </div>
-              {r.pe && !loading && <PEBar pe={r.pe} />}
+              {r.pe !== null && <PEBar pe={r.pe} />}
             </div>
           );
         })}
