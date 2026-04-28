@@ -46,25 +46,38 @@ interface HeatmapPayload {
 
 const PCT_CAP = 3; // saturate color intensity at ±3%
 
+/**
+ * HSL-based palette: keeps a single hue per direction (mint or coral) and
+ * varies saturation + lightness with magnitude. This gives a smooth band
+ * from dark-tinted near-zero values to vibrant extremes — much cleaner
+ * than RGB lerp which produces muddy mid-tones.
+ *
+ * Hues match Tsua's brand:
+ *   - mint  hue=162  (paired with text #062318 on bright, #d4f5e8 on dark)
+ *   - coral hue=352  (paired with text #240811 on bright, #ffd9de on dark)
+ */
 function heatColor(pct: number): { bg: string; text: string } {
   const clamped = Math.max(-PCT_CAP, Math.min(PCT_CAP, pct));
   const t = Math.abs(clamped) / PCT_CAP; // 0 → 1
-  if (Math.abs(clamped) < 0.05) {
-    // near-flat → neutral gray
-    return { bg: 'rgb(40,55,75)', text: '#cbd6e3' };
+
+  // Truly flat → muted dark slate, no hue tint
+  if (Math.abs(clamped) < 0.08) {
+    return { bg: 'hsl(220, 14%, 21%)', text: '#94a3b8' };
   }
+
+  // Smooth ease so mid intensities don't all collapse into one shade
+  const eased = t * t * (3 - 2 * t); // smoothstep
+  const sat = 52 + eased * 36;       // 52% → 88%
+  const light = 19 + eased * 26;     // 19% → 45%
+
   if (clamped > 0) {
-    // green
-    const r = Math.round(0  + (1 - t) * 30);
-    const g = Math.round(229 - (1 - t) * 80);
-    const b = Math.round(176 - (1 - t) * 90);
-    return { bg: `rgb(${r},${g},${b})`, text: '#03241c' };
+    const bg = `hsl(162, ${sat.toFixed(1)}%, ${light.toFixed(1)}%)`;
+    const text = light > 33 ? '#062318' : '#d4f5e8';
+    return { bg, text };
   }
-  // red
-  const r = Math.round(255 - (1 - t) * 90);
-  const g = Math.round(77  - (1 - t) * 25);
-  const b = Math.round(106 - (1 - t) * 40);
-  return { bg: `rgb(${r},${g},${b})`, text: '#240811' };
+  const bg = `hsl(352, ${sat.toFixed(1)}%, ${light.toFixed(1)}%)`;
+  const text = light > 33 ? '#240811' : '#ffd9de';
+  return { bg, text };
 }
 
 function fmtPct(p: number): string {
@@ -97,7 +110,7 @@ function StockRect({ stock, rect, locale }: StockRectProps) {
   return (
     <Link
       href={`/${locale}/stocks/${stock.ticker}`}
-      className="absolute overflow-hidden flex flex-col items-center justify-center transition-transform hover:z-10 hover:scale-[1.04] hover:shadow-2xl"
+      className="absolute overflow-hidden flex flex-col items-center justify-center transition-all duration-150 hover:z-10 hover:scale-[1.04] hover:shadow-2xl"
       style={{
         left: rect.x,
         top: rect.y,
@@ -105,6 +118,7 @@ function StockRect({ stock, rect, locale }: StockRectProps) {
         height: Math.max(0, rect.h - 1),
         background: bg,
         color: text,
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.07), inset 0 -1px 0 rgba(0,0,0,0.18)',
       }}
       title={`${stock.ticker} · ${stock.name}\n${fmtPct(stock.changePercent)} · ${fmtCap(stock.marketCap)}\nמחיר: $${stock.price.toFixed(2)}`}
     >
@@ -297,16 +311,24 @@ export function SectorTreemap() {
         })}
       </div>
 
-      {/* Legend */}
+      {/* Legend — colors match heatColor() output at the labelled stops */}
       <div className="flex items-center justify-between flex-wrap gap-2 text-xs text-tsua-muted px-1">
         <div className="flex items-center gap-2">
           <span className="font-semibold">תנועה יומית:</span>
-          <div className="flex items-center rounded-md overflow-hidden border" style={{ borderColor: 'rgba(26,40,64,0.7)' }}>
-            <span className="px-2 py-0.5 text-[10px] font-bold" style={{ background: 'rgb(165,52,66)', color: '#240811' }}>-3%</span>
-            <span className="px-2 py-0.5 text-[10px] font-bold" style={{ background: 'rgb(210,65,86)', color: '#240811' }}>-1%</span>
-            <span className="px-2 py-0.5 text-[10px] font-bold" style={{ background: 'rgb(40,55,75)', color: '#cbd6e3' }}>0%</span>
-            <span className="px-2 py-0.5 text-[10px] font-bold" style={{ background: 'rgb(0,180,140)', color: '#03241c' }}>+1%</span>
-            <span className="px-2 py-0.5 text-[10px] font-bold" style={{ background: 'rgb(0,229,176)', color: '#03241c' }}>+3%</span>
+          <div className="flex items-center rounded-md overflow-hidden" style={{ boxShadow: '0 0 0 1px rgba(26,40,64,0.7)' }}>
+            {[-3, -1.5, 0, 1.5, 3].map((p) => {
+              const { bg, text } = heatColor(p);
+              const label = p === 0 ? '0%' : `${p > 0 ? '+' : ''}${p}%`;
+              return (
+                <span
+                  key={p}
+                  className="px-2 py-0.5 text-[10px] font-bold tabular-nums"
+                  style={{ background: bg, color: text }}
+                >
+                  {label}
+                </span>
+              );
+            })}
           </div>
         </div>
         <div>גודל הריבוע = שווי שוק. לחיצה פותחת את דף המניה.</div>
