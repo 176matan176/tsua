@@ -1,20 +1,21 @@
 import { NextResponse } from 'next/server';
+import { fetchYahooPE } from '@/lib/quotes';
 
 export const dynamic = 'force-dynamic';
-// P/E ratios move slowly — refresh at most once an hour on the server.
+// P/E ratios move slowly — re-fetch at most once per hour on the server.
 export const revalidate = 3600;
 
 const FINNHUB_KEY = process.env.FINNHUB_API_KEY;
 
 /**
- * Index P/E ratios. Free Finnhub `/stock/metric` returns data for many
- * stocks but is patchy for ETFs (SPY/QQQ/DIA/EIS often come back with
- * empty `metric.peAnnual`). When live data is missing we fall back to a
- * curated estimate so the widget never blanks.
+ * Index P/E ratios.
  *
- * The fallback values are refreshed manually each quarter from public
- * fund-fact-sheet aggregators (SPY/QQQ/DIA: SSGA / Invesco / SPDR pages,
- * EIS: iShares MSCI Israel fact sheet).
+ * Source order:
+ *   1. Yahoo `quoteSummary` (has trailingPE for ETFs — SPY/QQQ/DIA/EIS).
+ *   2. Finnhub `/stock/metric` (works for individual stocks; mostly empty
+ *      for ETFs on the free tier — kept as a defensive fallback).
+ *   3. Curated static fallback so the widget never blanks. These are
+ *      refreshed manually each quarter from public fund-fact-sheet pages.
  */
 const INDEX_LIST = [
   { symbol: 'SPY',  nameHe: 'S&P 500',     flag: '🇺🇸' },
@@ -38,7 +39,7 @@ interface FinnhubMetric {
   };
 }
 
-async function fetchPE(symbol: string): Promise<number | null> {
+async function fetchFinnhubPE(symbol: string): Promise<number | null> {
   if (!FINNHUB_KEY) return null;
   try {
     const r = await fetch(
@@ -52,25 +53,46 @@ async function fetchPE(symbol: string): Promise<number | null> {
       json.metric?.peTTM ??
       json.metric?.peNormalizedAnnual ??
       null;
-    return typeof pe === 'number' && Number.isFinite(pe) && pe > 0
-      ? parseFloat(pe.toFixed(1))
-      : null;
+    return typeof pe === 'number' && Number.isFinite(pe) && pe > 0 ? pe : null;
   } catch {
     return null;
   }
 }
 
+async function resolvePE(symbol: string): Promise<{ pe: number; source: 'live' } | null> {
+  // Yahoo first — works for ETFs and stocks alike, no rate limit, no key.
+  const yahoo = await fetchYahooPE(symbol);
+  if (yahoo?.trailingPE) {
+    return { pe: parseFloat(yahoo.trailingPE.toFixed(1)), source: 'live' };
+  }
+  // Finnhub second — covers individual stocks if Yahoo blocked the symbol.
+  const finnhub = await fetchFinnhubPE(symbol);
+  if (finnhub) {
+    return { pe: parseFloat(finnhub.toFixed(1)), source: 'live' };
+  }
+  return null;
+}
+
 export async function GET() {
-  const peValues = await Promise.all(INDEX_LIST.map((i) => fetchPE(i.symbol)));
+  const resolved = await Promise.all(INDEX_LIST.map((i) => resolvePE(i.symbol)));
 
   const ratios = INDEX_LIST.map((idx, i) => {
-    const live = peValues[i];
+    const live = resolved[i];
+    if (live) {
+      return {
+        symbol: idx.symbol,
+        nameHe: idx.nameHe,
+        flag: idx.flag,
+        pe: live.pe,
+        source: 'live' as const,
+      };
+    }
     return {
       symbol: idx.symbol,
       nameHe: idx.nameHe,
       flag: idx.flag,
-      pe: live ?? FALLBACK[idx.symbol] ?? null,
-      source: live != null ? ('live' as const) : ('estimate' as const),
+      pe: FALLBACK[idx.symbol] ?? null,
+      source: 'estimate' as const,
     };
   });
 

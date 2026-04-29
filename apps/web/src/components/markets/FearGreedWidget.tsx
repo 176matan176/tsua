@@ -73,28 +73,32 @@ export function FearGreedWidget() {
               <div className="text-5xl">{emoji}</div>
             </div>
 
-            {/* Gradient bar — fear (coral) on the LEFT, greed (mint) on the RIGHT.
-                Indicator is positioned via `left: value%` so a higher score
-                visibly slides the dot rightward, into the green zone. */}
+            {/* Gradient bar — RTL-native orientation:
+                  RIGHT  = start of reading = פחד קיצוני (red)
+                  LEFT   = end of reading   = חמדנות קיצונית (green)
+                The indicator slides leftward as the score rises, mirroring
+                the natural Hebrew right-to-left progression. */}
             <div className="relative w-full h-2.5 rounded-full overflow-hidden mt-2"
-              style={{ background: 'linear-gradient(to right, #ff4d6a, #ff8c42, #ffd166, #06d6a0, #00e5b0)' }}>
-              {/* Indicator */}
+              style={{ background: 'linear-gradient(to left, #ff4d6a, #ff8c42, #ffd166, #06d6a0, #00e5b0)' }}>
+              {/* Indicator — `right: value%` so value=20 (fear) sits near the
+                  right (red) edge and value=80 (greed) sits near the left
+                  (green) edge. */}
               <div
                 className="absolute top-1/2 w-3 h-3 rounded-full border-2 border-white"
                 style={{
-                  left: `${data.value}%`,
+                  right: `${data.value}%`,
                   background: color,
                   boxShadow: `0 0 6px ${color}`,
-                  transform: 'translate(-50%, -50%)',
+                  transform: 'translate(50%, -50%)',
                 }}
               />
             </div>
 
-            {/* Labels — RTL container puts first child on the right.
-                Right side aligns with greed end of the bar; left with fear. */}
+            {/* Labels — RTL container puts the first child on the right.
+                Right side now reads "פחד קיצוני" to match the red end. */}
             <div className="flex justify-between mt-1.5">
-              <span className="text-[9px] text-tsua-muted">חמדנות קיצונית</span>
               <span className="text-[9px] text-tsua-muted">פחד קיצוני</span>
+              <span className="text-[9px] text-tsua-muted">חמדנות קיצונית</span>
             </div>
           </>
         ) : null}

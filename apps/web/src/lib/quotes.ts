@@ -112,3 +112,38 @@ export async function fetchQuotes(symbols: string[], revalidate = 60): Promise<Q
   );
   return results.map((r) => (r.status === 'fulfilled' ? r.value : ZERO));
 }
+
+/**
+ * Yahoo `quoteSummary` returns derived metrics like trailing/forward PE,
+ * dividend yield, EPS — which Finnhub's free tier does NOT expose for ETFs
+ * (SPY/QQQ/DIA/EIS all come back empty). Used by the indices P/E widget.
+ *
+ * Returns null when the symbol isn't covered or the request fails.
+ */
+export async function fetchYahooPE(
+  symbol: string,
+  revalidate = 21600,
+): Promise<{ trailingPE: number | null; forwardPE: number | null } | null> {
+  try {
+    const url = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(symbol)}?modules=summaryDetail`;
+    const r = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; TsuaBot/1.0; +https://tsua-rho.vercel.app)',
+        'Accept': 'application/json',
+      },
+      next: { revalidate },
+    });
+    if (!r.ok) return null;
+    const json = await r.json();
+    const detail = json?.quoteSummary?.result?.[0]?.summaryDetail;
+    if (!detail) return null;
+    const trailing = Number(detail.trailingPE?.raw);
+    const forward = Number(detail.forwardPE?.raw);
+    return {
+      trailingPE: Number.isFinite(trailing) && trailing > 0 ? trailing : null,
+      forwardPE: Number.isFinite(forward) && forward > 0 ? forward : null,
+    };
+  } catch {
+    return null;
+  }
+}
