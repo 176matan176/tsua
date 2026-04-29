@@ -2,8 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Theme Variables ────────────────────────────────────────────────── */
+/* ─── Theme Variables ──────────────────────────────────────────────────
+ * Two parallel sets of tokens:
+ *   1. Hex/rgba `--bg`, `--text`, … — used directly in inline styles
+ *      (`style={{ background: 'var(--card)' }}`).
+ *   2. Space-separated RGB triplets `--rgb-bg`, `--rgb-text`, … — consumed
+ *      by tailwind.config.js as `rgb(var(--rgb-bg) / <alpha-value>)` so
+ *      every `bg-tsua-*` / `text-tsua-*` class auto-swaps with the theme
+ *      and supports the `/20`-style alpha modifier.
+ * Both sets MUST stay in sync per theme.
+ */
 :root, [data-theme="dark"] {
+  /* Hex set — keep these aligned with the rgb set below */
   --bg:          #060b16;
   --bg2:         #0a0f1e;
   --card:        #0d1424;
@@ -28,6 +38,23 @@
   --hot-tint:        rgba(245,130,32,0.15);
   --hot-border:      rgba(245,130,32,0.25);
   --value:           #c8d8f0;
+
+  /* RGB triplets — Tailwind utility palette */
+  --rgb-bg:      6 11 22;
+  --rgb-bg2:     13 20 36;
+  --rgb-card:    15 25 41;
+  --rgb-card2:   20 31 48;
+  --rgb-border:  26 40 64;
+  --rgb-border2: 36 53 80;
+  --rgb-text:    232 240 255;
+  --rgb-text2:   168 188 212;
+  --rgb-muted:   90 112 144;
+  --rgb-muted2:  122 144 176;
+  --rgb-accent:  0 229 176;
+  --rgb-accent2: 0 168 132;
+  --rgb-blue:    59 130 246;
+  --rgb-red:     255 77 106;
+  --rgb-gold:    245 185 66;
 }
 
 [data-theme="light"] {
@@ -36,17 +63,17 @@
   --bg2:         #ece7dd;
   --card:        #fffef9;
   --card2:       #f8f5ee;
-  --border:      rgba(180,155,110,0.25);
-  --border2:     rgba(180,155,110,0.15);
+  --border:      rgba(180,155,110,0.45);
+  --border2:     rgba(180,155,110,0.28);
   --text:        #0c1520;
   --text2:       #2e4060;
-  --muted:       rgba(70,90,115,0.75);
-  --muted2:      rgba(90,110,135,0.5);
+  --muted:       rgba(70,90,115,0.85);
+  --muted2:      rgba(90,110,135,0.6);
   --surface:     rgba(255,254,249,0.98);
   --surface2:    rgba(242,238,231,0.85);
   --nav-bg:      rgba(250,247,240,0.98);
   --input-bg:    rgba(242,238,231,0.9);
-  --hover-bg:    rgba(0,0,0,0.03);
+  --hover-bg:    rgba(0,0,0,0.04);
   --accent:          #007a5c;
   --accent2:         #005c45;
   --accent-contrast: #ffffff;
@@ -56,6 +83,23 @@
   --hot-tint:        rgba(200,97,0,0.10);
   --hot-border:      rgba(200,97,0,0.22);
   --value:           #1a2332;
+
+  /* RGB triplets — Tailwind utility palette */
+  --rgb-bg:      242 237 228;
+  --rgb-bg2:     236 231 221;
+  --rgb-card:    255 254 249;
+  --rgb-card2:   248 245 238;
+  --rgb-border:  202 178 134;
+  --rgb-border2: 220 200 165;
+  --rgb-text:    12 21 32;
+  --rgb-text2:   46 64 96;
+  --rgb-muted:   80 96 120;
+  --rgb-muted2:  108 124 152;
+  --rgb-accent:  0 122 92;
+  --rgb-accent2: 0 92 69;
+  --rgb-blue:    29 78 216;
+  --rgb-red:     192 24 46;
+  --rgb-gold:    176 125 16;
 }
 
 /* Apply theme to body */
@@ -498,15 +542,12 @@ main { animation: fade-in 0.3s ease-out; }
 [data-theme="light"] .price-down { color: #c0182e; }
 [data-theme="light"] .price-flat { color: #6b7e96; }
 
-/* ─── Light theme — Tailwind utility-class fallbacks ───────────────────
- * Catches Tailwind classes that compile to dark-only colors and remaps
- * them to the warm-cream palette so a wider surface area of components
- * becomes legible without per-file edits.
+/* ─── Light theme — utility-class fallbacks ────────────────────────────
+ * The `tsua-*` utilities are now driven by CSS variables in tailwind.config,
+ * so they auto-swap with the theme. The rules below only handle 3rd-party
+ * Tailwind palette classes (`text-white`, `bg-slate-900`, `text-gray-400`,
+ * …) that components occasionally use directly and don't honor data-theme.
  */
-
-/* Tailwind `text-tsua-*` tokens come from tailwind.config but we still
- * have many hardcoded `text-white`, `text-slate-*`, `bg-slate-*`,
- * `bg-tsua-card`, `bg-white/4`, etc. that show up in light mode. */
 
 /* White-ish text on cream → pivot to dark text */
 [data-theme="light"] .text-white,
@@ -526,17 +567,7 @@ main { animation: fade-in 0.3s ease-out; }
 [data-theme="light"] .text-gray-500,
 [data-theme="light"] .text-zinc-500 { color: var(--muted) !important; }
 
-/* `text-tsua-muted` is `rgba(90,112,144,0.8)` — too cold on cream */
-[data-theme="light"] .text-tsua-muted { color: var(--muted) !important; }
-[data-theme="light"] .text-tsua-text  { color: var(--text)  !important; }
-[data-theme="light"] .text-tsua-bg    { color: var(--bg)    !important; }
-[data-theme="light"] .text-tsua-accent { color: var(--accent) !important; }
-
-/* Solid dark Tailwind backgrounds → cream card */
-[data-theme="light"] .bg-tsua-bg,
-[data-theme="light"] .bg-tsua-bg2,
-[data-theme="light"] .bg-tsua-card,
-[data-theme="light"] .bg-tsua-card2,
+/* Hard-coded slate/gray/zinc dark backgrounds → card */
 [data-theme="light"] .bg-slate-900,
 [data-theme="light"] .bg-slate-800,
 [data-theme="light"] .bg-gray-900,
