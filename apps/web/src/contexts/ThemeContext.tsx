@@ -28,13 +28,28 @@ function readInitialTheme(): Theme {
   return attr === 'light' ? 'light' : 'dark';
 }
 
+// Single non-media-qualified theme-color tag that overrides the SSR'd
+// media-qualified pair when the user picks a theme manually. Per the HTML
+// spec, browsers walk theme-color metas in document order and pick the first
+// whose media query matches; an unqualified tag always matches, so prepending
+// one wins regardless of OS preference.
+const MANUAL_META_ID = 'tsua-manual-theme-color';
+
 function applyTheme(t: Theme) {
   if (typeof document === 'undefined') return;
   document.documentElement.setAttribute('data-theme', t);
   document.documentElement.style.colorScheme = t;
-  // Update the <meta name="theme-color"> so mobile browser chrome matches
-  const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute('content', t === 'light' ? '#f2ede4' : '#060b16');
+
+  const color = t === 'light' ? '#f2ede4' : '#060b16';
+  let manual = document.getElementById(MANUAL_META_ID) as HTMLMetaElement | null;
+  if (!manual) {
+    manual = document.createElement('meta');
+    manual.id = MANUAL_META_ID;
+    manual.name = 'theme-color';
+    // Prepend so it wins the document-order tiebreak against SSR'd media tags.
+    document.head.prepend(manual);
+  }
+  manual.content = color;
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {

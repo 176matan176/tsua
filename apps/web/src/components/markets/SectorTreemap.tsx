@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import { squarify } from '@/lib/squarify';
@@ -110,6 +110,11 @@ function StockRect({ stock, rect, locale }: StockRectProps) {
   return (
     <Link
       href={`/${locale}/stocks/${stock.ticker}`}
+      // The treemap can render hundreds of stock tiles on screen at once.
+      // Next's default Link prefetch would warm a route bundle for each tile
+      // on viewport entry — turning a market overview into hundreds of
+      // background fetches. Tiles are explicit clicks; prefetch on demand.
+      prefetch={false}
       className="absolute overflow-hidden flex flex-col items-center justify-center transition-all duration-150 hover:z-10 hover:scale-[1.04] hover:shadow-2xl"
       style={{
         left: rect.x,
@@ -156,19 +161,25 @@ interface SectorBlockProps {
   locale: string;
 }
 
-function SectorBlock({ sector, rect, stocks, locale }: SectorBlockProps) {
+function SectorBlockInner({ sector, rect, stocks, locale }: SectorBlockProps) {
   const HEADER_H = Math.min(28, Math.max(18, rect.h * 0.07));
   const PADDING = 2;
 
-  const innerBox = {
-    x: rect.x + PADDING,
-    y: rect.y + HEADER_H,
-    w: Math.max(0, rect.w - 2 * PADDING),
-    h: Math.max(0, rect.h - HEADER_H - PADDING),
-  };
-
-  const items = stocks.map((s) => ({ value: s.marketCap, data: s }));
-  const stockRects = squarify(items, innerBox);
+  // Inner squarify is the heavy work in this component (it iterates over
+  // every stock in the sector). It only needs to recompute when the sector's
+  // box dimensions change OR the stocks list changes — not on every parent
+  // re-render (e.g. a sibling sector animating, or the heatmap polling tick
+  // re-rendering the tree even though our slice is identical).
+  const stockRects = useMemo(() => {
+    const innerBox = {
+      x: rect.x + PADDING,
+      y: rect.y + HEADER_H,
+      w: Math.max(0, rect.w - 2 * PADDING),
+      h: Math.max(0, rect.h - HEADER_H - PADDING),
+    };
+    const items = stocks.map((s) => ({ value: s.marketCap, data: s }));
+    return squarify(items, innerBox);
+  }, [stocks, rect.x, rect.y, rect.w, rect.h, HEADER_H]);
 
   const showHeader = rect.w > 60;
 
@@ -207,6 +218,23 @@ function SectorBlock({ sector, rect, stocks, locale }: SectorBlockProps) {
   );
 }
 
+// Skip re-rendering the whole sector subtree when nothing visible to it has
+// changed. The default shallow equality is fine here because stocks/sector
+// are referentially stable across renders (they come from the parent's
+// useMemo-derived layout) and rect is a fresh object only when dimensions
+// actually shift.
+const SectorBlock = memo(SectorBlockInner, (prev, next) => {
+  return (
+    prev.sector === next.sector &&
+    prev.stocks === next.stocks &&
+    prev.locale === next.locale &&
+    prev.rect.x === next.rect.x &&
+    prev.rect.y === next.rect.y &&
+    prev.rect.w === next.rect.w &&
+    prev.rect.h === next.rect.h
+  );
+});
+
 export function SectorTreemap() {
   const locale = useLocale();
   const [data, setData] = useState<HeatmapPayload | null>(null);
@@ -214,21 +242,45 @@ export function SectorTreemap() {
   const [size, setSize] = useState({ w: 0, h: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Fetch heatmap data
+  // Fetch heatmap data — re-poll every 60s while mounted.
   useEffect(() => {
-    let cancelled = false;
+    // We need a fresh AbortController per request: a single controller's
+    // signal can only be aborted once, after which all subsequent fetches
+    // through it would throw immediately. The outer `outerCtrl` covers
+    // unmount and aborts whatever request is currently in flight.
+    const outerCtrl = new AbortController();
+    let inFlight: AbortController | null = null;
+
     async function load() {
+      // Cancel any prior in-flight request so a slow response can't clobber
+      // a fresher one (60s poll, but a stalled request could outlive it).
+      inFlight?.abort();
+      const ctrl = new AbortController();
+      inFlight = ctrl;
+      // Bridge unmount → in-flight request: when outerCtrl aborts, kill ctrl too.
+      const onUnmount = () => ctrl.abort();
+      outerCtrl.signal.addEventListener('abort', onUnmount, { once: true });
+
       try {
-        const r = await fetch('/api/sectors/heatmap');
+        const r = await fetch('/api/sectors/heatmap', { signal: ctrl.signal });
         const json: HeatmapPayload = await r.json();
-        if (!cancelled) setData(json);
+        if (outerCtrl.signal.aborted) return;
+        setData(json);
+      } catch (err) {
+        if ((err as { name?: string })?.name === 'AbortError') return;
+        // swallow other errors — keep last good data on screen
       } finally {
-        if (!cancelled) setLoading(false);
+        outerCtrl.signal.removeEventListener('abort', onUnmount);
+        if (!outerCtrl.signal.aborted) setLoading(false);
       }
     }
+
     load();
     const int = setInterval(load, 60_000);
-    return () => { cancelled = true; clearInterval(int); };
+    return () => {
+      outerCtrl.abort();
+      clearInterval(int);
+    };
   }, []);
 
   // Track container size for responsive treemap

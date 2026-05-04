@@ -1,6 +1,6 @@
 export const dynamic = 'force-dynamic';
 
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { notFound } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
@@ -42,13 +42,31 @@ export const metadata: Metadata = {
     images: ['/api/og'],
   },
   manifest: '/manifest.json',
-  themeColor: '#00e5b0',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
     title: 'תשואה',
   },
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover',
+};
+
+/**
+ * Viewport + theme color.
+ *
+ * `themeColor` was a brand-mint pin that flashed on the mobile address bar
+ * regardless of which palette the user actually saw. The array form lets the
+ * UA pick the right value at first paint based on `prefers-color-scheme`,
+ * matching what our boot script applies to <html data-theme>. ThemeContext
+ * still updates the live <meta> when the user toggles manually.
+ */
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: 'cover',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f2ede4' },
+    { media: '(prefers-color-scheme: dark)',  color: '#060b16' },
+  ],
 };
 
 export function generateStaticParams() {

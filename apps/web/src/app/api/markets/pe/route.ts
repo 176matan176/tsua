@@ -60,8 +60,10 @@ async function fetchFinnhubPE(symbol: string): Promise<number | null> {
 }
 
 async function resolvePE(symbol: string): Promise<{ pe: number; source: 'live' } | null> {
-  // Yahoo first — works for ETFs and stocks alike, no rate limit, no key.
-  const yahoo = await fetchYahooPE(symbol);
+  // Pass the route's revalidate so the underlying fetch doesn't outlive the
+  // route's own ISR window — otherwise Next would re-render every hour but
+  // keep replaying the same Yahoo response cached for 6h.
+  const yahoo = await fetchYahooPE(symbol, 3600);
   if (yahoo?.trailingPE) {
     return { pe: parseFloat(yahoo.trailingPE.toFixed(1)), source: 'live' };
   }

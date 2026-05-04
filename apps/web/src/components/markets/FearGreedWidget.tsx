@@ -31,24 +31,34 @@ function getEmoji(v: number) {
   return '🤑';
 }
 
+type FetchState =
+  | { status: 'loading' }
+  | { status: 'ok'; data: FGData }
+  | { status: 'error' };
+
 export function FearGreedWidget() {
-  const [data, setData] = useState<FGData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [state, setState] = useState<FetchState>({ status: 'loading' });
 
   useEffect(() => {
-    fetch('https://api.alternative.me/fng/?limit=1')
-      .then(r => r.json())
-      .then(d => {
-        const item = d.data?.[0];
-        if (item) setData({ value: Number(item.value), classification: item.value_classification });
+    const ctrl = new AbortController();
+    fetch('/api/markets/feargreed', { signal: ctrl.signal })
+      .then((r) => r.json())
+      .then((d) => {
+        if (d?.ok && Number.isFinite(d.value)) {
+          setState({
+            status: 'ok',
+            data: { value: Number(d.value), classification: String(d.classification ?? 'Neutral') },
+          });
+        } else {
+          setState({ status: 'error' });
+        }
       })
-      .catch(() => setData({ value: 52, classification: 'Neutral' }))
-      .finally(() => setLoading(false));
+      .catch((err) => {
+        if (err?.name === 'AbortError') return;
+        setState({ status: 'error' });
+      });
+    return () => ctrl.abort();
   }, []);
-
-  const color = data ? getColor(data.value) : '#c8d8f0';
-  const label = data ? (LABELS[data.classification] ?? data.classification) : '';
-  const emoji = data ? getEmoji(data.value) : '😐';
 
   return (
     <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(15,25,41,0.7)', border: '1px solid rgba(26,40,64,0.8)' }}>
@@ -57,51 +67,60 @@ export function FearGreedWidget() {
       </div>
 
       <div className="px-4 py-4" dir="rtl">
-        {loading ? (
+        {state.status === 'loading' && (
           <div className="space-y-3 animate-pulse">
             <div className="h-8 rounded w-24 mx-auto" style={{ background: 'rgba(26,40,64,0.6)' }} />
             <div className="h-3 rounded" style={{ background: 'rgba(26,40,64,0.4)' }} />
           </div>
-        ) : data ? (
-          <>
-            {/* Score */}
-            <div className="flex items-center justify-between mb-3">
-              <div>
-                <div className="text-4xl font-black font-mono" style={{ color }}>{data.value}</div>
-                <div className="text-sm font-bold mt-0.5" style={{ color }}>{label}</div>
+        )}
+
+        {state.status === 'error' && (
+          <div className="py-3 text-center">
+            <div className="text-2xl mb-1">📡</div>
+            <div className="text-xs text-tsua-muted">לא ניתן לטעון את המדד כעת</div>
+            <div className="text-[10px] text-tsua-muted mt-0.5">נסה לרענן בעוד מספר דקות</div>
+          </div>
+        )}
+
+        {state.status === 'ok' && (() => {
+          const { data } = state;
+          const color = getColor(data.value);
+          const label = LABELS[data.classification] ?? data.classification;
+          const emoji = getEmoji(data.value);
+          return (
+            <>
+              {/* Score */}
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <div className="text-4xl font-black font-mono" style={{ color }}>{data.value}</div>
+                  <div className="text-sm font-bold mt-0.5" style={{ color }}>{label}</div>
+                </div>
+                <div className="text-5xl">{emoji}</div>
               </div>
-              <div className="text-5xl">{emoji}</div>
-            </div>
 
-            {/* Gradient bar — RTL-native orientation:
-                  RIGHT  = start of reading = פחד קיצוני (red)
-                  LEFT   = end of reading   = חמדנות קיצונית (green)
-                The indicator slides leftward as the score rises, mirroring
-                the natural Hebrew right-to-left progression. */}
-            <div className="relative w-full h-2.5 rounded-full overflow-hidden mt-2"
-              style={{ background: 'linear-gradient(to left, #ff4d6a, #ff8c42, #ffd166, #06d6a0, #00e5b0)' }}>
-              {/* Indicator — `right: value%` so value=20 (fear) sits near the
-                  right (red) edge and value=80 (greed) sits near the left
-                  (green) edge. */}
-              <div
-                className="absolute top-1/2 w-3 h-3 rounded-full border-2 border-white"
-                style={{
-                  right: `${data.value}%`,
-                  background: color,
-                  boxShadow: `0 0 6px ${color}`,
-                  transform: 'translate(50%, -50%)',
-                }}
-              />
-            </div>
+              {/* Gradient bar — RTL-native orientation:
+                    RIGHT  = start of reading = פחד קיצוני (red)
+                    LEFT   = end of reading   = חמדנות קיצונית (green) */}
+              <div className="relative w-full h-2.5 rounded-full overflow-hidden mt-2"
+                style={{ background: 'linear-gradient(to left, #ff4d6a, #ff8c42, #ffd166, #06d6a0, #00e5b0)' }}>
+                <div
+                  className="absolute top-1/2 w-3 h-3 rounded-full border-2 border-white"
+                  style={{
+                    right: `${data.value}%`,
+                    background: color,
+                    boxShadow: `0 0 6px ${color}`,
+                    transform: 'translate(50%, -50%)',
+                  }}
+                />
+              </div>
 
-            {/* Labels — RTL container puts the first child on the right.
-                Right side now reads "פחד קיצוני" to match the red end. */}
-            <div className="flex justify-between mt-1.5">
-              <span className="text-[9px] text-tsua-muted">פחד קיצוני</span>
-              <span className="text-[9px] text-tsua-muted">חמדנות קיצונית</span>
-            </div>
-          </>
-        ) : null}
+              <div className="flex justify-between mt-1.5">
+                <span className="text-[9px] text-tsua-muted">פחד קיצוני</span>
+                <span className="text-[9px] text-tsua-muted">חמדנות קיצונית</span>
+              </div>
+            </>
+          );
+        })()}
 
         <p className="text-[9px] text-tsua-muted text-center mt-3">
           מדד קריפטו · Alternative.me
