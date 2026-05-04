@@ -118,22 +118,102 @@ export async function fetchQuotes(symbols: string[], revalidate = 60): Promise<Q
  * dividend yield, EPS — which Finnhub's free tier does NOT expose for ETFs
  * (SPY/QQQ/DIA/EIS all come back empty). Used by the indices P/E widget.
  *
+ * Yahoo gates this endpoint behind a "crumb" (anti-CSRF token) tied to a
+ * session cookie. The flow is:
+ *   1. GET https://fc.yahoo.com — returns a `A3=` Set-Cookie (used to be A1)
+ *   2. GET /v1/test/getcrumb with that cookie — returns a short string crumb
+ *   3. Call quoteSummary with `?crumb=` and the matching `Cookie:` header
+ *
+ * The cookie/crumb pair is valid for the lifetime of the cookie (~1 year)
+ * but Yahoo will rotate it earlier under load, so we treat any 401 as "stale
+ * crumb" and refresh once before giving up.
+ *
  * Returns null when the symbol isn't covered or the request fails.
  */
+
+// Browser-shaped UA — Yahoo will silently 401 some bot UAs even with a valid
+// crumb. Matches what a Chrome desktop client sends.
+const YAHOO_UA =
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+
+// Module-scope crumb cache. Survives across requests within a single Node
+// runtime (Vercel keeps an instance warm for a while), so the typical PE
+// fetch only pays the 2-extra-roundtrip cost once per cold start.
+let crumbCache: { cookie: string; crumb: string; fetchedAt: number } | null = null;
+
+async function getYahooCrumb(forceRefresh = false): Promise<{ cookie: string; crumb: string } | null> {
+  if (!forceRefresh && crumbCache) return crumbCache;
+
+  try {
+    // Step 1: hit fc.yahoo.com to obtain a session cookie. Yahoo currently
+    // sets `A3=` here (was `A1=` in older docs). We don't follow redirects —
+    // the 404 is expected; we only need the Set-Cookie header.
+    const r1 = await fetch('https://fc.yahoo.com', {
+      headers: { 'User-Agent': YAHOO_UA },
+      redirect: 'manual',
+    });
+    const setCookie = r1.headers.get('set-cookie');
+    if (!setCookie) return null;
+    // The header may contain multiple cookies separated by commas. Naive
+    // split would break on Expires=Tue, ... — restrict to commas followed
+    // by a `name=` token.
+    const cookie = setCookie
+      .split(/,(?=\s*[A-Za-z0-9_-]+=)/)
+      .map((c) => c.split(';')[0].trim())
+      .filter(Boolean)
+      .join('; ');
+    if (!cookie) return null;
+
+    // Step 2: trade the cookie for a crumb.
+    const r2 = await fetch('https://query1.finance.yahoo.com/v1/test/getcrumb', {
+      headers: { 'User-Agent': YAHOO_UA, Cookie: cookie },
+    });
+    if (!r2.ok) return null;
+    const crumb = (await r2.text()).trim();
+    if (!crumb || crumb.length < 4 || crumb.includes('<')) return null;
+
+    crumbCache = { cookie, crumb, fetchedAt: Date.now() };
+    return crumbCache;
+  } catch {
+    return null;
+  }
+}
+
+async function quoteSummaryRaw(
+  symbol: string,
+  auth: { cookie: string; crumb: string },
+  revalidate: number,
+): Promise<Response> {
+  const url =
+    `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(symbol)}` +
+    `?modules=summaryDetail&crumb=${encodeURIComponent(auth.crumb)}`;
+  return fetch(url, {
+    headers: {
+      'User-Agent': YAHOO_UA,
+      Accept: 'application/json',
+      Cookie: auth.cookie,
+    },
+    next: { revalidate },
+  });
+}
+
 export async function fetchYahooPE(
   symbol: string,
   revalidate = 21600,
 ): Promise<{ trailingPE: number | null; forwardPE: number | null } | null> {
   try {
-    const url = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(symbol)}?modules=summaryDetail`;
-    const r = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; TsuaBot/1.0; +https://tsua-rho.vercel.app)',
-        'Accept': 'application/json',
-      },
-      next: { revalidate },
-    });
+    let auth = await getYahooCrumb();
+    if (!auth) return null;
+
+    let r = await quoteSummaryRaw(symbol, auth, revalidate);
+    // Stale crumb? Refresh once and retry.
+    if (r.status === 401) {
+      auth = await getYahooCrumb(true);
+      if (!auth) return null;
+      r = await quoteSummaryRaw(symbol, auth, revalidate);
+    }
     if (!r.ok) return null;
+
     const json = await r.json();
     const detail = json?.quoteSummary?.result?.[0]?.summaryDetail;
     if (!detail) return null;
