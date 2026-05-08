@@ -1,22 +1,24 @@
 import { NextResponse } from 'next/server';
 import { fetchYahooPE } from '@/lib/quotes';
 
-export const dynamic = 'force-dynamic';
-// P/E ratios move slowly — re-fetch at most once per hour on the server.
-export const revalidate = 3600;
-
-const FINNHUB_KEY = process.env.FINNHUB_API_KEY;
-
 /**
  * Index P/E ratios.
  *
+ * Moved from `/api/markets/pe` because Vercel's edge cache returned a stale
+ * 404 for that path indefinitely (10+ days, never refreshed). Same logic,
+ * fresh URL.
+ *
  * Source order:
- *   1. Yahoo `quoteSummary` (has trailingPE for ETFs — SPY/QQQ/DIA/EIS).
+ *   1. Yahoo `quoteSummary` via fetchYahooPE (does the crumb dance)
  *   2. Finnhub `/stock/metric` (works for individual stocks; mostly empty
- *      for ETFs on the free tier — kept as a defensive fallback).
- *   3. Curated static fallback so the widget never blanks. These are
- *      refreshed manually each quarter from public fund-fact-sheet pages.
+ *      for ETFs on the free tier — kept as a defensive fallback)
+ *   3. Curated static fallback so the widget never blanks; refreshed
+ *      manually each quarter from public fund-fact-sheet pages.
  */
+export const revalidate = 3600; // 1h — P/E moves slowly
+
+const FINNHUB_KEY = process.env.FINNHUB_API_KEY;
+
 const INDEX_LIST = [
   { symbol: 'SPY',  nameHe: 'S&P 500',     flag: '🇺🇸' },
   { symbol: 'QQQ',  nameHe: 'נאסד"ק 100',  flag: '🇺🇸' },
@@ -25,10 +27,10 @@ const INDEX_LIST = [
 ] as const;
 
 const FALLBACK: Record<string, number> = {
-  SPY: 21.8,
-  QQQ: 31.5,
-  DIA: 21.2,
-  EIS: 14.3,
+  SPY: 28.5,
+  QQQ: 35.5,
+  DIA: 24.0,
+  EIS: 19.3,
 };
 
 interface FinnhubMetric {
@@ -60,14 +62,10 @@ async function fetchFinnhubPE(symbol: string): Promise<number | null> {
 }
 
 async function resolvePE(symbol: string): Promise<{ pe: number; source: 'live' } | null> {
-  // Pass the route's revalidate so the underlying fetch doesn't outlive the
-  // route's own ISR window — otherwise Next would re-render every hour but
-  // keep replaying the same Yahoo response cached for 6h.
   const yahoo = await fetchYahooPE(symbol, 3600);
   if (yahoo?.trailingPE) {
     return { pe: parseFloat(yahoo.trailingPE.toFixed(1)), source: 'live' };
   }
-  // Finnhub second — covers individual stocks if Yahoo blocked the symbol.
   const finnhub = await fetchFinnhubPE(symbol);
   if (finnhub) {
     return { pe: parseFloat(finnhub.toFixed(1)), source: 'live' };

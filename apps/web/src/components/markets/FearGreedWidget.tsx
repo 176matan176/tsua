@@ -41,7 +41,7 @@ export function FearGreedWidget() {
 
   useEffect(() => {
     const ctrl = new AbortController();
-    fetch('/api/markets/feargreed', { signal: ctrl.signal })
+    fetch('/api/feargreed', { signal: ctrl.signal })
       .then((r) => r.json())
       .then((d) => {
         if (d?.ok && Number.isFinite(d.value)) {

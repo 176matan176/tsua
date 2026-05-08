@@ -1,9 +1,21 @@
 import { NextResponse } from 'next/server';
 
-export const dynamic = 'force-dynamic';
-// FNG updates daily — half-hour cache is plenty and saves us hammering
-// alternative.me from every visitor.
-export const revalidate = 1800;
+/**
+ * Fear & Greed proxy.
+ *
+ * The route at the previous path `/api/markets/feargreed` was permanently
+ * 404'd by Vercel's edge cache (10-day-old cached 404 even after the route
+ * was committed and pushed). Moving to a fresh path bypasses that stuck
+ * edge cache. We also dropped the `force-dynamic` + `revalidate` combo —
+ * `revalidate` alone is sufficient and Next 14.2 sometimes mishandles the
+ * combination during the route-manifest stage of a Vercel build.
+ *
+ * Why proxy at all (instead of fetching alternative.me from the browser):
+ *   - Hides visitor IPs from a third party
+ *   - Single shared cache across all clients
+ *   - Honest `{ ok: false }` failure mode rather than fabricating data
+ */
+export const revalidate = 1800; // 30 min — FNG updates daily
 
 interface FNGItem {
   value: string;
@@ -15,24 +27,10 @@ interface FNGPayload {
   data?: FNGItem[];
 }
 
-/**
- * GET /api/markets/feargreed
- *
- * Server-side proxy for the Alternative.me Fear & Greed index.
- *
- * Why proxy instead of the client hitting alternative.me directly:
- *   - Hides visitor IPs from a third party.
- *   - Single shared cache across all clients (revalidate above).
- *   - Lets us tighten `connect-src` in CSP later without breaking the widget.
- *   - Returns `{ ok: false }` honestly on failure rather than fabricating
- *     a "neutral 52" reading that misleads users.
- */
 export async function GET() {
   try {
     const r = await fetch('https://api.alternative.me/fng/?limit=1', {
-      headers: {
-        'User-Agent': 'TsuaBot/1.0 (+https://tsua-rho.vercel.app)',
-      },
+      headers: { 'User-Agent': 'TsuaBot/1.0 (+https://tsua-rho.vercel.app)' },
       next: { revalidate: 1800 },
     });
     if (!r.ok) {

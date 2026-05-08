@@ -56,7 +56,7 @@ export function MarketPE() {
 
     async function load() {
       try {
-        const res = await fetch('/api/markets/pe', { signal: ctrl.signal });
+        const res = await fetch('/api/pe', { signal: ctrl.signal });
         if (!res.ok) throw new Error(`status ${res.status}`);
         const json = (await res.json()) as PEResponse;
         if (ctrl.signal.aborted) return;
