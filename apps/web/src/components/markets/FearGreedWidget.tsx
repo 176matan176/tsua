@@ -4,7 +4,12 @@ import { useEffect, useState } from 'react';
 
 interface FGData {
   value: number;
+  scoreExact: number;
   classification: string;
+  previousClose: number | null;
+  previousWeek: number | null;
+  previousMonth: number | null;
+  updatedAt: number;
 }
 
 const LABELS: Record<string, string> = {
@@ -47,7 +52,15 @@ export function FearGreedWidget() {
         if (d?.ok && Number.isFinite(d.value)) {
           setState({
             status: 'ok',
-            data: { value: Number(d.value), classification: String(d.classification ?? 'Neutral') },
+            data: {
+              value: Number(d.value),
+              scoreExact: Number.isFinite(Number(d.scoreExact)) ? Number(d.scoreExact) : Number(d.value),
+              classification: String(d.classification ?? 'Neutral'),
+              previousClose: Number.isFinite(Number(d.previousClose)) ? Number(d.previousClose) : null,
+              previousWeek: Number.isFinite(Number(d.previousWeek)) ? Number(d.previousWeek) : null,
+              previousMonth: Number.isFinite(Number(d.previousMonth)) ? Number(d.previousMonth) : null,
+              updatedAt: Number.isFinite(Number(d.updatedAt)) ? Number(d.updatedAt) : Date.now(),
+            },
           });
         } else {
           setState({ status: 'error' });
@@ -87,6 +100,15 @@ export function FearGreedWidget() {
           const color = getColor(data.value);
           const label = LABELS[data.classification] ?? data.classification;
           const emoji = getEmoji(data.value);
+          // Use the precise (un-rounded) score for dot positioning so the
+          // marker doesn't snap to integer steps on the gradient bar.
+          const dotPos = Math.max(0, Math.min(100, data.scoreExact));
+          // Build the historical comparison row only from values we actually
+          // have — CNN occasionally omits one of the windows.
+          const trends: { label: string; v: number }[] = [];
+          if (data.previousClose !== null) trends.push({ label: 'אתמול', v: data.previousClose });
+          if (data.previousWeek !== null)  trends.push({ label: 'שבוע',  v: data.previousWeek });
+          if (data.previousMonth !== null) trends.push({ label: 'חודש',  v: data.previousMonth });
           return (
             <>
               {/* Score */}
@@ -106,7 +128,7 @@ export function FearGreedWidget() {
                 <div
                   className="absolute top-1/2 w-3 h-3 rounded-full border-2 border-white"
                   style={{
-                    right: `${data.value}%`,
+                    right: `${dotPos}%`,
                     background: color,
                     boxShadow: `0 0 6px ${color}`,
                     transform: 'translate(50%, -50%)',
@@ -118,12 +140,26 @@ export function FearGreedWidget() {
                 <span className="text-[9px] text-tsua-muted">פחד קיצוני</span>
                 <span className="text-[9px] text-tsua-muted">חמדנות קיצונית</span>
               </div>
+
+              {trends.length > 0 && (
+                <div className="grid grid-cols-3 gap-2 mt-3 pt-3" style={{ borderTop: '1px solid rgba(26,40,64,0.4)' }}>
+                  {trends.map((t) => {
+                    const tColor = getColor(t.v);
+                    return (
+                      <div key={t.label} className="text-center">
+                        <div className="text-[9px] text-tsua-muted mb-0.5">{t.label}</div>
+                        <div className="text-sm font-black font-mono" style={{ color: tColor }}>{Math.round(t.v)}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </>
           );
         })()}
 
         <p className="text-[9px] text-tsua-muted text-center mt-3">
-          מדד קריפטו · Alternative.me
+          מדד מניות · CNN Fear &amp; Greed
         </p>
       </div>
     </div>
