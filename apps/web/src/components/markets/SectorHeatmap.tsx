@@ -55,31 +55,46 @@ export function SectorHeatmap({ variant = 'full' }: SectorHeatmapProps) {
   const locale = useLocale();
   const [sectors, setSectors] = useState<SectorQuote[] | null>(null);
   const [loading, setLoading] = useState(true);
+  // Bumped on every successful load; lets the user see the freshness pulse
+  // even though we don't show the timestamp explicitly in compact variant.
+  const [errored, setErrored] = useState(false);
+  // Force-rerun trigger for the retry button — increments to bust the
+  // useEffect dependency and re-fire the loader without unmounting.
+  const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
-    let cancelled = false;
+    const ctrl = new AbortController();
 
     async function load() {
       try {
-        const r = await fetch('/api/sectors');
+        // cache:'no-store' so the browser doesn't serve a stale response
+        // ahead of our 60s interval (server side already does its own ISR).
+        const r = await fetch('/api/sectors', { cache: 'no-store', signal: ctrl.signal });
+        if (!r.ok) throw new Error(`status ${r.status}`);
         const data = await r.json();
-        if (!cancelled && Array.isArray(data.sectors)) {
+        if (ctrl.signal.aborted) return;
+        if (Array.isArray(data.sectors) && data.sectors.length > 0) {
           setSectors(data.sectors);
+          setErrored(false);
+        } else {
+          // API returned `{ sectors: [], error }` envelope — surface it.
+          setErrored(true);
         }
-      } catch {
-        // ignore — keep loading skeleton visible
+      } catch (err) {
+        if ((err as { name?: string })?.name === 'AbortError') return;
+        setErrored(true);
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!ctrl.signal.aborted) setLoading(false);
       }
     }
 
     load();
     const interval = setInterval(load, 60_000); // refresh every minute
     return () => {
-      cancelled = true;
+      ctrl.abort();
       clearInterval(interval);
     };
-  }, []);
+  }, [retryKey]);
 
   const gridClass = variant === 'compact'
     ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2'
@@ -99,12 +114,23 @@ export function SectorHeatmap({ variant = 'full' }: SectorHeatmapProps) {
     );
   }
 
+  // Honest error path: distinguish "API explicitly returned no data" from
+  // "we never reached the network", and offer a retry. Without the button the
+  // user is stuck waiting for the 60s interval to attempt again.
   if (!sectors || sectors.length === 0) {
     return (
       <div className="rounded-xl p-4 text-center text-sm text-tsua-muted"
         style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}
       >
-        לא ניתן לטעון נתוני מגזרים כרגע.
+        <div className="text-2xl mb-1">📡</div>
+        <div>{errored ? 'שגיאה בטעינת נתוני מגזרים' : 'אין נתוני מגזרים זמינים'}</div>
+        <button
+          onClick={() => { setLoading(true); setRetryKey(k => k + 1); }}
+          className="mt-3 text-[11px] font-semibold px-3 py-1.5 rounded-lg text-tsua-text hover:text-tsua-accent transition-colors"
+          style={{ background: 'rgba(15,25,41,0.6)', border: '1px solid rgba(26,40,64,0.7)' }}
+        >
+          🔄 נסה שוב
+        </button>
       </div>
     );
   }

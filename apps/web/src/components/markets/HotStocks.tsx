@@ -1,8 +1,14 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import { useLivePrice } from '@/contexts/PriceContext';
+
+// After this much wall-time without a price showing up in the PriceContext,
+// the row stops showing a skeleton and shows "—" + ⚠️ instead. Otherwise a
+// row for a delisted ticker (or a socket that never connects) spins forever.
+const NO_DATA_GRACE_MS = 12_000;
 
 // Curated popular stocks (US + Israeli)
 const HOT = [
@@ -19,6 +25,14 @@ const HOT = [
 function HotRow({ symbol, nameHe, flag, tag }: typeof HOT[0]) {
   const locale = useLocale();
   const live = useLivePrice(symbol);
+  // Flip to true after NO_DATA_GRACE_MS without a price arriving. Lets the row
+  // bail out of perpetual skeleton state for symbols that never deliver.
+  const [gracePassed, setGracePassed] = useState(false);
+  useEffect(() => {
+    if (live) return; // already have data; no timer needed
+    const t = setTimeout(() => setGracePassed(true), NO_DATA_GRACE_MS);
+    return () => clearTimeout(t);
+  }, [live]);
 
   return (
     <Link
@@ -56,9 +70,7 @@ function HotRow({ symbol, nameHe, flag, tag }: typeof HOT[0]) {
 
       {/* Price */}
       <div className="text-end shrink-0">
-        {!live ? (
-          <div className="w-14 h-4 rounded animate-pulse" style={{ background: 'rgba(26,40,64,0.5)' }} />
-        ) : (
+        {live ? (
           <>
             <div
               className="text-sm font-black font-mono tabular-nums"
@@ -77,6 +89,17 @@ function HotRow({ symbol, nameHe, flag, tag }: typeof HOT[0]) {
               {live.changePercent >= 0 ? '+' : ''}{live.changePercent.toFixed(2)}%
             </div>
           </>
+        ) : gracePassed ? (
+          <div
+            className="text-sm font-black font-mono text-tsua-muted flex items-center gap-1 justify-end"
+            dir="ltr"
+            title="לא התקבל מחיר — נסה לרענן את העמוד"
+          >
+            <span>⚠️</span>
+            <span>—</span>
+          </div>
+        ) : (
+          <div className="w-14 h-4 rounded animate-pulse" style={{ background: 'rgba(26,40,64,0.5)' }} />
         )}
       </div>
     </Link>

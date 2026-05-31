@@ -18,22 +18,34 @@ const DEFAULTS: Rate[] = [
   { code: 'JPY', label: 'ין',    flag: '🇯🇵', rate: null, change: null, changePercent: null },
 ];
 
+// After this much time without a successful refresh, mark the time as stale.
+// 30 min handles weekends / midnight (Yahoo's FX feed pauses then) without
+// crying wolf during normal trading hours.
+const STALE_AFTER_MS = 30 * 60 * 1000;
+
+function fmtTime(d: Date): string {
+  return d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+}
+
 export function CurrencyRates() {
   const [rates, setRates] = useState<Rate[]>(DEFAULTS);
-  const [updated, setUpdated] = useState<string | null>(null);
+  // Store a real Date (not a formatted string) so we can compute staleness.
+  const [updated, setUpdated] = useState<Date | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  // True when the *latest* attempt failed. Separate from "we have no data at
+  // all" — the widget keeps rendering prior rows but warns honestly.
+  const [refreshFailed, setRefreshFailed] = useState(false);
 
   useEffect(() => {
-    let alive = true;
+    const ctrl = new AbortController();
 
     async function fetchRates() {
       try {
         // Server-side endpoint pulls from Yahoo Finance (live intraday FX).
-        const res = await fetch('/api/fx', { cache: 'no-store' });
+        const res = await fetch('/api/fx', { cache: 'no-store', signal: ctrl.signal });
         if (!res.ok) throw new Error('fx api failed');
         const data = await res.json();
-        if (!alive) return;
+        if (ctrl.signal.aborted) return;
 
         if (Array.isArray(data?.rates) && data.rates.length) {
           setRates(data.rates.map((r: Rate) => ({
@@ -44,17 +56,16 @@ export function CurrencyRates() {
             change: r.change,
             changePercent: r.changePercent,
           })));
-          const ts = data.updatedAt ? new Date(data.updatedAt) : new Date();
-          setUpdated(ts.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' }));
-          setError(false);
+          setUpdated(data.updatedAt ? new Date(data.updatedAt) : new Date());
+          setRefreshFailed(false);
         } else {
           throw new Error('no data');
         }
-      } catch {
-        if (!alive) return;
-        setError(true);
+      } catch (err) {
+        if ((err as { name?: string })?.name === 'AbortError') return;
+        setRefreshFailed(true);
       } finally {
-        if (alive) setLoading(false);
+        if (!ctrl.signal.aborted) setLoading(false);
       }
     }
 
@@ -62,22 +73,40 @@ export function CurrencyRates() {
     // Refresh every 60 seconds so the widget actually feels live.
     const timer = setInterval(fetchRates, 60 * 1000);
     return () => {
-      alive = false;
+      ctrl.abort();
       clearInterval(timer);
     };
   }, []);
+
+  const isStale = updated !== null && Date.now() - updated.getTime() > STALE_AFTER_MS;
+  const showWarning = refreshFailed || isStale;
+  // Cold-fail = we never got any data at all (vs. "we have stale data plus a failed retry").
+  const coldFail = refreshFailed && !updated;
 
   return (
     <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(15,25,41,0.7)', border: '1px solid rgba(26,40,64,0.8)' }}>
       <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(26,40,64,0.6)' }}>
         <h3 className="text-sm font-bold text-tsua-text">💱 שערי חליפין</h3>
-        {updated && !error && (
-          <span className="flex items-center gap-1.5 text-[10px] text-tsua-muted">
-            <span className="inline-block w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#00e5b0' }} />
-            עודכן {updated}
+        {updated && (
+          <span
+            className="flex items-center gap-1.5 text-[10px]"
+            style={{ color: showWarning ? '#ffd166' : undefined }}
+            title={
+              refreshFailed
+                ? `הרענון האחרון נכשל. מהזמן ${updated.toLocaleString('he-IL')}`
+                : isStale
+                  ? `הנתונים ישנים (מ-${updated.toLocaleString('he-IL')})`
+                  : updated.toLocaleString('he-IL')
+            }
+          >
+            {showWarning
+              ? <span>⚠️</span>
+              : <span className="inline-block w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#00e5b0' }} />
+            }
+            <span className={showWarning ? '' : 'text-tsua-muted'}>עודכן {fmtTime(updated)}</span>
           </span>
         )}
-        {error && (
+        {coldFail && (
           <span className="text-[10px]" style={{ color: '#ff4d6a' }}>שגיאת טעינה</span>
         )}
       </div>
@@ -95,8 +124,14 @@ export function CurrencyRates() {
                 </div>
               </div>
               <div className="text-end">
-                {loading || r.rate === null ? (
+                {/* Three explicit states:
+                      - loading + no rate → skeleton (truthful first paint)
+                      - cold-failed → "—" so the row doesn't spin forever
+                      - has rate → render */}
+                {r.rate === null && loading ? (
                   <div className="w-16 h-4 rounded animate-pulse" style={{ background: 'rgba(26,40,64,0.6)' }} />
+                ) : r.rate === null ? (
+                  <span className="text-sm font-black font-mono text-tsua-muted" dir="ltr">—</span>
                 ) : (
                   <div>
                     <span className="text-sm font-black font-mono" style={{ color: '#c8d8f0' }} dir="ltr">

@@ -15,7 +15,11 @@ import { useLocale } from 'next-intl';
 interface IndexData {
   symbol: string; nameHe: string; nameEn: string;
   flag: string; currency: string;
-  price: number; change: number; changePercent: number;
+  // Nullable now — server emits null instead of 0 when a quote fails to load,
+  // so we can render "—" instead of pretending "$0.00" is a real price.
+  price: number | null;
+  change: number | null;
+  changePercent: number | null;
 }
 interface StockRow {
   symbol: string; nameHe: string; nameEn: string; exchange: string;
@@ -32,13 +36,52 @@ interface MarketsData {
   forex: ForexRate[];
 }
 
+// After this many ms without a successful refresh, the timestamp gets an
+// amber warning to signal staleness. 5 min matches our 60s refresh cadence
+// + a generous grace period for transient failures.
+const STALE_AFTER_MS = 5 * 60 * 1000;
+// Auto-refresh interval. 60s == server-side ISR for /api/markets, so it's
+// the maximum frequency at which we'd actually see new data.
+const REFRESH_MS = 60 * 1000;
+
 function pct(n: number) {
   const sign = n >= 0 ? '+' : '';
   return `${sign}${n.toFixed(2)}%`;
 }
 
 function IndexCard({ idx }: { idx: IndexData }) {
-  const isUp = idx.changePercent >= 0;
+  // No-data path: show neutral card with "—" instead of pretending a 0-priced
+  // index moved 0%. Keeps the grid layout stable while signalling honestly.
+  const hasData = idx.price !== null && idx.changePercent !== null;
+  if (!hasData) {
+    return (
+      <div
+        className="rounded-2xl p-4"
+        style={{
+          background: 'rgba(13,20,36,0.6)',
+          border: '1px solid rgba(26,40,64,0.7)',
+        }}
+      >
+        <div className="flex items-start justify-between mb-3">
+          <div>
+            <div className="text-xs text-tsua-muted flex items-center gap-1.5">
+              <span>{idx.flag}</span>
+              <span className="font-mono">{idx.symbol}</span>
+            </div>
+            <div className="font-bold text-tsua-text text-sm mt-0.5">{idx.nameHe}</div>
+          </div>
+          <span className="text-[10px] font-black px-2 py-1 rounded-lg text-tsua-muted" style={{ background: 'rgba(26,40,64,0.5)' }}>
+            ⚠️ N/A
+          </span>
+        </div>
+        <div className="text-2xl font-black font-mono text-tsua-muted" dir="ltr">—</div>
+        <div className="text-[10px] text-tsua-muted mt-1">נתון לא זמין</div>
+      </div>
+    );
+  }
+
+  const changePct = idx.changePercent!;
+  const isUp = changePct >= 0;
   return (
     <div
       className="rounded-2xl p-4 transition-all hover:scale-[1.02]"
@@ -65,7 +108,7 @@ function IndexCard({ idx }: { idx: IndexData }) {
             : { background: 'rgba(255,77,106,0.1)', color: '#ff4d6a' }
           }
         >
-          {isUp ? '▲' : '▼'} {Math.abs(idx.changePercent).toFixed(2)}%
+          {isUp ? '▲' : '▼'} {Math.abs(changePct).toFixed(2)}%
         </span>
       </div>
       <div
@@ -73,10 +116,10 @@ function IndexCard({ idx }: { idx: IndexData }) {
         style={{ color: isUp ? '#00e5b0' : '#ff4d6a' }}
         dir="ltr"
       >
-        {idx.currency === 'ILS' ? '₪' : '$'}{idx.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        {idx.currency === 'ILS' ? '₪' : '$'}{idx.price!.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
       </div>
       <div className="text-xs font-semibold mt-1" style={{ color: isUp ? '#00e5b0' : '#ff4d6a' }} dir="ltr">
-        {isUp ? '+' : ''}{idx.change.toFixed(2)}
+        {isUp ? '+' : ''}{(idx.change ?? 0).toFixed(2)}
       </div>
     </div>
   );
@@ -222,30 +265,83 @@ function SkeletonCard() {
   );
 }
 
+/** Shallow runtime check that the response is shaped the way we expect.
+ *  Server bugs / proxy interference can return HTML or wrong-shape JSON; we
+ *  want to fall to the error path rather than crash on `.map of undefined`. */
+function isMarketsData(x: unknown): x is MarketsData {
+  if (!x || typeof x !== 'object') return false;
+  const d = x as Record<string, unknown>;
+  return Array.isArray(d.indices) && Array.isArray(d.gainers)
+      && Array.isArray(d.losers)  && Array.isArray(d.forex);
+}
+
 export function MarketsPage() {
   const locale = useLocale();
   const [data, setData] = useState<MarketsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  // True when the *latest* refresh attempt failed. Independent of whether we
+  // still have prior data on screen — that's what `data` tracks. Without this
+  // a silent 60s-cycle failure shows a stale "עודכן 14:32" forever.
+  const [refreshFailed, setRefreshFailed] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  async function fetchData(isRefresh = false) {
-    if (isRefresh) setRefreshing(true);
-    else setLoading(true);
-    try {
-      const res = await fetch('/api/markets', { cache: 'no-store' });
-      if (res.ok) {
+  useEffect(() => {
+    const ctrl = new AbortController();
+
+    async function fetchData(isRefresh = false) {
+      if (isRefresh) setRefreshing(true);
+      try {
+        const res = await fetch('/api/markets', { cache: 'no-store', signal: ctrl.signal });
+        if (!res.ok) throw new Error(`status ${res.status}`);
         const d = await res.json();
+        if (ctrl.signal.aborted) return;
+        if (!isMarketsData(d)) throw new Error('bad shape');
         setData(d);
         setLastUpdated(new Date());
+        setRefreshFailed(false);
+      } catch (err) {
+        if ((err as { name?: string })?.name === 'AbortError') return;
+        // Keep prior `data` so the widget doesn't blank out on a transient
+        // failure — but flip the flag so the header tells the truth.
+        setRefreshFailed(true);
+      } finally {
+        if (!ctrl.signal.aborted) {
+          setLoading(false);
+          setRefreshing(false);
+        }
       }
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
     }
-  }
 
-  useEffect(() => { fetchData(); }, []);
+    fetchData();
+    const interval = setInterval(() => fetchData(true), REFRESH_MS);
+    return () => {
+      ctrl.abort();
+      clearInterval(interval);
+    };
+  }, []);
+
+  // Manual refresh button bypasses the interval but reuses the same fetcher.
+  // We can't reach the closed-over fetchData; trigger a one-off identical call.
+  const manualRefresh = () => {
+    setRefreshing(true);
+    fetch('/api/markets', { cache: 'no-store' })
+      .then(r => r.ok ? r.json() : Promise.reject(new Error(`status ${r.status}`)))
+      .then(d => {
+        if (!isMarketsData(d)) throw new Error('bad shape');
+        setData(d);
+        setLastUpdated(new Date());
+        setRefreshFailed(false);
+      })
+      .catch(() => setRefreshFailed(true))
+      .finally(() => setRefreshing(false));
+  };
+
+  // Show staleness if either the last fetch failed OR the timestamp is older
+  // than STALE_AFTER_MS (e.g., user backgrounded the tab and our interval was
+  // throttled by the browser).
+  const isStale = lastUpdated !== null && Date.now() - lastUpdated.getTime() > STALE_AFTER_MS;
+  const showWarning = refreshFailed || isStale;
 
   return (
     <div className="space-y-5" dir="rtl">
@@ -257,14 +353,31 @@ export function MarketsPage() {
             📊 שווקים
           </h1>
           {lastUpdated && (
-            <p className="text-xs text-tsua-muted mt-0.5">
-              עודכן{' '}
-              {lastUpdated.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}
+            <p
+              className="text-xs mt-0.5 flex items-center gap-1"
+              style={{ color: showWarning ? '#ffd166' : undefined }}
+              title={
+                refreshFailed
+                  ? `הרענון האחרון נכשל. הנתונים מהזמן ${lastUpdated.toLocaleString('he-IL')}`
+                  : isStale
+                    ? `הנתונים ישנים (מ-${lastUpdated.toLocaleString('he-IL')})`
+                    : lastUpdated.toLocaleString('he-IL')
+              }
+            >
+              {showWarning && <span>⚠️</span>}
+              <span className={showWarning ? '' : 'text-tsua-muted'}>
+                עודכן {lastUpdated.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            </p>
+          )}
+          {!lastUpdated && refreshFailed && !loading && (
+            <p className="text-xs mt-0.5" style={{ color: '#ff4d6a' }}>
+              ⚠️ לא ניתן לטעון נתונים
             </p>
           )}
         </div>
         <button
-          onClick={() => fetchData(true)}
+          onClick={manualRefresh}
           disabled={refreshing}
           className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl text-tsua-muted hover:text-tsua-text transition-all disabled:opacity-50"
           style={{ background: 'rgba(15,25,41,0.6)', border: '1px solid rgba(26,40,64,0.7)' }}

@@ -88,23 +88,37 @@ function IndicatorCard({ ind }: { ind: MacroIndicator }) {
 export function MacroWidget() {
   const [indicators, setIndicators] = useState<MacroIndicator[] | null>(null);
   const [loading, setLoading] = useState(true);
+  // Track failure independently so we can show an error card instead of
+  // silently disappearing — `return null` on the empty path made it impossible
+  // for users to tell whether "no macro data" meant "broken" or "by design".
+  const [errored, setErrored] = useState(false);
 
   useEffect(() => {
-    let cancelled = false;
+    const ctrl = new AbortController();
 
-    fetch('/api/macro')
-      .then(r => r.json())
+    fetch('/api/macro', { signal: ctrl.signal })
+      .then(r => {
+        if (!r.ok) throw new Error(`status ${r.status}`);
+        return r.json();
+      })
       .then(d => {
-        if (!cancelled && Array.isArray(d.indicators)) {
+        if (ctrl.signal.aborted) return;
+        if (Array.isArray(d.indicators) && d.indicators.length > 0) {
           setIndicators(d.indicators);
+          setErrored(false);
+        } else {
+          setErrored(true);
         }
       })
-      .catch(() => {})
+      .catch((err) => {
+        if (err?.name === 'AbortError') return;
+        setErrored(true);
+      })
       .finally(() => {
-        if (!cancelled) setLoading(false);
+        if (!ctrl.signal.aborted) setLoading(false);
       });
 
-    return () => { cancelled = true; };
+    return () => ctrl.abort();
   }, []);
 
   if (loading && !indicators) {
@@ -125,8 +139,28 @@ export function MacroWidget() {
     );
   }
 
+  // Show an honest error card instead of vanishing — preserves the section's
+  // place in the layout and gives the user a hint that something's wrong.
+  if ((!indicators || indicators.length === 0) && errored) {
+    return (
+      <div
+        className="rounded-2xl overflow-hidden"
+        style={{ background: 'var(--card)', border: '1px solid var(--border)' }}
+      >
+        <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--border2)' }}>
+          <h3 className="text-sm font-black text-tsua-text">🌍 נתוני מקרו</h3>
+        </div>
+        <div className="p-6 text-center">
+          <div className="text-2xl mb-1">📡</div>
+          <div className="text-xs text-tsua-muted">לא ניתן לטעון נתוני מקרו כעת</div>
+          <div className="text-[10px] text-tsua-muted mt-0.5">נסה לרענן בעוד מספר דקות</div>
+        </div>
+      </div>
+    );
+  }
+
   if (!indicators || indicators.length === 0) {
-    return null; // gracefully hide if fetching fails
+    return null; // shouldn't happen, but stay defensive
   }
 
   // Group by country — Israel first (RTL-appropriate), US second

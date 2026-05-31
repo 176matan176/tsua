@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 import { fetchQuote, fetchYahooQuote } from '@/lib/quotes';
 
-export const dynamic = 'force-dynamic';
+// 60s ISR — markets data moves intraday but we don't need sub-minute freshness
+// on the dashboard. `force-dynamic` would defeat the cache and hammer Finnhub.
+export const revalidate = 60;
 
 const INDICES = [
   { symbol: 'SPY',  nameHe: 'S&P 500',   nameEn: 'S&P 500',    flag: '🇺🇸', currency: 'USD' },
@@ -49,16 +51,23 @@ export async function GET() {
       Promise.all(FOREX.map(f => fetchYahooQuote(f.symbol))),
     ]);
 
-    const indices = INDICES.map((idx, i) => ({
-      symbol: idx.symbol,
-      nameHe: idx.nameHe,
-      nameEn: idx.nameEn,
-      flag: idx.flag,
-      currency: idx.currency,
-      price: indexQuotes[i]?.c ?? 0,
-      change: indexQuotes[i]?.d ?? 0,
-      changePercent: indexQuotes[i]?.dp ?? 0,
-    }));
+    // Map each index quote to a row. If the quote came back empty (c === 0),
+    // emit `null` rather than 0/0/0 — otherwise the UI happily renders "$0.00"
+    // as if that were a real price.
+    const indices = INDICES.map((idx, i) => {
+      const q = indexQuotes[i];
+      const has = (q?.c ?? 0) > 0;
+      return {
+        symbol: idx.symbol,
+        nameHe: idx.nameHe,
+        nameEn: idx.nameEn,
+        flag: idx.flag,
+        currency: idx.currency,
+        price:         has ? q.c  : null,
+        change:        has ? q.d  : null,
+        changePercent: has ? q.dp : null,
+      };
+    });
 
     const watchWithQuotes = WATCH_LIST.map((s, i) => ({
       ...s,
@@ -84,7 +93,13 @@ export async function GET() {
       changePercent: forexQuotes[i]?.dp ?? 0,
     })).filter(f => f.rate > 0);
 
-    return NextResponse.json({ indices, gainers, losers, forex });
+    return NextResponse.json({
+      indices,
+      gainers,
+      losers,
+      forex,
+      timestamp: Date.now(),
+    });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
