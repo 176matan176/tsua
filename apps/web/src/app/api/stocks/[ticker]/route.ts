@@ -85,8 +85,12 @@ export async function GET(
       // `?? null` is correct here — `0` is a legitimate pre-market value we
       // want to preserve, while `undefined` (Yahoo didn't return it) becomes null.
       volume: quote.v ?? null,
+      // Finnhub returns marketCapitalization *in millions*, not billions. The
+      // original `* 1_000_000_000` was off by 1000x — NVDA was rendering as
+      // $5,109,588B instead of $5.1T. The widget divides by 1e9 to format as
+      // "$X.XB", so the right scale to dollars is `* 1_000_000`.
       marketCap: typeof profile.marketCapitalization === 'number'
-        ? profile.marketCapitalization * 1_000_000_000
+        ? profile.marketCapitalization * 1_000_000
         : null,
       currency: (profile.currency as string) || 'USD',
       exchange: (profile.exchange as string) || '',
