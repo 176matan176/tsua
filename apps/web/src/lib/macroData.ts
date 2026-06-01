@@ -3,7 +3,14 @@
  *
  * Sources (all FREE, no API key required):
  *   - Bank of Israel PublicApi (JSON):           boi.org.il/PublicApi/GetInterest
+ *   - CBS Israel index API (JSON):               api.cbs.gov.il/index/data/price?id=120010
  *   - FRED graph CSV endpoint (no auth needed):  fred.stlouisfed.org/graph/fredgraph.csv?id=<SERIES>
+ *
+ * NOTE on Israeli CPI: we previously used FRED's ISRCPIALLMINMEI series, but
+ * that's sourced from OECD which publishes Israel data with a 12-15 month lag
+ * — the widget was showing inflation as of March 2025 in mid-2026. CBS itself
+ * publishes the monthly CPI around the 15th of the following month (same
+ * cadence as US BLS) and exposes it via a public JSON API with no auth.
  *
  * These are monthly-updated indicators, so server-side cache of 1 hour is plenty.
  */
@@ -63,6 +70,35 @@ function delta(rows: Array<{ date: string; value: number }>): number | null {
   return last.value - prev.value;
 }
 
+/**
+ * CBS Israel CPI — series 120010 ("מדד המחירים לצרכן - כללי").
+ * Response shape (truncated):
+ *   { month: [{ code, name, date: [{ year, month, percentYear, ... }, ...] }] }
+ * `date` is ordered newest-first. `percentYear` is the year-over-year %
+ * change already computed by CBS — same metric FRED gives us for US via
+ * `yoy(CPIAUCSL)`. We just need to format the asOf date.
+ */
+async function fetchCbsIlCpi(): Promise<{ value: number | null; asOf: string | null }> {
+  try {
+    const r = await fetch(
+      'https://api.cbs.gov.il/index/data/price?id=120010&format=json',
+      { headers: { Accept: 'application/json' }, next: { revalidate: 3600 } },
+    );
+    if (!r.ok) return { value: null, asOf: null };
+    const j = await r.json();
+    const newest = j?.month?.[0]?.date?.[0];
+    if (!newest || typeof newest.percentYear !== 'number') {
+      return { value: null, asOf: null };
+    }
+    // Build YYYY-MM-DD from numeric year+month so it matches the FRED format
+    // used elsewhere in this module (the widget's `formatDate` parses ISO).
+    const mm = String(newest.month).padStart(2, '0');
+    return { value: newest.percentYear, asOf: `${newest.year}-${mm}-01` };
+  } catch {
+    return { value: null, asOf: null };
+  }
+}
+
 async function fetchBoiInterest(): Promise<{ value: number | null; asOf: string | null }> {
   try {
     const r = await fetch('https://www.boi.org.il/PublicApi/GetInterest?lang=EN', {
@@ -91,8 +127,8 @@ export async function fetchAllMacro(): Promise<MacroIndicator[]> {
     usUnemp,
   ] = await Promise.allSettled([
     fetchBoiInterest(),
-    fetchFredSeries('ISRCPIALLMINMEI'),
-    fetchFredSeries('LRHUTTTTILM156S'),
+    fetchCbsIlCpi(),                       // CBS Israel — fresh monthly
+    fetchFredSeries('LRHUTTTTILM156S'),    // OECD IL unemployment (acceptable lag)
     fetchFredSeries('FEDFUNDS'),
     fetchFredSeries('CPIAUCSL'),
     fetchFredSeries('UNRATE'),
@@ -116,15 +152,16 @@ export async function fetchAllMacro(): Promise<MacroIndicator[]> {
   }
 
   if (ilCpi.status === 'fulfilled') {
-    const y = yoy(ilCpi.value);
+    // CBS hands us the YoY % directly via `percentYear`, no need for the
+    // 13-month rolling diff we use for FRED-sourced series.
     indicators.push({
       key: 'il-cpi',
       label: 'אינפלציה ישראל',
       country: 'IL',
       flag: '🇮🇱',
-      value: y?.value ?? null,
+      value: ilCpi.value.value,
       unit: '%',
-      asOf: y?.date ?? null,
+      asOf: ilCpi.value.asOf,
       trend: null,
       description: 'שינוי שנתי במדד המחירים לצרכן (יעד: 1-3%)',
     });
