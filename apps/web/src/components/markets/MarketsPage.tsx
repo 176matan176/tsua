@@ -34,6 +34,9 @@ interface MarketsData {
   gainers: StockRow[];
   losers: StockRow[];
   forex: ForexRate[];
+  /** Server-side generation timestamp (ms since epoch). Optional for backward
+   *  compat — old cached responses may not have it. */
+  timestamp?: number;
 }
 
 // After this many ms without a successful refresh, the timestamp gets an
@@ -298,7 +301,10 @@ export function MarketsPage() {
         if (ctrl.signal.aborted) return;
         if (!isMarketsData(d)) throw new Error('bad shape');
         setData(d);
-        setLastUpdated(new Date());
+        // Prefer the server-side timestamp when present — that reflects when
+        // the data was actually *generated*, which under ISR can be much
+        // older than "now" (the cache may serve a 50s-old response).
+        setLastUpdated(new Date(d.timestamp ?? Date.now()));
         setRefreshFailed(false);
       } catch (err) {
         if ((err as { name?: string })?.name === 'AbortError') return;
@@ -330,7 +336,7 @@ export function MarketsPage() {
       .then(d => {
         if (!isMarketsData(d)) throw new Error('bad shape');
         setData(d);
-        setLastUpdated(new Date());
+        setLastUpdated(new Date(d.timestamp ?? Date.now()));
         setRefreshFailed(false);
       })
       .catch(() => setRefreshFailed(true))

@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchQuotes } from '@/lib/quotes';
 
-export const dynamic = 'force-dynamic';
+// 30s ISR — was force-dynamic, which made every chip-hover re-hit Finnhub
+// and contributed to the rate-limits the Yahoo fallback exists to absorb.
+export const revalidate = 30;
 
 // GET /api/stocks/batch?symbols=TEVA,NVDA,AAPL
 //

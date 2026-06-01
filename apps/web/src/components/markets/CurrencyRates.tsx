@@ -35,6 +35,10 @@ export function CurrencyRates() {
   // True when the *latest* attempt failed. Separate from "we have no data at
   // all" — the widget keeps rendering prior rows but warns honestly.
   const [refreshFailed, setRefreshFailed] = useState(false);
+  // Which provider served this batch. The server can fall back to Frankfurter
+  // (ECB end-of-day rates) when Yahoo is down — the user should know they're
+  // looking at yesterday's close and not the live intraday rate.
+  const [source, setSource] = useState<string | null>(null);
 
   useEffect(() => {
     const ctrl = new AbortController();
@@ -57,6 +61,7 @@ export function CurrencyRates() {
             changePercent: r.changePercent,
           })));
           setUpdated(data.updatedAt ? new Date(data.updatedAt) : new Date());
+          setSource(typeof data.source === 'string' ? data.source : null);
           setRefreshFailed(false);
         } else {
           throw new Error('no data');
@@ -151,9 +156,18 @@ export function CurrencyRates() {
       </div>
 
       <div className="px-4 py-2" style={{ borderTop: '1px solid rgba(26,40,64,0.4)' }}>
-        <p className="text-[10px] text-tsua-muted text-center">
-          מחיר ₪ לכל מטבע · מתעדכן כל דקה
-        </p>
+        {/* When the server fell through to Frankfurter (ECB EOD rates), tell
+            the user — otherwise they'll think the rates are live intraday
+            when they're actually yesterday's 4pm Frankfurt close. */}
+        {source && source !== 'yahoo' ? (
+          <p className="text-[10px] text-center" style={{ color: '#ffd166' }}>
+            ⚠️ שערים סופי יום (ECB) — Yahoo לא זמין
+          </p>
+        ) : (
+          <p className="text-[10px] text-tsua-muted text-center">
+            מחיר ₪ לכל מטבע · מתעדכן כל דקה
+          </p>
+        )}
       </div>
     </div>
   );

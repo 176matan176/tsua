@@ -1,7 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchQuote } from '@/lib/quotes';
 
-export const dynamic = 'force-dynamic';
+// 60s ISR — quote is the freshness-critical field; profile/metrics barely
+// change. Better than force-dynamic which forced every page-view to hit
+// Finnhub and contributed to the rate limits we're falling back from.
+export const revalidate = 60;
+
+/** Defensive JSON parse — Finnhub occasionally returns HTML error pages
+ *  on rate-limit, which would explode an `await res.json()`. Returns {}
+ *  on any parse failure so the route still returns the quote we already
+ *  successfully fetched. */
+async function safeJson(res: Response | null | undefined): Promise<Record<string, unknown>> {
+  if (!res || !res.ok) return {};
+  try {
+    return (await res.json()) as Record<string, unknown>;
+  } catch {
+    return {};
+  }
+}
 
 const FINNHUB_KEY = process.env.FINNHUB_API_KEY;
 
@@ -41,13 +57,24 @@ export async function GET(
       return NextResponse.json({ error: 'No price data returned' }, { status: 404 });
     }
 
-    const profile = profileRes && profileRes.ok ? await profileRes.json() : {};
-    const metricsData = metricsRes && metricsRes.ok ? await metricsRes.json() : {};
-    const m = metricsData?.metric ?? {};
+    // safeJson swallows non-OK responses *and* HTML-rather-than-JSON bodies
+    // so a Finnhub error page can't sink the whole route. Profile/metrics
+    // are nice-to-haves; the quote is what we must deliver.
+    const profile = await safeJson(profileRes);
+    const metricsData = await safeJson(metricsRes);
+    const m = (metricsData?.metric ?? {}) as Record<string, unknown>;
+
+    // Flag responses where we couldn't enrich with profile/metrics so the
+    // client can surface a "partial data" hint instead of pretending the
+    // company is anonymous (logo:null, no industry, no fundamentals).
+    const partial = !profile.name || !m;
+
+    const num = (v: unknown): number | null =>
+      typeof v === 'number' && Number.isFinite(v) ? v : null;
 
     return NextResponse.json({
       ticker,
-      name: profile.name || ticker,
+      name: (profile.name as string) || ticker,
       price: quote.c,
       change: quote.d,
       changePercent: quote.dp,
@@ -55,30 +82,35 @@ export async function GET(
       high: quote.h,
       low: quote.l,
       prevClose: quote.pc,
-      volume: quote.v || null,
-      marketCap: profile.marketCapitalization ? profile.marketCapitalization * 1_000_000_000 : null,
-      currency: profile.currency || 'USD',
-      exchange: profile.exchange || '',
-      logo: profile.logo || null,
-      country: profile.country || '',
+      // `?? null` is correct here — `0` is a legitimate pre-market value we
+      // want to preserve, while `undefined` (Yahoo didn't return it) becomes null.
+      volume: quote.v ?? null,
+      marketCap: typeof profile.marketCapitalization === 'number'
+        ? profile.marketCapitalization * 1_000_000_000
+        : null,
+      currency: (profile.currency as string) || 'USD',
+      exchange: (profile.exchange as string) || '',
+      logo: (profile.logo as string) || null,
+      country: (profile.country as string) || '',
       // Company overview
-      description: null, // Finnhub free tier doesn't include description
-      industry: profile.finnhubIndustry || null,
-      sector: profile.gics || null,
-      weburl: profile.weburl || null,
-      employees: profile.employeeTotal || null,
-      ipo: profile.ipo || null,
+      description: (profile.description as string) ?? null,
+      industry: (profile.finnhubIndustry as string) || null,
+      sector: (profile.gics as string) || null,
+      weburl: (profile.weburl as string) || null,
+      employees: num(profile.employeeTotal),
+      ipo: (profile.ipo as string) || null,
       // Fundamentals from /stock/metric
-      week52High: m['52WeekHigh'] ?? null,
-      week52Low: m['52WeekLow'] ?? null,
-      peRatio: m['peBasicExclExtraTTM'] ?? m['peTTM'] ?? null,
-      forwardPE: m['peNormalizedAnnual'] ?? m['peExclExtraAnnual'] ?? null,
-      eps: m['epsBasicExclExtraItemsTTM'] ?? null,
-      beta: m['beta'] ?? null,
-      dividendYield: m['dividendYieldIndicatedAnnual'] ?? null,
-      pbRatio: m['pbAnnual'] ?? null,
-      roeTTM: m['roeTTM'] ?? null,
-      revenueGrowthTTM: m['revenueGrowthTTMYoy'] ?? null,
+      week52High: num(m['52WeekHigh']),
+      week52Low: num(m['52WeekLow']),
+      peRatio: num(m['peBasicExclExtraTTM']) ?? num(m['peTTM']),
+      forwardPE: num(m['peNormalizedAnnual']) ?? num(m['peExclExtraAnnual']),
+      eps: num(m['epsBasicExclExtraItemsTTM']),
+      beta: num(m['beta']),
+      dividendYield: num(m['dividendYieldIndicatedAnnual']),
+      pbRatio: num(m['pbAnnual']),
+      roeTTM: num(m['roeTTM']),
+      revenueGrowthTTM: num(m['revenueGrowthTTMYoy']),
+      partial,
     });
 
   } catch (error: any) {

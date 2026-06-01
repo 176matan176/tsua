@@ -82,18 +82,44 @@ function SkeletonNews() {
   );
 }
 
+// Discriminated union so "empty array because API failed" and "empty array
+// because the ticker genuinely has no recent news" can render different copy.
+type NewsState =
+  | { status: 'loading' }
+  | { status: 'ok'; news: NewsArticle[] }
+  | { status: 'error' };
+
 export function StockNews({ ticker }: { ticker: string }) {
-  const [news, setNews] = useState<NewsArticle[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [state, setState] = useState<NewsState>({ status: 'loading' });
+  // Retry button increments this; useEffect re-runs.
+  const [retry, setRetry] = useState(0);
 
   useEffect(() => {
-    setLoading(true);
-    fetch(`/api/stocks/${ticker}/news`)
-      .then(r => r.json())
-      .then(data => setNews(Array.isArray(data) ? data : []))
-      .catch(() => setNews([]))
-      .finally(() => setLoading(false));
-  }, [ticker]);
+    const ctrl = new AbortController();
+    setState({ status: 'loading' });
+
+    fetch(`/api/stocks/${ticker}/news`, { signal: ctrl.signal })
+      .then(r => {
+        if (!r.ok) throw new Error(`status ${r.status}`);
+        return r.json();
+      })
+      .then(data => {
+        if (ctrl.signal.aborted) return;
+        // Server now returns { error } on upstream failure; only set ok when
+        // we actually got an array.
+        if (Array.isArray(data)) {
+          setState({ status: 'ok', news: data });
+        } else {
+          setState({ status: 'error' });
+        }
+      })
+      .catch((err) => {
+        if ((err as { name?: string })?.name === 'AbortError') return;
+        setState({ status: 'error' });
+      });
+
+    return () => ctrl.abort();
+  }, [ticker, retry]);
 
   return (
     <div
@@ -107,15 +133,29 @@ export function StockNews({ ticker }: { ticker: string }) {
       </div>
 
       <div className="py-1">
-        {loading && <SkeletonNews />}
+        {state.status === 'loading' && <SkeletonNews />}
 
-        {!loading && news.length === 0 && (
+        {state.status === 'error' && (
+          <div className="text-center py-8">
+            <div className="text-2xl mb-1">📡</div>
+            <div className="text-sm text-tsua-muted">לא ניתן לטעון חדשות כעת</div>
+            <button
+              onClick={() => setRetry(r => r + 1)}
+              className="mt-3 text-[11px] font-semibold px-3 py-1.5 rounded-lg text-tsua-text hover:text-tsua-accent transition-colors"
+              style={{ background: 'rgba(15,25,41,0.6)', border: '1px solid rgba(26,40,64,0.7)' }}
+            >
+              🔄 נסה שוב
+            </button>
+          </div>
+        )}
+
+        {state.status === 'ok' && state.news.length === 0 && (
           <div className="text-center py-8 text-tsua-muted text-sm">
             {'אין חדשות זמינות כרגע'}
           </div>
         )}
 
-        {!loading && news.map(article => (
+        {state.status === 'ok' && state.news.map(article => (
           <NewsCard key={article.id} article={article} />
         ))}
       </div>

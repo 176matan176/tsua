@@ -30,7 +30,7 @@ export async function GET(
   const h24ago = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
   const h48ago = new Date(now.getTime() - 48 * 60 * 60 * 1000).toISOString();
 
-  const [{ data: curr }, { data: prev }] = await Promise.all([
+  const [currResp, prevResp] = await Promise.all([
     supabase
       .from('posts')
       .select('sentiment')
@@ -44,8 +44,19 @@ export async function GET(
       .lt('created_at', h24ago),
   ]);
 
-  const currCounts = countBySentiment(curr ?? []);
-  const prevCounts = countBySentiment(prev ?? []);
+  // Previously we destructured `{ data: curr }` and discarded the error
+  // field — a DB outage looked identical to "no posts exist", which
+  // poisoned the widget with a fake "אין מספיק נתונים" state. Surface the
+  // real error so the client can render an honest "couldn't load" card.
+  if (currResp.error || prevResp.error) {
+    return NextResponse.json(
+      { error: currResp.error?.message ?? prevResp.error?.message ?? 'db error' },
+      { status: 500 },
+    );
+  }
+
+  const currCounts = countBySentiment(currResp.data ?? []);
+  const prevCounts = countBySentiment(prevResp.data ?? []);
 
   const total     = currCounts.bullish + currCounts.bearish + currCounts.neutral;
   const prevTotal = prevCounts.bullish + prevCounts.bearish + prevCounts.neutral;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { StockHeader, StockData } from '@/components/stocks/StockHeader';
 import { TradingViewChart } from '@/components/charts/TradingViewChart';
 import { SentimentMeter } from '@/components/stocks/SentimentMeter';
@@ -14,6 +14,15 @@ type Tab = 'feed' | 'news';
 export function StockPageClient({ ticker }: { ticker: string }) {
   const [stockData, setStockData] = useState<StockData | null>(null);
   const [tab, setTab] = useState<Tab>('feed');
+
+  // Reset `stockData` whenever the user navigates to a different ticker.
+  // Without this, KeyStats / CompanyOverview keep rendering the *previous*
+  // ticker's name, sector, market cap, etc. (labeled with the new ticker!)
+  // for the ~500ms it takes StockHeader's fetch to settle — looks like the
+  // old company has the new ticker's symbol.
+  useEffect(() => {
+    setStockData(null);
+  }, [ticker]);
 
   const sidebarContent = stockData ? (
     <>

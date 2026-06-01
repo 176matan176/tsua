@@ -57,39 +57,97 @@ function SkeletonPulse({ className }: { className: string }) {
   );
 }
 
+// Tracks the REST-shaped quote so we can fall back to it if the WS price
+// never arrives. Extends what StockData carries; we only need the basics.
+interface RestQuote { price: number; change: number; changePercent: number }
+
 export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
   const locale = useLocale();
   const { user } = useAuth();
   const livePrice = useLivePrice(ticker);
   const [data, setData] = useState<StockData | null>(null);
   const [loading, setLoading] = useState(true);
+  // Honest error flag — was previously a fabricated fake-data fallback that
+  // claimed USD/empty-exchange for *any* failed ticker, including TASE ones.
+  const [errored, setErrored] = useState(false);
   const [inWatchlist, setInWatchlist] = useState(false);
   const [watchlistLoading, setWatchlistLoading] = useState(false);
+  // REST-fetched quote used as a fallback when the WS socket isn't delivering.
+  // We capture it from /api/stocks/<ticker> alongside the metadata.
+  const [restQuote, setRestQuote] = useState<RestQuote | null>(null);
+  // After 5s without livePrice, give up waiting and render with the REST quote.
+  const [waitedForLive, setWaitedForLive] = useState(false);
 
+  // Reset waiting-for-live on every ticker switch so the timer restarts.
   useEffect(() => {
-    fetch(`/api/stocks/${ticker}`)
-      .then(r => r.json())
-      .then(d => {
-        setData(d);
-        onDataLoaded?.(d);
-      })
-      .catch(() => setData({
-        ticker, name: ticker, currency: 'USD', exchange: '', logo: null,
-        open: 0, high: 0, low: 0, prevClose: null, volume: null, marketCap: null,
-        week52High: null, week52Low: null, peRatio: null, forwardPE: null, eps: null,
-        beta: null, dividendYield: null, pbRatio: null, roeTTM: null, revenueGrowthTTM: null,
-        industry: null, sector: null, weburl: null, employees: null, ipo: null, country: null,
-      }))
-      .finally(() => setLoading(false));
+    setWaitedForLive(false);
+    setRestQuote(null);
+    setErrored(false);
   }, [ticker]);
 
-  // Check watchlist status
+  // Main metadata fetch — AbortController prevents a slow response for the
+  // *previous* ticker from overwriting the new ticker's data after navigation.
+  useEffect(() => {
+    const ctrl = new AbortController();
+    setLoading(true);
+
+    fetch(`/api/stocks/${ticker}`, { signal: ctrl.signal })
+      .then(r => {
+        if (!r.ok) throw new Error(`status ${r.status}`);
+        return r.json();
+      })
+      .then((d: StockData & { price?: number; change?: number; changePercent?: number }) => {
+        if (ctrl.signal.aborted) return;
+        if (!d || typeof d !== 'object') throw new Error('bad shape');
+        setData(d);
+        onDataLoaded?.(d);
+        // Capture the REST quote for fallback rendering when WS is silent.
+        if (typeof d.price === 'number' && d.price > 0) {
+          setRestQuote({
+            price: d.price,
+            change: typeof d.change === 'number' ? d.change : 0,
+            changePercent: typeof d.changePercent === 'number' ? d.changePercent : 0,
+          });
+        }
+      })
+      .catch((err) => {
+        if ((err as { name?: string })?.name === 'AbortError') return;
+        // Don't fabricate a fake-but-real-looking object — the old behavior
+        // labelled TASE tickers as USD/NYSE which was actively misleading.
+        setErrored(true);
+      })
+      .finally(() => {
+        if (!ctrl.signal.aborted) setLoading(false);
+      });
+
+    return () => ctrl.abort();
+  }, [ticker, onDataLoaded]);
+
+  // After REST_FALLBACK_MS without a WS price arriving, flip waitedForLive so
+  // the render path uses the REST quote (still fresh, just not pushed).
+  useEffect(() => {
+    if (livePrice) return;
+    const t = setTimeout(() => setWaitedForLive(true), 5000);
+    return () => clearTimeout(t);
+  }, [livePrice, ticker]);
+
+  // Check watchlist status — own AbortController so it doesn't race on
+  // ticker change either.
   useEffect(() => {
     if (!user) return;
-    fetch(`/api/watchlist/${ticker}`)
-      .then(r => r.json())
-      .then(d => setInWatchlist(d.inWatchlist ?? false))
-      .catch(() => {});
+    const ctrl = new AbortController();
+    fetch(`/api/watchlist/${ticker}`, { signal: ctrl.signal })
+      .then(r => r.ok ? r.json() : Promise.reject(new Error(`status ${r.status}`)))
+      .then(d => {
+        if (ctrl.signal.aborted) return;
+        setInWatchlist(d.inWatchlist ?? false);
+      })
+      .catch((err) => {
+        if ((err as { name?: string })?.name === 'AbortError') return;
+        // Stay defensive — false is the safe default for the toggle button.
+        setInWatchlist(false);
+      });
+    return () => ctrl.abort();
   }, [ticker, user]);
 
   async function toggleWatchlist() {
@@ -119,15 +177,41 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
     }
   }
 
-  const price = livePrice?.price ?? 0;
-  const change = livePrice?.change ?? 0;
-  const changePercent = livePrice?.changePercent ?? 0;
-  const flash = livePrice?.flash ?? null;
-  const isPositive = changePercent >= 0;
+  // Pick the freshest price source. WS livePrice is best (sub-second push);
+  // REST quote is a fallback (still real, but generated server-side). If both
+  // are missing we have nothing valid to display — that's the skeleton path.
+  const priceSource: 'live' | 'rest' | null =
+    livePrice && livePrice.price > 0 ? 'live'
+    : restQuote && restQuote.price > 0 ? 'rest'
+    : null;
+  const price          = priceSource === 'live' ? livePrice!.price          : priceSource === 'rest' ? restQuote!.price          : null;
+  const change         = priceSource === 'live' ? livePrice!.change         : priceSource === 'rest' ? restQuote!.change         : null;
+  const changePercent  = priceSource === 'live' ? livePrice!.changePercent  : priceSource === 'rest' ? restQuote!.changePercent  : null;
+  const flash          = priceSource === 'live' ? (livePrice!.flash ?? null) : null;
+  const isPositive = (changePercent ?? 0) >= 0;
   const currencySymbol = data?.currency === 'ILS' ? '₪' : '$';
   const description = getStockDescription(ticker);
 
-  if (loading || !livePrice) {
+  // Honest error card when the metadata fetch failed and we have nothing to
+  // show — replaces the prior behavior of fabricating fake StockData.
+  if (errored && !data) {
+    return (
+      <div
+        className="rounded-2xl p-5 text-center"
+        style={{ background: 'rgba(13,20,36,0.9)', border: '1px solid rgba(255,77,106,0.3)' }}
+      >
+        <div className="text-3xl mb-2">📡</div>
+        <h2 className="text-base font-bold text-tsua-text">לא ניתן לטעון נתוני {ticker}</h2>
+        <p className="text-xs text-tsua-muted mt-1">בדוק שהסימול תקין או נסה שוב בעוד מספר דקות</p>
+      </div>
+    );
+  }
+
+  // Show skeleton while metadata is still in-flight, OR while we're waiting
+  // on the first WS price (max 5s before falling back to REST).
+  const noPriceYet = price === null;
+  const showSkeleton = loading || (noPriceYet && !waitedForLive);
+  if (showSkeleton) {
     return (
       <div
         className="rounded-2xl p-5"
@@ -196,11 +280,22 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
                 {data.industry}
               </span>
             )}
-            {/* LIVE badge */}
-            {livePrice && (
+            {/* Source badge — distinguishes a real WebSocket push from the
+                REST fallback so the user knows whether the price is sub-second
+                live or pinned to the last server-side fetch. */}
+            {priceSource === 'live' && (
               <span className="flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(0,229,176,0.08)', color: '#00e5b0', border: '1px solid rgba(0,229,176,0.2)' }}>
                 <span className="w-1.5 h-1.5 rounded-full bg-tsua-green animate-pulse inline-block" />
                 LIVE
+              </span>
+            )}
+            {priceSource === 'rest' && (
+              <span
+                className="flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full"
+                style={{ background: 'rgba(245,185,66,0.1)', color: '#f5b942', border: '1px solid rgba(245,185,66,0.25)' }}
+                title="חיבור זמן־אמת לא פעיל — המחיר עודכן בעת טעינת הדף"
+              >
+                ⏱️ מחיר מעוכב
               </span>
             )}
           </div>
@@ -218,35 +313,42 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
             </p>
           )}
 
-          {/* Price row */}
+          {/* Price row — when both WS and REST failed to deliver a price,
+              show "—" with a quiet badge instead of the "$0.00" sentinel. */}
           <div className="mt-4 flex items-end gap-3">
             <span
               dir="ltr"
               className="text-4xl font-black font-mono transition-colors duration-300"
               style={{ color: flash === 'up' ? '#00e5b0' : flash === 'down' ? '#ff4d6a' : '#e8f0ff' }}
             >
-              {currencySymbol}{price.toFixed(2)}
+              {price !== null
+                ? `${currencySymbol}${price.toFixed(2)}`
+                : '—'}
             </span>
-            <div className="flex flex-col pb-0.5">
-              <span
-                dir="ltr"
-                className="text-lg font-bold"
-                style={{ color: isPositive ? '#00e5b0' : '#ff4d6a' }}
-              >
-                {isPositive ? '+' : ''}{change.toFixed(2)}
-              </span>
-              <span
-                dir="ltr"
-                className="text-sm font-bold px-2 py-0.5 rounded-lg"
-                style={{
-                  background: isPositive ? 'rgba(0,229,176,0.1)' : 'rgba(255,77,106,0.1)',
-                  color: isPositive ? '#00e5b0' : '#ff4d6a',
-                  border: `1px solid ${isPositive ? 'rgba(0,229,176,0.2)' : 'rgba(255,77,106,0.2)'}`,
-                }}
-              >
-                {isPositive ? '▲' : '▼'} {Math.abs(changePercent).toFixed(2)}%
-              </span>
-            </div>
+            {price !== null ? (
+              <div className="flex flex-col pb-0.5">
+                <span
+                  dir="ltr"
+                  className="text-lg font-bold"
+                  style={{ color: isPositive ? '#00e5b0' : '#ff4d6a' }}
+                >
+                  {isPositive ? '+' : ''}{(change ?? 0).toFixed(2)}
+                </span>
+                <span
+                  dir="ltr"
+                  className="text-sm font-bold px-2 py-0.5 rounded-lg"
+                  style={{
+                    background: isPositive ? 'rgba(0,229,176,0.1)' : 'rgba(255,77,106,0.1)',
+                    color: isPositive ? '#00e5b0' : '#ff4d6a',
+                    border: `1px solid ${isPositive ? 'rgba(0,229,176,0.2)' : 'rgba(255,77,106,0.2)'}`,
+                  }}
+                >
+                  {isPositive ? '▲' : '▼'} {Math.abs(changePercent ?? 0).toFixed(2)}%
+                </span>
+              </div>
+            ) : (
+              <span className="text-xs text-tsua-muted self-end pb-1">מחיר לא זמין</span>
+            )}
           </div>
         </div>
 

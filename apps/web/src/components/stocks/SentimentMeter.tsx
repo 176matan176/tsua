@@ -14,24 +14,53 @@ interface SentimentData {
   change24h: number;
 }
 
+/** Runtime check — server may return an error envelope or wrong shape if the
+ *  Supabase query failed. Without this, every numeric access falls to `0` and
+ *  the UI quietly renders an empty meter as if there's just no community data. */
+function isSentimentData(x: unknown): x is SentimentData {
+  if (!x || typeof x !== 'object') return false;
+  const d = x as Record<string, unknown>;
+  return typeof d.bullish === 'number' && typeof d.bearish === 'number'
+      && typeof d.neutral === 'number' && typeof d.total === 'number';
+}
+
 export function SentimentMeter({ ticker }: SentimentMeterProps) {
   const [data, setData]         = useState<SentimentData | null>(null);
   const [loading, setLoading]   = useState(true);
+  // Separate from "data is empty" — lets us tell the user the truth instead of
+  // showing "אין מספיק נתונים" when the real cause is a DB error.
+  const [errored, setErrored]   = useState(false);
   const [animated, setAnimated] = useState(false);
 
   useEffect(() => {
+    const ctrl = new AbortController();
     setLoading(true);
     setAnimated(false);
-    fetch(`/api/stocks/${ticker}/sentiment`)
-      .then(r => r.json())
-      .then((d: SentimentData) => {
-        setData(d);
-        setTimeout(() => setAnimated(true), 80);
+    setErrored(false);
+
+    fetch(`/api/stocks/${ticker}/sentiment`, { signal: ctrl.signal })
+      .then(r => {
+        if (!r.ok) throw new Error(`status ${r.status}`);
+        return r.json();
       })
-      .catch(() =>
-        setData({ bullish: 0, bearish: 0, neutral: 0, total: 0, change24h: 0 })
-      )
-      .finally(() => setLoading(false));
+      .then((d: unknown) => {
+        if (ctrl.signal.aborted) return;
+        if (isSentimentData(d)) {
+          setData(d);
+          setTimeout(() => setAnimated(true), 80);
+        } else {
+          setErrored(true);
+        }
+      })
+      .catch((err) => {
+        if ((err as { name?: string })?.name === 'AbortError') return;
+        setErrored(true);
+      })
+      .finally(() => {
+        if (!ctrl.signal.aborted) setLoading(false);
+      });
+
+    return () => ctrl.abort();
   }, [ticker]);
 
   // Skeleton
@@ -48,6 +77,22 @@ export function SentimentMeter({ ticker }: SentimentMeterProps) {
           {[1, 2, 3].map(i => (
             <div key={i} className="h-14 rounded-xl" style={{ background: 'var(--border)' }} />
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Error state — distinct from the genuinely-empty path below. Same visual
+  // weight (small card) so it doesn't dominate the page, but truthful copy.
+  if (errored) {
+    return (
+      <div
+        className="rounded-2xl p-5 text-center"
+        style={{ background: 'var(--card)', border: '1px solid var(--border)' }}
+      >
+        <div className="text-2xl mb-2">📡</div>
+        <div className="text-sm font-bold" style={{ color: 'var(--text2)' }}>
+          לא ניתן לטעון סנטימנט כעת
         </div>
       </div>
     );

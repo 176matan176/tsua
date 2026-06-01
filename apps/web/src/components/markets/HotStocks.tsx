@@ -22,6 +22,20 @@ const HOT = [
   { symbol: 'NICE',  nameHe: 'נייס',      flag: '🇮🇱', tag: '📊 IL' },
 ];
 
+/**
+ * Invisible probe that subscribes to the first HOT symbol and fires the
+ * callback once a price arrives. Cheaper than wiring a top-level
+ * `useContext(PriceContext)` in the parent — we already pay for that
+ * subscription via the `HotRow` for NVDA below.
+ */
+function LiveListener({ onFirstPrice }: { onFirstPrice: () => void }) {
+  const live = useLivePrice(HOT[0].symbol);
+  useEffect(() => {
+    if (live) onFirstPrice();
+  }, [live, onFirstPrice]);
+  return null;
+}
+
 function HotRow({ symbol, nameHe, flag, tag }: typeof HOT[0]) {
   const locale = useLocale();
   const live = useLivePrice(symbol);
@@ -107,11 +121,25 @@ function HotRow({ symbol, nameHe, flag, tag }: typeof HOT[0]) {
 }
 
 export function HotStocks() {
+  // Show a live indicator in the header — gives the user a visual signal
+  // that prices are actually flowing (vs. perpetually skeleton-y rows).
+  // We seed `liveYet` once at least one of our 8 HOT symbols has emitted
+  // a price; after that the green pulse stays on. If the socket dies, all
+  // rows individually flip to ⚠️ after NO_DATA_GRACE_MS, which is the
+  // honest per-row signal — header staying green a bit longer is fine.
+  const [liveYet, setLiveYet] = useState(false);
   return (
     <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(15,25,41,0.7)', border: '1px solid rgba(26,40,64,0.8)' }}>
-      <div className="px-4 py-3" style={{ borderBottom: '1px solid rgba(26,40,64,0.6)' }}>
+      <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(26,40,64,0.6)' }}>
         <h3 className="text-sm font-bold text-tsua-text">🔥 מניות רותחות</h3>
+        {liveYet && (
+          <span className="flex items-center gap-1.5 text-[10px] text-tsua-muted">
+            <span className="inline-block w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#00e5b0' }} />
+            LIVE
+          </span>
+        )}
       </div>
+      <LiveListener onFirstPrice={() => setLiveYet(true)} />
 
       <div dir="rtl">
         {HOT.map(s => <HotRow key={s.symbol} {...s} />)}

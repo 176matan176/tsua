@@ -30,6 +30,12 @@ export function PriceProvider({ children }: { children: React.ReactNode }) {
   const refCountRef = useRef<Record<string, number>>({});
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const [connected, setConnected] = useState(false);
+  // Bumped every time the subscription set actually changes. Used as a
+  // useEffect dep so price-event listeners re-register for *new* tickers —
+  // we previously used `Array.from(subscriptionsRef.current).join(',')`,
+  // but refs don't trigger re-renders so the dep was stale and handlers
+  // for tickers subscribed after mount never wired up.
+  const [subVersion, setSubVersion] = useState(0);
 
   // Connect to backend Socket.io
   useEffect(() => {
@@ -95,7 +101,9 @@ export function PriceProvider({ children }: { children: React.ReactNode }) {
         socket?.off(event, handler);
       });
     };
-  }, [connected, Array.from(subscriptionsRef.current).join(',')]);
+    // `subVersion` is the real signal — bumps whenever the subscription set
+    // changes, which the ref alone could never communicate to the effect.
+  }, [connected, subVersion]);
 
   // Fallback polling when socket is not connected
   useEffect(() => {
@@ -149,6 +157,10 @@ export function PriceProvider({ children }: { children: React.ReactNode }) {
     if (!subscriptionsRef.current.has(ticker)) {
       subscriptionsRef.current.add(ticker);
       socketRef.current?.emit('subscribe:price', { ticker });
+      // Bump the version so the price-listener effect re-runs and registers
+      // a handler for this new ticker. Without this, prices flow on the
+      // socket but never make it into our state.
+      setSubVersion(v => v + 1);
     }
   }, []);
 
@@ -157,6 +169,14 @@ export function PriceProvider({ children }: { children: React.ReactNode }) {
     if (refCountRef.current[ticker] === 0) {
       subscriptionsRef.current.delete(ticker);
       socketRef.current?.emit('unsubscribe:price', { ticker });
+      // Drop stale price from the map — otherwise the prices object grows
+      // forever as the user navigates between tickers (slow memory leak).
+      setPrices(prev => {
+        if (!(ticker in prev)) return prev;
+        const { [ticker]: _drop, ...rest } = prev;
+        return rest;
+      });
+      setSubVersion(v => v + 1);
     }
   }, []);
 
