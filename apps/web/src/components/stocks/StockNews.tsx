@@ -17,10 +17,16 @@ interface NewsArticle {
   category: string;
 }
 
+// Articles older than this are dimmed + flagged. The freshness signal
+// matters on a trading platform — a 3-day-old "breaking" headline is
+// misleading, especially after a weekend.
+const STALE_ARTICLE_MS = 24 * 60 * 60 * 1000;
+
 function NewsCard({ article }: { article: NewsArticle }) {
   const locale = useLocale();
   const dateLocale = locale === 'he' ? he : enUS;
   const timeAgo = formatDistanceToNow(new Date(article.datetime), { addSuffix: true, locale: dateLocale });
+  const isStale = Date.now() - article.datetime > STALE_ARTICLE_MS;
 
   return (
     <a
@@ -51,7 +57,14 @@ function NewsCard({ article }: { article: NewsArticle }) {
           >
             {article.source}
           </span>
-          <span className="text-[10px] text-tsua-muted">{timeAgo}</span>
+          <span
+            className="text-[10px] flex items-center gap-1"
+            style={{ color: isStale ? '#ffd166' : 'var(--muted)' }}
+            title={isStale ? `הכתבה מ-${new Date(article.datetime).toLocaleString('he-IL')}` : undefined}
+          >
+            {isStale && <span>⚠️</span>}
+            {timeAgo}
+          </span>
         </div>
 
         {/* Headline */}

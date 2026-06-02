@@ -6,11 +6,29 @@ import { ArrowsPointingOutIcon, ArrowsPointingInIcon } from '@heroicons/react/24
 
 interface TradingViewChartProps {
   ticker: string;
+  /** When the parent has already fetched stock metadata, pass the currency so
+   *  we can resolve TASE vs. US listings authoritatively. Falls back to the
+   *  allowlist below when undefined (initial render before the API responds). */
+  currency?: string | null;
 }
 
-function toTVSymbol(ticker: string): string {
+/**
+ * Map a bare ticker to the exchange-prefixed symbol TradingView expects.
+ *
+ * Priority:
+ *   1. Explicit `.TA` suffix → TASE
+ *   2. Caller-supplied currency `ILS` → TASE
+ *   3. Known TASE list (works without API data; covers popular dual-listed names)
+ *   4. Known NASDAQ list (same idea — eager render before API resolves)
+ *   5. Bare ticker — let TradingView's own symbol resolver have a go.
+ *
+ * The allowlists are now only used pre-API. Once the parent hands us a
+ * currency, we trust it absolutely (handles new TASE listings the lists miss).
+ */
+function toTVSymbol(ticker: string, currency?: string | null): string {
   const t = ticker.toUpperCase().replace('$', '');
   if (t.endsWith('.TA')) return `TASE:${t.replace('.TA', '')}`;
+  if (currency === 'ILS') return `TASE:${t}`;
   const taseOnly = ['TEVA', 'NICE', 'ESLT', 'MNDO', 'LUMI', 'POLI', 'BEZQ', 'ICL', 'ELBIT'];
   if (taseOnly.includes(t)) return `TASE:${t}`;
   const nasdaq = ['NVDA', 'AAPL', 'MSFT', 'GOOGL', 'META', 'AMZN', 'TSLA', 'AMD', 'INTC', 'CHKP'];
@@ -18,10 +36,10 @@ function toTVSymbol(ticker: string): string {
   return t;
 }
 
-function TradingViewChartInner({ ticker }: TradingViewChartProps) {
+function TradingViewChartInner({ ticker, currency }: TradingViewChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const locale = useLocale();
-  const symbol = toTVSymbol(ticker);
+  const symbol = toTVSymbol(ticker, currency);
   const [fullscreen, setFullscreen] = useState(false);
 
   useEffect(() => {

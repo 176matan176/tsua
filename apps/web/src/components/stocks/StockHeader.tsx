@@ -41,6 +41,11 @@ export interface StockData {
   employees: number | null;
   ipo: string | null;
   country: string | null;
+  /** Server flips this true when the Finnhub profile/metrics call failed (or
+   *  came back empty) — the quote is still fresh, but company name/logo/PE
+   *  may be missing. Lets the UI show a subtle "company data unavailable"
+   *  hint instead of pretending the company is anonymous. */
+  partial?: boolean;
 }
 
 interface StockHeaderProps {
@@ -310,6 +315,21 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
               }}
             >
               {description}
+            </p>
+          )}
+
+          {/* Partial-data hint — the quote is real but profile/metrics came
+              back empty (Finnhub rate-limit or unsupported ticker). Tells the
+              user some fields below may be blank, instead of letting them
+              assume the company has no industry, no PE, no logo. */}
+          {data?.partial && (
+            <p
+              className="mt-2 text-[11px] flex items-center gap-1"
+              style={{ color: '#ffd166' }}
+              title="קריאת פרופיל לחברה נכשלה — חלק מהשדות עשויים להיות חסרים"
+            >
+              <span>⚠️</span>
+              נתוני חברה חלקיים — המחיר עדיין מעודכן
             </p>
           )}
 

@@ -28,16 +28,26 @@ function WatchlistRow({
   const locale = useLocale();
   const live = useLivePrice(item.ticker);
   const [removing, setRemoving] = useState(false);
+  // Surface remove failures so the row doesn't appear to "do nothing" and
+  // then reappear after page reload (the prior behavior).
+  const [removeError, setRemoveError] = useState(false);
   const isUp = (live?.changePercent ?? 0) >= 0;
   const currencySymbol = item.exchange === 'TASE' || item.exchange === 'Tel Aviv Stock Exchange' ? '₪' : '$';
 
   async function handleRemove() {
     setRemoving(true);
+    setRemoveError(false);
     try {
-      await fetch(`/api/watchlist/${item.ticker}`, { method: 'DELETE' });
+      // Was previously fire-and-forget — the local row disappeared regardless
+      // of HTTP status, so a 500 would silently roll back on reload.
+      const res = await fetch(`/api/watchlist/${item.ticker}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error(`status ${res.status}`);
       onRemove(item.ticker);
+      // No need to setRemoving(false) — the component unmounts when onRemove
+      // fires and the parent filters this row out of `items`.
     } catch {
       setRemoving(false);
+      setRemoveError(true);
     }
   }
 
@@ -72,9 +82,11 @@ function WatchlistRow({
         </div>
       </div>
 
-      {/* Live price */}
+      {/* Live price — runtime type-guard on .price so a malformed socket
+          payload (price: null or string) can't crash .toFixed and blow up the
+          whole row. Same defense as on /stocks/[ticker]. */}
       <div className="text-end shrink-0">
-        {live ? (
+        {live && typeof live.price === 'number' && Number.isFinite(live.price) ? (
           <>
             <div
               dir="ltr"
@@ -88,7 +100,7 @@ function WatchlistRow({
               className="text-xs font-semibold"
               style={{ color: isUp ? '#00e5b0' : '#ff4d6a' }}
             >
-              {isUp ? '▲' : '▼'} {Math.abs(live.changePercent).toFixed(2)}%
+              {isUp ? '▲' : '▼'} {Math.abs(live.changePercent ?? 0).toFixed(2)}%
             </div>
           </>
         ) : (
@@ -99,14 +111,26 @@ function WatchlistRow({
         )}
       </div>
 
-      {/* Remove button */}
-      <button
-        onClick={handleRemove}
-        disabled={removing}
-        className="p-2 rounded-xl text-tsua-muted hover:text-red-400 hover:bg-red-500/8 transition-all opacity-0 group-hover:opacity-100 disabled:opacity-40"
-      >
-        <TrashIcon className="w-4 h-4" />
-      </button>
+      {/* Remove button + inline error indicator if the DELETE failed. */}
+      <div className="flex items-center gap-1">
+        {removeError && (
+          <span
+            className="text-[10px]"
+            style={{ color: '#ff4d6a' }}
+            title="הסרה נכשלה — נסה שוב"
+          >
+            ⚠️
+          </span>
+        )}
+        <button
+          onClick={handleRemove}
+          disabled={removing}
+          className="p-2 rounded-xl text-tsua-muted hover:text-red-400 hover:bg-red-500/8 transition-all opacity-0 group-hover:opacity-100 disabled:opacity-40"
+          title={removeError ? 'נסה שוב' : 'הסר ממעקב'}
+        >
+          <TrashIcon className="w-4 h-4" />
+        </button>
+      </div>
     </div>
   );
 }
@@ -143,15 +167,40 @@ export function WatchlistPage() {
   const { user } = useAuth();
   const [items, setItems] = useState<WatchlistItem[]>([]);
   const [loading, setLoading] = useState(true);
+  // Distinct from "items is empty" — lets us show "couldn't load" vs the
+  // friendly "discover stocks" empty state.
+  const [errored, setErrored] = useState(false);
+  const [retry, setRetry] = useState(0);
 
   useEffect(() => {
     if (!user) { setLoading(false); return; }
-    fetch('/api/watchlist')
-      .then(r => r.json())
-      .then(d => setItems(Array.isArray(d) ? d : []))
-      .catch(() => setItems([]))
-      .finally(() => setLoading(false));
-  }, [user]);
+    const ctrl = new AbortController();
+    setLoading(true);
+    setErrored(false);
+
+    fetch('/api/watchlist', { signal: ctrl.signal })
+      .then(r => {
+        if (!r.ok) throw new Error(`status ${r.status}`);
+        return r.json();
+      })
+      .then(d => {
+        if (ctrl.signal.aborted) return;
+        if (Array.isArray(d)) {
+          setItems(d);
+        } else {
+          setErrored(true);
+        }
+      })
+      .catch((err) => {
+        if ((err as { name?: string })?.name === 'AbortError') return;
+        setErrored(true);
+      })
+      .finally(() => {
+        if (!ctrl.signal.aborted) setLoading(false);
+      });
+
+    return () => ctrl.abort();
+  }, [user, retry]);
 
   function removeItem(ticker: string) {
     setItems(prev => prev.filter(i => i.ticker !== ticker));
@@ -233,8 +282,26 @@ export function WatchlistPage() {
           <WatchlistRow key={item.id} item={item} onRemove={removeItem} />
         ))}
 
-        {/* Empty */}
-        {!loading && items.length === 0 && <EmptyState />}
+        {/* Honest error state — distinct from the "you haven't added anything"
+            empty state below. Without this, a 500 from /api/watchlist looked
+            identical to a brand-new account. */}
+        {!loading && items.length === 0 && errored && (
+          <div className="text-center py-16 px-4">
+            <div className="text-3xl mb-2">📡</div>
+            <h2 className="text-base font-bold text-tsua-text">לא ניתן לטעון את רשימת המעקב</h2>
+            <p className="text-sm text-tsua-muted mt-1">נסה לרענן בעוד מספר רגעים</p>
+            <button
+              onClick={() => setRetry(r => r + 1)}
+              className="mt-4 text-xs font-semibold px-4 py-2 rounded-lg text-tsua-text hover:text-tsua-accent transition-colors"
+              style={{ background: 'rgba(15,25,41,0.6)', border: '1px solid rgba(26,40,64,0.7)' }}
+            >
+              🔄 נסה שוב
+            </button>
+          </div>
+        )}
+
+        {/* Empty (genuine) */}
+        {!loading && items.length === 0 && !errored && <EmptyState />}
       </div>
     </div>
   );

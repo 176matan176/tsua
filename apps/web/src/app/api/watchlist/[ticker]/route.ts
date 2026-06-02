@@ -30,13 +30,20 @@ export async function DELETE(
 
   const ticker = params.ticker.toUpperCase();
 
-  const { error } = await supabase
+  // Use .select() so we get back the rows that were actually removed —
+  // otherwise a DELETE that matched zero rows returns the same 200 as a
+  // successful one, and the client can't tell the difference.
+  const { data: removed, error } = await supabase
     .from('watchlist')
     .delete()
     .eq('user_id', user.id)
-    .eq('ticker', ticker);
+    .eq('ticker', ticker)
+    .select('id');
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (!removed || removed.length === 0) {
+    return NextResponse.json({ error: 'not in watchlist' }, { status: 404 });
+  }
   return NextResponse.json({ removed: ticker });
 }
 

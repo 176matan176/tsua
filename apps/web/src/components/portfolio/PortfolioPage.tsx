@@ -148,12 +148,20 @@ function TradeModal({ ticker, currentPrice, availableCash, availableShares, mode
 
 function HoldingCard({ h, onTrade }: { h: Holding; onTrade: (ticker: string, mode: 'buy' | 'sell') => void }) {
   const live = useLivePrice(h.ticker);
-  const currentPrice = live?.price ?? h.avg_price;
+  // Track whether we have a real live price vs falling back to cost basis.
+  // Without this, a ticker with no live feed renders "P&L: 0.00 / 0.0%" which
+  // looks like a flat-priced holding instead of "we don't have a price".
+  const hasLive = live !== null && typeof live.price === 'number' && live.price > 0;
+  const currentPrice = hasLive ? live!.price : h.avg_price;
   const value = h.shares * currentPrice;
   const cost = h.shares * h.avg_price;
   const pnl = value - cost;
-  const pnlPct = (pnl / cost) * 100;
+  // Guard against bonus-shares / zero-cost lots that would compute Infinity.
+  const pnlPct = cost > 0 ? (pnl / cost) * 100 : 0;
   const up = pnl >= 0;
+  // Currency: TASE positions price in shekels — was showing "$" for those.
+  const isILS = h.exchange === 'TASE' || h.exchange === 'Tel Aviv Stock Exchange';
+  const cur = isILS ? '₪' : '$';
 
   return (
     <div
@@ -176,7 +184,7 @@ function HoldingCard({ h, onTrade }: { h: Holding; onTrade: (ticker: string, mod
         <div className="text-right">
           <div className="font-black text-tsua-text transition-colors duration-300" dir="ltr"
             style={{ color: live?.flash === 'up' ? '#00e5b0' : live?.flash === 'down' ? '#ff4d6a' : '#e8f0ff' }}>
-            ${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+            {cur}{value.toLocaleString(undefined, { maximumFractionDigits: 0 })}
           </div>
           <div className="text-xs font-bold" style={{ color: up ? '#00e5b0' : '#ff4d6a' }} dir="ltr">
             {up ? '+' : ''}{pnlPct.toFixed(1)}%
@@ -184,8 +192,24 @@ function HoldingCard({ h, onTrade }: { h: Holding; onTrade: (ticker: string, mod
         </div>
       </div>
       <div className="flex items-center justify-between mt-3 text-xs text-tsua-muted">
-        <span>{h.shares} {'מניות'} @ ${h.avg_price}</span>
-        <span>{'מחיר נוכחי:'} <span className="font-semibold transition-colors duration-300" style={{ color: live?.flash === 'up' ? '#00e5b0' : live?.flash === 'down' ? '#ff4d6a' : '#e8f0ff' }}>${currentPrice.toFixed(2)}</span></span>
+        <span>{h.shares} {'מניות'} @ {cur}{h.avg_price}</span>
+        {/* When `hasLive` is false we're showing the cost-basis price — flag
+            that explicitly instead of letting the user read "מחיר נוכחי" as
+            a real live quote. */}
+        <span>
+          {'מחיר נוכחי:'}{' '}
+          <span
+            className="font-semibold transition-colors duration-300"
+            style={{ color: live?.flash === 'up' ? '#00e5b0' : live?.flash === 'down' ? '#ff4d6a' : '#e8f0ff' }}
+          >
+            {cur}{currentPrice.toFixed(2)}
+          </span>
+          {!hasLive && (
+            <span className="ms-1" style={{ color: '#ffd166' }} title="לא התקבל מחיר חי — מוצג מחיר העלות">
+              ⚠️
+            </span>
+          )}
+        </span>
         <div className="flex gap-2">
           <button onClick={() => onTrade(h.ticker, 'buy')}
             className="text-xs font-bold px-3 py-1 rounded-lg"
@@ -269,16 +293,30 @@ export function PortfolioPage() {
   const [tradeModal, setTradeModal] = useState<{ ticker: string; mode: 'buy' | 'sell' } | null>(null);
   const [tradeLoading, setTradeLoading] = useState(false);
   const [tradeError, setTradeError] = useState('');
+  // Tracks "we tried to load and it failed" — was silently absent before, so
+  // a 500 from /api/portfolio left the user staring at the loading skeleton
+  // forever with no signal.
+  const [loadError, setLoadError] = useState(false);
 
   const fetchPortfolio = useCallback(async () => {
     if (!user) return;
-    const res = await fetch('/api/portfolio', { cache: 'no-store' });
-    if (!res.ok) return;
-    const data = await res.json();
-    setHoldings(data.holdings ?? []);
-    setTransactions(data.transactions ?? []);
-    setCash(data.cash ?? INITIAL_CASH);
-    setLoading(false);
+    try {
+      const res = await fetch('/api/portfolio', { cache: 'no-store' });
+      if (!res.ok) throw new Error(`status ${res.status}`);
+      const data = await res.json();
+      setHoldings(data.holdings ?? []);
+      setTransactions(data.transactions ?? []);
+      setCash(data.cash ?? INITIAL_CASH);
+      setLoadError(false);
+    } catch {
+      // Keep prior data on screen if any (so a transient failure during a
+      // refresh doesn't blank the page); just flip the flag.
+      setLoadError(true);
+    } finally {
+      // Was inside the success branch — meant `loading` stayed true forever
+      // on any failure (network error, 500, JSON parse). Now always clears.
+      setLoading(false);
+    }
   }, [user]);
 
   useEffect(() => {
@@ -351,6 +389,26 @@ export function PortfolioPage() {
     );
   }
 
+  // Surface load failures — was previously indistinguishable from a brand-new
+  // empty portfolio. Provides a manual retry so the user isn't stuck waiting
+  // for the next mount.
+  if (loadError && holdings.length === 0) {
+    return (
+      <div className="rounded-2xl p-8 text-center" style={{ background: 'rgba(13,20,36,0.7)', border: '1px solid rgba(26,40,64,0.7)' }}>
+        <div className="text-3xl mb-2">📡</div>
+        <h2 className="text-base font-bold text-tsua-text">לא ניתן לטעון את התיק</h2>
+        <p className="text-sm text-tsua-muted mt-1">נסה לרענן בעוד מספר רגעים</p>
+        <button
+          onClick={() => { setLoading(true); fetchPortfolio(); }}
+          className="mt-4 text-xs font-semibold px-4 py-2 rounded-lg text-tsua-text hover:text-tsua-accent transition-colors"
+          style={{ background: 'rgba(15,25,41,0.6)', border: '1px solid rgba(26,40,64,0.7)' }}
+        >
+          🔄 נסה שוב
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4 animate-fade-in" dir="rtl">
 
@@ -367,18 +425,34 @@ export function PortfolioPage() {
         />
       )}
 
-      {/* Header */}
+      {/* Header — the "+ קנה" button used to hardcode 'NVDA' as the trade
+          ticker, but the modal only opens when there's a matching holding.
+          If the user didn't already own NVDA the button silently did nothing.
+          Now: pick the first existing holding if any (still rare/wrong but
+          at least functional), otherwise link to /markets so they can pick
+          a stock to buy via the per-stock buy button there. */}
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-black text-tsua-text">
           💼 {'תיק וירטואלי'}
         </h1>
-        <button
-          onClick={() => setTradeModal({ ticker: 'NVDA', mode: 'buy' })}
-          className="text-sm font-bold px-4 py-2 rounded-xl text-tsua-bg"
-          style={{ background: 'linear-gradient(135deg, #00e5b0, #00c49a)' }}
-        >
-          + {'קנה מניה'}
-        </button>
+        {holdings.length > 0 ? (
+          <button
+            onClick={() => setTradeModal({ ticker: holdings[0].ticker, mode: 'buy' })}
+            className="text-sm font-bold px-4 py-2 rounded-xl text-tsua-bg"
+            style={{ background: 'linear-gradient(135deg, #00e5b0, #00c49a)' }}
+            title={`הוסף לפוזיציה הקיימת ב-${holdings[0].ticker}`}
+          >
+            + {'קנה עוד'}
+          </button>
+        ) : (
+          <a
+            href={`/${locale}/markets`}
+            className="text-sm font-bold px-4 py-2 rounded-xl text-tsua-bg"
+            style={{ background: 'linear-gradient(135deg, #00e5b0, #00c49a)' }}
+          >
+            + {'מצא מניה לקניה'}
+          </a>
+        )}
       </div>
 
       {/* Main value card */}

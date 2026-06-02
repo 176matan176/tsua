@@ -69,7 +69,9 @@ export function StockPageClient({ ticker }: { ticker: string }) {
   return (
     <div className="space-y-4">
       <StockHeader ticker={ticker} onDataLoaded={setStockData} />
-      <TradingViewChart ticker={ticker} />
+      {/* Pass currency through so TASE tickers not in our allowlist still
+          render with the correct exchange prefix once the API resolves. */}
+      <TradingViewChart ticker={ticker} currency={stockData?.currency} />
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4 items-start">
         {/* LEFT */}
