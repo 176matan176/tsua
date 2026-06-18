@@ -32,9 +32,15 @@ export async function generateMetadata({ params }: StockPageProps): Promise<Meta
   // Example: "מניית NVDA (אנבידיה)" vs "מניית LUMI" for unknowns.
   const heDisplay = heName ? `מניית ${ticker} (${heName})` : `מניית ${ticker}`;
 
+  // The root layout's metadata sets `template: '%s | תשואה'`, so Next.js
+  // appends "| תשואה" automatically. Don't include it in the page title
+  // — otherwise the rendered <title> reads "…| תשואה | תשואה".
+  //
+  // Also kept the page title under ~60 chars to avoid Google truncation:
+  // headline keywords first, decorative phrasing trimmed.
   const title = isHebrew
-    ? `${heDisplay} — מחיר חי, ניתוח ודיון בקהילה | תשואה`
-    : `${ticker}${heName ? ` (${heName})` : ''} — Live Price, Analysis & Community | Tsua`;
+    ? `${heDisplay} — מחיר וניתוח`
+    : `${ticker}${heName ? ` (${heName})` : ''} — Live Price & Analysis`;
 
   // Description is heavily SEO-loaded: includes verbs Israeli traders search
   // for ("מחיר", "ניתוח", "דיון") plus the company name + ticker. Stays under
