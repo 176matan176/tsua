@@ -105,52 +105,89 @@ export function PriceProvider({ children }: { children: React.ReactNode }) {
     // changes, which the ref alone could never communicate to the effect.
   }, [connected, subVersion]);
 
-  // Fallback polling when socket is not connected
+  // Fallback polling when the realtime socket isn't connected.
+  //
+  // History: this used to require NEXT_PUBLIC_API_URL pointing at an external
+  // Express backend. In production that env var isn't always set (and the
+  // backend may be cold/down), so the LiveMarketBar / HotStocks / WatchlistRow
+  // sat permanently in skeleton state — no socket, no polling, no data.
+  //
+  // Now: we always have a working fallback by hitting our own Next.js route
+  // `/api/stocks/batch`, which itself uses fetchQuote (Finnhub primary + Yahoo
+  // fallback) so coverage is broad and reliable. If NEXT_PUBLIC_API_URL is set
+  // we still prefer it (lower latency, more frequent updates from the bespoke
+  // backend); otherwise we fall through to the relative path.
   useEffect(() => {
     if (connected) {
       if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
       return;
     }
 
+    const externalApi = process.env.NEXT_PUBLIC_API_URL;
+
     const poll = async () => {
       const tickers = Array.from(subscriptionsRef.current);
       if (tickers.length === 0) return;
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-      if (!apiUrl) return;
+      // Try external first (faster + has volume etc.); fall back to internal
+      // route which always works as long as Finnhub/Yahoo are reachable.
+      const url = externalApi
+        ? `${externalApi}/api/v1/stocks/batch?symbols=${tickers.join(',')}`
+        : `/api/stocks/batch?symbols=${tickers.join(',')}`;
 
       try {
-        const res = await fetch(`${apiUrl}/api/v1/stocks/batch?symbols=${tickers.join(',')}`);
-        if (!res.ok) return;
-        const data = await res.json();
-        setPrices(prev => {
-          const next = { ...prev };
-          Object.entries(data).forEach(([ticker, priceData]: [string, any]) => {
-            const prevPrice = prev[ticker]?.price;
-            const flash = prevPrice !== undefined
-              ? (priceData.price > prevPrice ? 'up' : priceData.price < prevPrice ? 'down' : null)
-              : null;
-            next[ticker] = { ...priceData, flash };
-            if (flash) {
-              setTimeout(() => {
-                setPrices(p => p[ticker] ? { ...p, [ticker]: { ...p[ticker], flash: null } } : p);
-              }, 800);
-            }
-          });
-          return next;
-        });
+        const res = await fetch(url, { cache: 'no-store' });
+        if (!res.ok) {
+          // If the external API failed and we haven't tried internal yet, try it.
+          if (externalApi) {
+            const r2 = await fetch(`/api/stocks/batch?symbols=${tickers.join(',')}`, { cache: 'no-store' });
+            if (!r2.ok) return;
+            return applyBatch(await r2.json());
+          }
+          return;
+        }
+        applyBatch(await res.json());
       } catch {
-        // ignore
+        // Last-ditch: try the internal route from a thrown fetch.
+        if (externalApi) {
+          try {
+            const r2 = await fetch(`/api/stocks/batch?symbols=${tickers.join(',')}`, { cache: 'no-store' });
+            if (r2.ok) applyBatch(await r2.json());
+          } catch { /* swallow — next interval will retry */ }
+        }
       }
     };
 
+    function applyBatch(data: Record<string, { price: number; change: number; changePercent: number }>) {
+      setPrices(prev => {
+        const next = { ...prev };
+        Object.entries(data).forEach(([ticker, priceData]) => {
+          if (typeof priceData?.price !== 'number') return;
+          const prevPrice = prev[ticker]?.price;
+          const flash = prevPrice !== undefined
+            ? (priceData.price > prevPrice ? 'up' : priceData.price < prevPrice ? 'down' : null)
+            : null;
+          next[ticker] = { ...priceData, flash };
+          if (flash) {
+            setTimeout(() => {
+              setPrices(p => p[ticker] ? { ...p, [ticker]: { ...p[ticker], flash: null } } : p);
+            }, 800);
+          }
+        });
+        return next;
+      });
+    }
+
+    // First poll fires immediately so the bar doesn't sit empty for 30s on
+    // a fresh page load. Then the interval keeps it warm.
     poll();
     pollIntervalRef.current = setInterval(poll, 30000);
 
     return () => {
       if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
     };
-  }, [connected]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [connected, subVersion]);
 
   const subscribe = useCallback((ticker: string) => {
     refCountRef.current[ticker] = (refCountRef.current[ticker] || 0) + 1;
