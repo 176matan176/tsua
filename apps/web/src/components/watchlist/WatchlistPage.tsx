@@ -125,6 +125,7 @@ function WatchlistRow({
         <button
           onClick={handleRemove}
           disabled={removing}
+          aria-label={`הסר את ${item.ticker} מרשימת המעקב`}
           className="p-2 rounded-xl text-tsua-muted hover:text-red-400 hover:bg-red-500/8 transition-all opacity-0 group-hover:opacity-100 disabled:opacity-40"
           title={removeError ? 'נסה שוב' : 'הסר ממעקב'}
         >

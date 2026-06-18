@@ -124,11 +124,21 @@ export default async function RootLayout({ children, params: { locale } }: RootL
             <TermsConsent />
             <OnboardingModal />
             <div className="min-h-screen flex flex-col">
+              {/* Skip-to-content link — required for keyboard users (and an
+                  Israeli accessibility-law staple). Hidden until focused via
+                  Tab; the focused state slides it into view above the nav. */}
+              <a
+                href="#main-content"
+                className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:start-2 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-lg focus:font-bold focus:text-tsua-bg"
+                style={{ background: 'var(--accent)' }}
+              >
+                דלג לתוכן הראשי
+              </a>
               <Navbar />
               <LiveMarketBar />
               <div className="flex flex-1 max-w-7xl mx-auto w-full px-3 md:px-4 py-3 md:py-6 gap-4 md:gap-6 pb-20 md:pb-6">
                 <Sidebar />
-                <main className="flex-1 min-w-0">{children}</main>
+                <main id="main-content" tabIndex={-1} className="flex-1 min-w-0">{children}</main>
               </div>
               <BottomNav />
             </div>

@@ -147,3 +147,92 @@ export function getStockDescription(ticker: string): string | null {
   const key = ticker.toUpperCase().replace('$', '');
   return DESCRIPTIONS[key] ?? null;
 }
+
+/**
+ * Hebrew display names for SEO titles, OG cards, and structured data.
+ *
+ * Separate from the long-form descriptions above because Google ranking
+ * benefits from the Hebrew name appearing in `<title>` and `og:title`
+ * — Israelis who Google "מניית אנבידיה" should find us first.
+ *
+ * Coverage rule: any ticker that appears in HotStocks / SectorTreemap /
+ * the markets gainers/losers feed should be here. Long-tail tickers fall
+ * back to the bare ticker, which is fine — SEO impact is mostly on the head.
+ */
+const HEBREW_NAMES: Record<string, string> = {
+  // ── Indices / ETFs ──
+  SPY:        'S&P 500',
+  QQQ:        'נאסד"ק 100',
+  DIA:        'דאו ג\'ונס',
+  IWM:        'ראסל 2000',
+  EIS:        'MSCI ישראל',
+  'TA125.TA': 'ת"א 125',
+  'TA35.TA':  'ת"א 35',
+  'TA90.TA':  'ת"א 90',
+
+  // ── Israeli (TASE + dual-listed) ──
+  TEVA:  'טבע',
+  NICE:  'נייס',
+  CHKP:  'צ\'ק פוינט',
+  WIX:   'וויקס',
+  MNDY:  'monday.com',
+  FROG:  'JFrog',
+  ESLT:  'אלביט מערכות',
+  MNDO:  'מיינד C.T.I.',
+  ICL:   'כיל',
+
+  // ── US Mega-cap tech ──
+  NVDA:  'אנבידיה',
+  AAPL:  'אפל',
+  MSFT:  'מיקרוסופט',
+  GOOGL: 'גוגל',
+  GOOG:  'גוגל',
+  META:  'מטא',
+  AMZN:  'אמזון',
+  TSLA:  'טסלה',
+  NFLX:  'נטפליקס',
+  AMD:   'AMD',
+  INTC:  'אינטל',
+
+  // ── US Finance / Payments ──
+  JPM:   'JPMorgan',
+  BAC:   'בנק אוף אמריקה',
+  WFC:   'וולס פארגו',
+  GS:    'גולדמן זאקס',
+  MS:    'מורגן סטנלי',
+  C:     'סיטיגרופ',
+  V:     'ויזה',
+  MA:    'מאסטרקארד',
+  BRK:   'ברקשייר התאוויי',
+
+  // ── US Other ──
+  BA:    'בואינג',
+  XOM:   'אקסון מוביל',
+  PFE:   'פייזר',
+  JNJ:   'ג\'ונסון אנד ג\'ונסון',
+  WMT:   'וולמארט',
+  COST:  'קוסטקו',
+  MCD:   'מקדונלד\'ס',
+  SBUX:  'סטארבקס',
+  KO:    'קוקה קולה',
+  PEP:   'פפסי',
+  NKE:   'נייקי',
+  F:     'פורד',
+  GM:    'ג\'נרל מוטורס',
+
+  // ── Crypto-adjacent ──
+  MSTR:  'מייקרוסטרטג\'י',
+  MARA:  'Marathon Digital',
+  RIOT:  'Riot Platforms',
+};
+
+/**
+ * Hebrew display name for a ticker, used in page titles, OG cards, and
+ * structured data. Returns null when we don't have a localised name —
+ * caller should fall back to the bare ticker.
+ */
+export function getStockHebrewName(ticker: string): string | null {
+  if (!ticker) return null;
+  const key = ticker.toUpperCase().replace('$', '');
+  return HEBREW_NAMES[key] ?? null;
+}

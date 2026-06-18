@@ -385,10 +385,11 @@ export function MarketsPage() {
         <button
           onClick={manualRefresh}
           disabled={refreshing}
+          aria-label="רענן את נתוני השווקים"
           className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl text-tsua-muted hover:text-tsua-text transition-all disabled:opacity-50"
           style={{ background: 'rgba(15,25,41,0.6)', border: '1px solid rgba(26,40,64,0.7)' }}
         >
-          <ArrowPathIcon className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+          <ArrowPathIcon className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} aria-hidden="true" />
           רענן
         </button>
       </div>

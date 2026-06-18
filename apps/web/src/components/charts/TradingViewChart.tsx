@@ -139,6 +139,8 @@ function TradingViewChartInner({ ticker, currency }: TradingViewChartProps) {
             {/* Fullscreen toggle */}
             <button
               onClick={() => setFullscreen(f => !f)}
+              aria-label={fullscreen ? 'יציאה ממסך מלא' : 'הצג גרף במסך מלא'}
+              aria-pressed={fullscreen}
               className="p-1.5 rounded-lg transition-colors hover:bg-tsua-border text-tsua-muted hover:text-tsua-text"
               title={fullscreen ? 'Exit fullscreen' : 'Fullscreen'}
             >

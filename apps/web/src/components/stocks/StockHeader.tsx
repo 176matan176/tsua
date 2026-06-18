@@ -378,6 +378,8 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
             <button
               onClick={toggleWatchlist}
               disabled={watchlistLoading}
+              aria-label={inWatchlist ? `הסר את ${ticker} ממעקב` : `הוסף את ${ticker} למעקב`}
+              aria-pressed={inWatchlist}
               className="flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-xl transition-all hover:scale-105 active:scale-95 disabled:opacity-60"
               style={inWatchlist
                 ? { background: 'rgba(0,229,176,0.1)', border: '1px solid rgba(0,229,176,0.3)', color: '#00e5b0' }

@@ -230,7 +230,60 @@ function HoldingCard({ h, onTrade }: { h: Holding; onTrade: (ticker: string, mod
 // Up to 20 holdings supported with stable hook calls — add more slots if needed
 const SLOTS = 20;
 
-function useLivePortfolioTotals(holdings: Holding[], cash: number) {
+/**
+ * Classify a holding as ILS-priced or USD-priced. Used to drive FX conversion
+ * in the totals — TASE shares are quoted in shekels, everything else assumed USD.
+ */
+function isIlsHolding(h: { exchange: string }): boolean {
+  return h.exchange === 'TASE' || h.exchange === 'Tel Aviv Stock Exchange';
+}
+
+/**
+ * Pulls the current USD→ILS FX rate from /api/fx so we can normalize a mixed
+ * portfolio (NVDA + TEVA on TASE) into a single shekel-denominated total.
+ *
+ * Without this, `totalValue` summed USD prices and ILS prices as if they were
+ * the same number, then prefixed the result with "₪" — so a portfolio of
+ * $1,000 NVDA + ₪3,700 TEVA showed up as ₪4,700 instead of the truthful
+ * ~₪7,400 (at 3.70). One of the worst kinds of bug: silent, plausibly-correct,
+ * and visible on the headline number of the screen.
+ */
+function useUsdIlsRate(): { rate: number | null; updatedAt: number | null; errored: boolean } {
+  const [rate, setRate] = useState<number | null>(null);
+  const [updatedAt, setUpdatedAt] = useState<number | null>(null);
+  const [errored, setErrored] = useState(false);
+
+  useEffect(() => {
+    const ctrl = new AbortController();
+    fetch('/api/fx', { signal: ctrl.signal })
+      .then(r => {
+        if (!r.ok) throw new Error(`status ${r.status}`);
+        return r.json();
+      })
+      .then(d => {
+        if (ctrl.signal.aborted) return;
+        const usd = Array.isArray(d?.rates)
+          ? d.rates.find((x: { code?: string; rate?: number }) => x.code === 'USD')
+          : null;
+        if (usd && typeof usd.rate === 'number' && usd.rate > 0) {
+          setRate(usd.rate);
+          setUpdatedAt(typeof d.updatedAt === 'number' ? d.updatedAt : Date.now());
+          setErrored(false);
+        } else {
+          setErrored(true);
+        }
+      })
+      .catch((err) => {
+        if ((err as { name?: string })?.name === 'AbortError') return;
+        setErrored(true);
+      });
+    return () => ctrl.abort();
+  }, []);
+
+  return { rate, updatedAt, errored };
+}
+
+function useLivePortfolioTotals(holdings: Holding[], cash: number, usdIlsRate: number | null) {
   // We need a fixed number of useLivePrice calls. Pre-allocate SLOTS slots.
   // Each slot maps to holdings[i] if it exists, otherwise a dummy ticker '' (useLivePrice handles empty string gracefully).
   const t = (i: number) => holdings[i]?.ticker ?? '';
@@ -259,22 +312,62 @@ function useLivePortfolioTotals(holdings: Holding[], cash: number) {
   const livePrices = [p0,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15,p16,p17,p18,p19];
 
   return useMemo(() => {
-    let investedValue = 0;
-    let todayChange = 0;
+    // Bucket each position by quote currency. We can't sum NVDA $ + TEVA ₪
+    // and call the result shekels — that gives the user a wrong totalValue
+    // and, worse, an incorrect totalReturn% next to a leaderboard rank.
+    let investedIls = 0;
+    let investedUsd = 0;
+    let todayChangeIls = 0;
+    let todayChangeUsd = 0;
+    let hasUsdHoldings = false;
+
     for (let i = 0; i < holdings.length && i < SLOTS; i++) {
       const h = holdings[i];
       const live = livePrices[i];
       const currentPrice = live?.price ?? h.avg_price;
-      investedValue += h.shares * currentPrice;
-      todayChange += live ? h.shares * live.change : 0;
+      const positionValue = h.shares * currentPrice;
+      const positionDelta = live ? h.shares * live.change : 0;
+      if (isIlsHolding(h)) {
+        investedIls += positionValue;
+        todayChangeIls += positionDelta;
+      } else {
+        investedUsd += positionValue;
+        todayChangeUsd += positionDelta;
+        hasUsdHoldings = true;
+      }
     }
-    const totalValue = investedValue + cash;
-    const totalReturn = totalValue - INITIAL_CASH;
+
+    // Convert USD bucket → ILS only when we have a real FX rate. If FX never
+    // loaded and the user has USD holdings, leave the conversion at 0 and
+    // flip `fxMissing` so the UI can warn instead of pretending the USD side
+    // is worthless. Cash is always ILS (virtual cash is denominated in ₪).
+    const fxAvailable = usdIlsRate !== null && usdIlsRate > 0;
+    const convertedUsd  = fxAvailable ? investedUsd * usdIlsRate! : 0;
+    const convertedUsdC = fxAvailable ? todayChangeUsd * usdIlsRate! : 0;
+
+    const investedValue = investedIls + convertedUsd;
+    const totalValue    = investedValue + cash;
+    const totalReturn   = totalValue - INITIAL_CASH;
     const totalReturnPct = (totalReturn / INITIAL_CASH) * 100;
     const isPositive = totalReturn >= 0;
-    return { totalValue, investedValue, totalReturn, totalReturnPct, isPositive, todayChange };
+    const todayChange = todayChangeIls + convertedUsdC;
+
+    return {
+      totalValue,
+      investedValue,
+      totalReturn,
+      totalReturnPct,
+      isPositive,
+      todayChange,
+      // Extra fields the header uses to show FX context honestly
+      investedIls,
+      investedUsd,
+      hasUsdHoldings,
+      fxMissing: hasUsdHoldings && !fxAvailable,
+      fxRate: fxAvailable ? usdIlsRate! : null,
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [holdings, cash, ...livePrices.map(p => p?.price), ...livePrices.map(p => p?.change)]);
+  }, [holdings, cash, usdIlsRate, ...livePrices.map(p => p?.price), ...livePrices.map(p => p?.change)]);
 }
 
 // Get the live price for the trade modal ticker
@@ -324,9 +417,14 @@ export function PortfolioPage() {
     else setLoading(false);
   }, [user, fetchPortfolio]);
 
-  // Real-time portfolio totals derived from live prices
-  const { totalValue, investedValue, totalReturn, totalReturnPct, isPositive, todayChange } =
-    useLivePortfolioTotals(holdings, cash);
+  // Pull live USD→ILS so portfolio totals can be denominated honestly in shekels.
+  const { rate: usdIlsRate, updatedAt: fxUpdatedAt } = useUsdIlsRate();
+
+  // Real-time portfolio totals derived from live prices + FX-converted USD bucket.
+  const {
+    totalValue, investedValue, totalReturn, totalReturnPct, isPositive, todayChange,
+    investedIls, investedUsd, hasUsdHoldings, fxMissing, fxRate,
+  } = useLivePortfolioTotals(holdings, cash, usdIlsRate);
 
   const selectedHolding = tradeModal ? holdings.find(h => h.ticker === tradeModal.ticker) : null;
 
@@ -462,10 +560,47 @@ export function PortfolioPage() {
       >
         <div className="absolute inset-0" style={{ background: isPositive ? 'radial-gradient(ellipse at top right, rgba(0,229,176,0.05), transparent 60%)' : 'radial-gradient(ellipse at top right, rgba(255,77,106,0.05), transparent 60%)' }} />
         <div className="relative">
-          <div className="text-xs text-tsua-muted mb-1">{'שווי תיק כולל'}</div>
+          <div className="text-xs text-tsua-muted mb-1 flex items-center gap-1.5">
+            {'שווי תיק כולל'}
+            {/* Conversion-honesty badge — when the user has USD holdings AND
+                we successfully fetched FX, tell them the headline is converted.
+                When FX failed, warn instead of silently zeroing the USD side. */}
+            {hasUsdHoldings && fxRate !== null && (
+              <span
+                className="text-[10px] text-tsua-muted"
+                title={
+                  fxUpdatedAt
+                    ? `הומר ב-1 USD = ₪${fxRate.toFixed(3)} (${new Date(fxUpdatedAt).toLocaleString('he-IL')})`
+                    : `הומר ב-1 USD = ₪${fxRate.toFixed(3)}`
+                }
+              >
+                · 1$ = ₪{fxRate.toFixed(2)}
+              </span>
+            )}
+            {fxMissing && (
+              <span
+                className="text-[10px]"
+                style={{ color: '#ffd166' }}
+                title="לא הצלחנו למשוך שער USD/ILS — הסיכום מציג רק את חלק השקלי"
+              >
+                ⚠️ שער USD לא זמין
+              </span>
+            )}
+          </div>
           <div className="text-3xl font-black text-tsua-text" dir="ltr">
             ₪{totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
           </div>
+          {/* Bucket breakdown — only shown when there's actually a mix. Makes
+              the conversion math transparent: ₪ side + $ side (× rate). */}
+          {hasUsdHoldings && (
+            <div className="text-[11px] text-tsua-muted mt-0.5" dir="ltr">
+              ₪{(investedIls + cash).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+              {' '}+ ${investedUsd.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+              {fxRate !== null && investedUsd > 0 && (
+                <span> (≈ ₪{(investedUsd * fxRate).toLocaleString(undefined, { maximumFractionDigits: 0 })})</span>
+              )}
+            </div>
+          )}
           {/* Total P&L vs ₪100,000 starting capital */}
           <div className="flex items-center gap-3 mt-1">
             <span className="text-lg font-bold" style={{ color: isPositive ? '#00e5b0' : '#ff4d6a' }} dir="ltr">

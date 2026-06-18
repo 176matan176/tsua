@@ -38,6 +38,7 @@ function NavItem({ navKey, icon: Icon, iconActive: IconActive, href, locale, pat
   return (
     <Link
       href={fullHref}
+      aria-current={isActive ? 'page' : undefined}
       className="relative flex flex-col items-center justify-center gap-1 flex-1 py-1 transition-all duration-200 active:scale-90"
     >
       {isActive && (
