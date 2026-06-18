@@ -29,13 +29,27 @@ export interface Quote {
 const ZERO: Quote = { c: 0, d: 0, dp: 0, o: 0, h: 0, l: 0, pc: 0, v: 0 };
 
 /**
+ * Some symbols use a caret prefix on Yahoo to disambiguate the index from a
+ * (delisted or hypothetical) equity of the same name. We accept the friendlier
+ * un-prefixed form across the app (URLs, watchlist DB rows, market-bar config)
+ * and translate at the network edge.
+ *
+ * Without this, `TA125.TA` 404s on Yahoo and the LiveMarketBar permanently
+ * skeletons that cell.
+ */
+const YAHOO_SYMBOL_ALIASES: Record<string, string> = {
+  'TA125.TA': '^TA125.TA',
+};
+
+/**
  * Yahoo Finance chart endpoint — doesn't require an API key. Returns the same
  * shape we need (price, prev close, OHLC, volume) for almost any symbol.
  * Used as a fallback whenever Finnhub fails or returns 0.
  */
 export async function fetchYahooQuote(symbol: string, revalidate = 60): Promise<Quote> {
   try {
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=2d`;
+    const yahooSymbol = YAHOO_SYMBOL_ALIASES[symbol] ?? symbol;
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yahooSymbol)}?interval=1d&range=2d`;
     const r = await fetch(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; TsuaBot/1.0; +https://tsua-rho.vercel.app)',
