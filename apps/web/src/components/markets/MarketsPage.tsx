@@ -321,9 +321,15 @@ export function MarketsPage() {
 
     fetchData();
     const interval = setInterval(() => fetchData(true), REFRESH_MS);
+    // Tab returning to focus also refreshes immediately — user might have
+    // been on another tab for 20 minutes and we want them to see current
+    // numbers on the spot, not wait up to 60s for the next interval tick.
+    const onVis = () => { if (document.visibilityState === 'visible') fetchData(true); };
+    document.addEventListener('visibilitychange', onVis);
     return () => {
       ctrl.abort();
       clearInterval(interval);
+      document.removeEventListener('visibilitychange', onVis);
     };
   }, []);
 

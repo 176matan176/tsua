@@ -77,9 +77,15 @@ export function CurrencyRates() {
     fetchRates();
     // Refresh every 60 seconds so the widget actually feels live.
     const timer = setInterval(fetchRates, 60 * 1000);
+    // Tab returning to focus also triggers an immediate refresh — better
+    // than waiting up to a full minute for the next tick after the user
+    // came back from another tab.
+    const onVis = () => { if (document.visibilityState === 'visible') fetchRates(); };
+    document.addEventListener('visibilitychange', onVis);
     return () => {
       ctrl.abort();
       clearInterval(timer);
+      document.removeEventListener('visibilitychange', onVis);
     };
   }, []);
 

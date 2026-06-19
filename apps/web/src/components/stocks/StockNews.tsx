@@ -108,30 +108,46 @@ export function StockNews({ ticker }: { ticker: string }) {
   const [retry, setRetry] = useState(0);
 
   useEffect(() => {
-    const ctrl = new AbortController();
+    let inFlight: AbortController | null = null;
     setState({ status: 'loading' });
 
-    fetch(`/api/stocks/${ticker}/news`, { signal: ctrl.signal })
-      .then(r => {
+    // News updates throughout the day. 5 min strikes a balance — fresh enough
+    // that headlines feel alive, light enough that we're not constantly
+    // hitting the news provider's free tier.
+    const REFRESH_MS = 5 * 60 * 1000;
+
+    async function load(isInitial: boolean) {
+      inFlight?.abort();
+      const ctrl = new AbortController();
+      inFlight = ctrl;
+      try {
+        const r = await fetch(`/api/stocks/${ticker}/news`, { signal: ctrl.signal });
         if (!r.ok) throw new Error(`status ${r.status}`);
-        return r.json();
-      })
-      .then(data => {
+        const data = await r.json();
         if (ctrl.signal.aborted) return;
-        // Server now returns { error } on upstream failure; only set ok when
-        // we actually got an array.
         if (Array.isArray(data)) {
           setState({ status: 'ok', news: data });
-        } else {
+        } else if (isInitial) {
+          // Background refresh got the error envelope — keep prior news on
+          // screen rather than flickering to the error card.
           setState({ status: 'error' });
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         if ((err as { name?: string })?.name === 'AbortError') return;
-        setState({ status: 'error' });
-      });
+        if (isInitial) setState({ status: 'error' });
+      }
+    }
 
-    return () => ctrl.abort();
+    load(true);
+    const interval = setInterval(() => load(false), REFRESH_MS);
+    const onVis = () => { if (document.visibilityState === 'visible') load(false); };
+    document.addEventListener('visibilitychange', onVis);
+
+    return () => {
+      inFlight?.abort();
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', onVis);
+    };
   }, [ticker, retry]);
 
   return (

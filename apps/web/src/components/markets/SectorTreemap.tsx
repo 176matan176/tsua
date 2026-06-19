@@ -277,9 +277,14 @@ export function SectorTreemap() {
 
     load();
     const int = setInterval(load, 60_000);
+    // Refresh immediately on tab return so the treemap isn't showing prices
+    // from however long the user was on another tab.
+    const onVis = () => { if (document.visibilityState === 'visible') load(); };
+    document.addEventListener('visibilitychange', onVis);
     return () => {
       outerCtrl.abort();
       clearInterval(int);
+      document.removeEventListener('visibilitychange', onVis);
     };
   }, []);
 

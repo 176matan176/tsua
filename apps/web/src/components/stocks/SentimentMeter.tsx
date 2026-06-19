@@ -33,34 +33,50 @@ export function SentimentMeter({ ticker }: SentimentMeterProps) {
   const [animated, setAnimated] = useState(false);
 
   useEffect(() => {
-    const ctrl = new AbortController();
+    let inFlight: AbortController | null = null;
     setLoading(true);
     setAnimated(false);
     setErrored(false);
 
-    fetch(`/api/stocks/${ticker}/sentiment`, { signal: ctrl.signal })
-      .then(r => {
+    // Community sentiment moves quickly as posts land. Poll every 2 min and
+    // refresh immediately when the tab comes back into focus.
+    const REFRESH_MS = 2 * 60 * 1000;
+
+    async function load(isInitial: boolean) {
+      inFlight?.abort();
+      const ctrl = new AbortController();
+      inFlight = ctrl;
+      try {
+        const r = await fetch(`/api/stocks/${ticker}/sentiment`, { signal: ctrl.signal });
         if (!r.ok) throw new Error(`status ${r.status}`);
-        return r.json();
-      })
-      .then((d: unknown) => {
+        const d: unknown = await r.json();
         if (ctrl.signal.aborted) return;
         if (isSentimentData(d)) {
           setData(d);
-          setTimeout(() => setAnimated(true), 80);
-        } else {
+          setErrored(false);
+          if (isInitial) setTimeout(() => setAnimated(true), 80);
+        } else if (isInitial) {
+          // Don't flip a healthy meter to error on a background-refresh blip.
           setErrored(true);
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         if ((err as { name?: string })?.name === 'AbortError') return;
-        setErrored(true);
-      })
-      .finally(() => {
-        if (!ctrl.signal.aborted) setLoading(false);
-      });
+        if (isInitial) setErrored(true);
+      } finally {
+        if (!ctrl.signal.aborted && isInitial) setLoading(false);
+      }
+    }
 
-    return () => ctrl.abort();
+    load(true);
+    const interval = setInterval(() => load(false), REFRESH_MS);
+    const onVis = () => { if (document.visibilityState === 'visible') load(false); };
+    document.addEventListener('visibilitychange', onVis);
+
+    return () => {
+      inFlight?.abort();
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', onVis);
+    };
   }, [ticker]);
 
   // Skeleton

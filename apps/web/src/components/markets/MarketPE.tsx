@@ -76,9 +76,14 @@ export function MarketPE() {
 
     load();
     const int = setInterval(load, REFRESH_MS);
+    // Tab return refresh — P/E moves slowly but if the user came back from
+    // another tab after a 30-min interval they should see fresh data instantly.
+    const onVis = () => { if (document.visibilityState === 'visible') load(); };
+    document.addEventListener('visibilitychange', onVis);
     return () => {
       ctrl.abort();
       clearInterval(int);
+      document.removeEventListener('visibilitychange', onVis);
     };
   }, []);
 

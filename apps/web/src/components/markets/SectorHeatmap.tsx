@@ -90,9 +90,14 @@ export function SectorHeatmap({ variant = 'full' }: SectorHeatmapProps) {
 
     load();
     const interval = setInterval(load, 60_000); // refresh every minute
+    // Tab return triggers an immediate refresh — sectors can move 1-2% in
+    // the time the user spent on another tab.
+    const onVis = () => { if (document.visibilityState === 'visible') load(); };
+    document.addEventListener('visibilitychange', onVis);
     return () => {
       ctrl.abort();
       clearInterval(interval);
+      document.removeEventListener('visibilitychange', onVis);
     };
   }, [retryKey]);
 

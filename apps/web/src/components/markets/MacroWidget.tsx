@@ -85,6 +85,11 @@ function IndicatorCard({ ind }: { ind: MacroIndicator }) {
   );
 }
 
+// Macro indicators are monthly. Polling every 30 min is overkill for the
+// underlying cadence but keeps a long-lived tab honest, and the visibility
+// listener catches the "user came back tomorrow" case immediately.
+const REFRESH_MS = 30 * 60 * 1000;
+
 export function MacroWidget() {
   const [indicators, setIndicators] = useState<MacroIndicator[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -94,14 +99,16 @@ export function MacroWidget() {
   const [errored, setErrored] = useState(false);
 
   useEffect(() => {
-    const ctrl = new AbortController();
+    let inFlight: AbortController | null = null;
 
-    fetch('/api/macro', { signal: ctrl.signal })
-      .then(r => {
+    async function load() {
+      inFlight?.abort();
+      const ctrl = new AbortController();
+      inFlight = ctrl;
+      try {
+        const r = await fetch('/api/macro', { signal: ctrl.signal });
         if (!r.ok) throw new Error(`status ${r.status}`);
-        return r.json();
-      })
-      .then(d => {
+        const d = await r.json();
         if (ctrl.signal.aborted) return;
         if (Array.isArray(d.indicators) && d.indicators.length > 0) {
           setIndicators(d.indicators);
@@ -109,16 +116,26 @@ export function MacroWidget() {
         } else {
           setErrored(true);
         }
-      })
-      .catch((err) => {
-        if (err?.name === 'AbortError') return;
-        setErrored(true);
-      })
-      .finally(() => {
+      } catch (err) {
+        if ((err as { name?: string })?.name === 'AbortError') return;
+        // Keep prior indicators on screen during a transient blip.
+        setErrored((prev) => indicators ? prev : true);
+      } finally {
         if (!ctrl.signal.aborted) setLoading(false);
-      });
+      }
+    }
 
-    return () => ctrl.abort();
+    load();
+    const interval = setInterval(load, REFRESH_MS);
+    const onVis = () => { if (document.visibilityState === 'visible') load(); };
+    document.addEventListener('visibilitychange', onVis);
+
+    return () => {
+      inFlight?.abort();
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', onVis);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (loading && !indicators) {

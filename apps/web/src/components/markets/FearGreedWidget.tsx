@@ -41,14 +41,27 @@ type FetchState =
   | { status: 'ok'; data: FGData }
   | { status: 'error' };
 
+// CNN publishes a new FNG value once per market day, so we don't need to
+// hammer them. 30 min keeps the widget fresh across a long-lived browser
+// session without thrashing — plus a visibility listener triggers an
+// immediate refresh when the user returns to the tab.
+const REFRESH_MS = 30 * 60 * 1000;
+
 export function FearGreedWidget() {
   const [state, setState] = useState<FetchState>({ status: 'loading' });
 
   useEffect(() => {
-    const ctrl = new AbortController();
-    fetch('/api/feargreed', { signal: ctrl.signal })
-      .then((r) => r.json())
-      .then((d) => {
+    let inFlight: AbortController | null = null;
+
+    async function load() {
+      inFlight?.abort();
+      const ctrl = new AbortController();
+      inFlight = ctrl;
+      try {
+        const r = await fetch('/api/feargreed', { signal: ctrl.signal });
+        if (!r.ok) throw new Error(`status ${r.status}`);
+        const d = await r.json();
+        if (ctrl.signal.aborted) return;
         if (d?.ok && Number.isFinite(d.value)) {
           setState({
             status: 'ok',
@@ -63,14 +76,31 @@ export function FearGreedWidget() {
             },
           });
         } else {
-          setState({ status: 'error' });
+          setState((prev) => prev.status === 'ok' ? prev : { status: 'error' });
         }
-      })
-      .catch((err) => {
-        if (err?.name === 'AbortError') return;
-        setState({ status: 'error' });
-      });
-    return () => ctrl.abort();
+      } catch (err) {
+        if ((err as { name?: string })?.name === 'AbortError') return;
+        // Keep prior 'ok' data on screen if any — a transient failure during
+        // background polling shouldn't blank the widget. Only fall to 'error'
+        // when we never had data.
+        setState((prev) => prev.status === 'ok' ? prev : { status: 'error' });
+      }
+    }
+
+    load();
+    const interval = setInterval(load, REFRESH_MS);
+    // Tab-return refresh: someone leaves the tab open overnight, comes back
+    // morning, and would otherwise see yesterday's "Greed" reading until the
+    // next 30-min tick. visibilitychange fires before paint when the tab
+    // becomes visible, so the refresh kicks off immediately.
+    const onVis = () => { if (document.visibilityState === 'visible') load(); };
+    document.addEventListener('visibilitychange', onVis);
+
+    return () => {
+      inFlight?.abort();
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', onVis);
+    };
   }, []);
 
   return (
