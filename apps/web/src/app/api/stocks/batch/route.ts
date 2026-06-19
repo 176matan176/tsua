@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchQuotes } from '@/lib/quotes';
 
-// 30s ISR — was force-dynamic, which made every chip-hover re-hit Finnhub
-// and contributed to the rate-limits the Yahoo fallback exists to absorb.
-export const revalidate = 30;
+// Per-request fresh — clients poll this every 30s for live tickers and
+// expect each poll to return current prices. The expensive part (Yahoo /
+// Finnhub network calls) is cached for 60s inside fetchQuotes via Next.js
+// Data Cache, so we don't double-hit upstream APIs.
+export const dynamic = 'force-dynamic';
 
 // GET /api/stocks/batch?symbols=TEVA,NVDA,AAPL
 //

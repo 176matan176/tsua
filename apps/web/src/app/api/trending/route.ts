@@ -12,8 +12,8 @@ import { createClient } from '@/lib/supabase/server';
  * along with bullish/bearish sentiment breakdown.
  */
 
+// `force-dynamic` wins over `revalidate`; the latter was dead config.
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
 
 interface TrendingTicker {
   ticker: string;

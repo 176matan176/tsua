@@ -2,8 +2,10 @@ import { NextResponse } from 'next/server';
 import { SECTORS } from '@/lib/sectors';
 import { fetchQuotes } from '@/lib/quotes';
 
-// `force-dynamic` + `revalidate` is contradictory; revalidate alone gives ISR.
-export const revalidate = 60;
+// Per-request fresh (same reasoning as /api/markets — ISR served 40-minute-
+// old heatmaps in low-traffic windows). The expensive Yahoo/Finnhub calls
+// inside fetchQuotes() are still 60s-cached, so the compute cost stays low.
+export const dynamic = 'force-dynamic';
 
 // GET /api/sectors — returns the 11 GICS sectors with live ETF performance
 // Uses fetchQuote (Finnhub → Yahoo fallback) so the heatmap stays populated

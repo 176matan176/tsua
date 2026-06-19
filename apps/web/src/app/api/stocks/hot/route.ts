@@ -7,7 +7,10 @@ import {
 } from '@/lib/hotStocks';
 import { fetchQuotes } from '@/lib/quotes';
 
-export const revalidate = 120; // 2-minute ISR cache
+// Per-request fresh. Hot scores blend live prices + recent post sentiment;
+// a 2-minute ISR cache meant the "trending" widget was up to 2 minutes
+// behind the actual community pulse it claims to reflect.
+export const dynamic = 'force-dynamic';
 
 function getSentiment(posts: { sentiment: string | null }[]) {
   const c = { bullish: 0, bearish: 0, neutral: 0 };

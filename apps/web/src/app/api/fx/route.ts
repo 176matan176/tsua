@@ -16,8 +16,9 @@ import { NextResponse } from 'next/server';
  *  - compute the change % consistently
  */
 
+// `force-dynamic` wins; `revalidate` was dead config. Yahoo FX rate-limit
+// is handled by the internal fetch cache on the upstream calls.
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
 
 const PAIRS = [
   { code: 'USD', label: 'דולר',  flag: '🇺🇸', symbol: 'USDILS=X' },

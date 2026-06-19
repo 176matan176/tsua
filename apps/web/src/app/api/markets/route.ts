@@ -1,9 +1,16 @@
 import { NextResponse } from 'next/server';
 import { fetchQuote, fetchYahooQuote } from '@/lib/quotes';
 
-// 60s ISR — markets data moves intraday but we don't need sub-minute freshness
-// on the dashboard. `force-dynamic` would defeat the cache and hammer Finnhub.
-export const revalidate = 60;
+// Real-time: every request hits the upstream. We learned the hard way that
+// `revalidate = 60` on Vercel served 40-minute-old data when the route wasn't
+// hit frequently — ISR's "serve stale + regen in background" only refreshes
+// AFTER an expired hit, which doesn't help a market dashboard that needs to
+// show the right number on first paint.
+//
+// The expensive part — Finnhub/Yahoo network calls — is still cached inside
+// fetchQuote() at 60s, so per-request compute stays cheap. Only the JSON
+// envelope is regenerated on every request, which is the part the user sees.
+export const dynamic = 'force-dynamic';
 
 const INDICES = [
   { symbol: 'SPY',  nameHe: 'S&P 500',   nameEn: 'S&P 500',    flag: '🇺🇸', currency: 'USD' },

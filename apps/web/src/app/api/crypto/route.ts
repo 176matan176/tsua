@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import { CRYPTO_COINS, getAllCoinIds } from '@/lib/crypto';
 
+// Per-request fresh. CoinGecko's free tier (30 req/min) is the actual rate
+// limit we worry about — protected by the internal fetch cache inside the
+// CoinGecko call, not the route-level ISR.
 export const dynamic = 'force-dynamic';
-export const revalidate = 60; // 1 min — CoinGecko rate-limits free tier to 30/min
 
 // GET /api/crypto — returns top 20 coins with live price, 24h change, market cap
 export async function GET() {
