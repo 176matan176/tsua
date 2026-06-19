@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import type { Post } from '@/types/shared';
@@ -188,6 +188,24 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
   const [repostCount, setRepostCount] = useState(post.repostCount);
   const [shareToast, setShareToast] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  // Report-flow state — opens a small modal where the user picks a reason.
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportSending, setReportSending] = useState(false);
+  const [reportSent, setReportSent] = useState(false);
+  const [reportError, setReportError] = useState<string | null>(null);
+
+  // useState(post.x) snapshots once on mount. When the parent re-fetches the
+  // same post and the row arrives with fresh likeCount / isLiked / etc. (or
+  // a different post lands in the same slot — see virtualised feeds), the
+  // child's local mirror gets stuck on the original values. Re-sync whenever
+  // the post's key fields change.
+  useEffect(() => {
+    setLiked(post.isLiked ?? false);
+    setLikeCount(post.likeCount);
+    setReplyCount(post.replyCount);
+    setRepostCount(post.repostCount);
+    setBookmarked(post.isBookmarked ?? false);
+  }, [post.id, post.isLiked, post.likeCount, post.replyCount, post.repostCount, post.isBookmarked]);
 
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true, locale: he });
   const initial = (post.author.displayName ?? post.author.username).charAt(0).toUpperCase();
@@ -196,11 +214,41 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
   const isBearish = post.sentiment === 'bearish';
 
   function toggleLike() {
+    // Don't let logged-out users see the heart flip red and then 401 silently
+    // — bounce them to login instead so the action eventually completes.
+    if (!user) {
+      window.location.href = `/${locale}/login?next=${encodeURIComponent(window.location.pathname)}`;
+      return;
+    }
     setLiked(l => !l);
     setLikeCount(c => liked ? c - 1 : c + 1);
     setLikeAnim(true);
     setTimeout(() => setLikeAnim(false), 600);
     onLikeToggle?.(post.id);
+  }
+
+  /** Submit a report via the report_post RPC. Idempotent on resubmit. */
+  async function submitReport(reason: string) {
+    if (reportSending) return;
+    setReportSending(true);
+    setReportError(null);
+    try {
+      const res = await fetch(`/api/posts/${post.id}/report`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data?.ok === false) {
+        throw new Error(data?.error ?? `status ${res.status}`);
+      }
+      setReportSent(true);
+      setTimeout(() => { setReportOpen(false); setReportSent(false); }, 1500);
+    } catch (err) {
+      setReportError(err instanceof Error ? err.message : 'send_failed');
+    } finally {
+      setReportSending(false);
+    }
   }
 
   async function handleReplyClick() {
@@ -638,6 +686,25 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
                           <span>שתף דרך…</span>
                         </button>
                       )}
+
+                      {/* Report — separate group, only shown to logged-in users
+                          (can't act on it as anonymous, and anon traffic is
+                          where most spammers come from). Visually separated
+                          from the share actions with a thicker divider + amber
+                          accent so it doesn't get confused with sharing. */}
+                      {user && user.id !== post.author.id && (
+                        <button
+                          onClick={() => { setShareOpen(false); setReportOpen(true); }}
+                          className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-[12px] font-semibold transition-colors hover:bg-red-500/8"
+                          style={{ color: '#ff8c8c', borderTop: '2px solid rgba(26,40,64,0.7)' }}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <line x1="4" y1="22" x2="4" y2="15"/>
+                            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+                          </svg>
+                          <span>דווח על הפוסט</span>
+                        </button>
+                      )}
                     </div>
                   </>
                 )}
@@ -728,6 +795,76 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
           </div>
         </div>
       </div>
+
+      {/* Report modal — kept inline so it shares state with the card. Renders
+          as a full-viewport overlay so it's reachable on mobile without
+          fighting scroll. Six reasons taken straight from the report_post RPC
+          taxonomy — keeps moderation queue groupable. */}
+      {reportOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="דיווח על פוסט"
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+          style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(6px)' }}
+          onClick={() => !reportSending && setReportOpen(false)}
+        >
+          <div
+            className="w-full max-w-sm rounded-2xl p-4"
+            style={{ background: 'var(--card)', border: '1px solid var(--border)' }}
+            onClick={(e) => e.stopPropagation()}
+            dir="rtl"
+          >
+            <h3 className="text-base font-black text-tsua-text mb-1">דיווח על פוסט</h3>
+            <p className="text-xs text-tsua-muted mb-4">
+              בחר/י את הסיבה. הצוות יבחן את הפוסט ויחזור אליך אם נדרשת פעולה נוספת.
+            </p>
+
+            {reportSent ? (
+              <div className="py-6 text-center">
+                <div className="text-3xl mb-2">✓</div>
+                <div className="text-sm font-bold" style={{ color: '#00e5b0' }}>הדיווח נשלח</div>
+                <div className="text-xs text-tsua-muted mt-1">תודה שעוזרים לשמור על הקהילה</div>
+              </div>
+            ) : (
+              <div className="space-y-1.5">
+                {([
+                  ['spam',       'ספאם או פרסומת'],
+                  ['harassment', 'הטרדה או התקפה אישית'],
+                  ['misleading', 'מטעה / מניפולציית מחיר'],
+                  ['illegal',    'תוכן בלתי-חוקי / ייעוץ ללא רישיון'],
+                  ['off_topic',  'לא קשור לשוק ההון'],
+                  ['other',      'אחר'],
+                ] as [string, string][]).map(([code, label]) => (
+                  <button
+                    key={code}
+                    onClick={() => submitReport(code)}
+                    disabled={reportSending}
+                    className="w-full text-start px-3 py-2.5 rounded-xl text-sm text-tsua-text transition-colors hover:bg-white/5 disabled:opacity-50"
+                    style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {reportError && !reportSent && (
+              <p className="text-xs mt-3 text-center" style={{ color: '#ff4d6a' }}>
+                שליחת הדיווח נכשלה — נסה שוב
+              </p>
+            )}
+
+            <button
+              onClick={() => setReportOpen(false)}
+              disabled={reportSending}
+              className="mt-4 w-full py-2 rounded-xl text-xs font-semibold text-tsua-muted hover:text-tsua-text transition-colors disabled:opacity-50"
+            >
+              ביטול
+            </button>
+          </div>
+        </div>
+      )}
     </article>
   );
 }

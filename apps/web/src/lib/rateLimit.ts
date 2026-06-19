@@ -14,14 +14,23 @@ setInterval(() => {
 interface RateLimitOptions {
   limit: number;      // max requests
   windowMs: number;   // time window in ms
+  /**
+   * Optional identity to key the limit on. Pass user.id when the caller is
+   * authenticated — otherwise users behind shared NAT (offices, mobile
+   * carriers) throttle each other.
+   *
+   * When omitted, falls back to client IP from x-forwarded-for/x-real-ip.
+   */
+  identity?: string;
 }
 
 export function rateLimit(req: Request, options: RateLimitOptions): { success: boolean; remaining: number } {
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+  const ident = options.identity
+    || req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
     || req.headers.get('x-real-ip')
     || 'unknown';
 
-  const key = `${ip}:${new URL(req.url).pathname}`;
+  const key = `${ident}:${new URL(req.url).pathname}`;
   const now = Date.now();
   const entry = rateLimitMap.get(key);
 

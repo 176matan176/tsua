@@ -99,9 +99,17 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
   const [freshIds, setFreshIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [usingMock, setUsingMock] = useState(false);
+  // True when the latest fetch failed. Distinct from "no posts yet" — a 500
+  // used to silently swap in MOCK_POSTS, making real errors look like fresh
+  // accounts with stale demo content.
+  const [loadError, setLoadError] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
   const [cursor, setCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  // Ref so the fetcher can attach the latest signal without re-creating
+  // itself on every render. Cleared in the useEffect cleanup.
+  const fetchAbortRef = useRef<AbortController | null>(null);
 
   // Keyboard shortcuts state
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
@@ -114,22 +122,39 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
   const pullStartY = useRef<number | null>(null);
 
   const fetchPosts = useCallback(async (cursorDate?: string) => {
+    // Cancel any in-flight fetch before starting a new one. Otherwise rapid
+    // ticker switches (AAPL → TSLA → MSFT) can have an older response arrive
+    // after a newer one, leaving the wrong feed on screen.
+    fetchAbortRef.current?.abort();
+    const ctrl = new AbortController();
+    fetchAbortRef.current = ctrl;
+
     try {
       const url = new URL('/api/posts', window.location.origin);
       url.searchParams.set('limit', '20');
       if (ticker) url.searchParams.set('ticker', ticker);
       if (cursorDate) url.searchParams.set('cursor', cursorDate);
 
-      const res = await fetch(url.toString(), { cache: 'no-store' });
+      const res = await fetch(url.toString(), { cache: 'no-store', signal: ctrl.signal });
 
       if (!res.ok) throw new Error('fetch failed');
       const data: Post[] = await res.json();
+      if (ctrl.signal.aborted) return;
 
       if (!data || data.length === 0) {
         if (!cursorDate) {
-          setPosts(MOCK_POSTS);
-          setUsingMock(true);
+          // Genuinely empty — only swap in demo posts when no ticker filter
+          // is active (otherwise "no posts about TSLA" should look empty, not
+          // pretend there's content). Don't trigger the error state here.
+          if (!ticker) {
+            setPosts(MOCK_POSTS);
+            setUsingMock(true);
+          } else {
+            setPosts([]);
+            setUsingMock(false);
+          }
         }
+        setLoadError(false);
         setHasMore(false);
         return;
       }
@@ -142,17 +167,24 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
         onPostsLoaded?.(data.length);
       }
 
+      setLoadError(false);
       setHasMore(data.length === 20);
       setCursor(data[data.length - 1].createdAt);
-    } catch {
+    } catch (err) {
+      // AbortError fires on cleanup — not a real failure.
+      if ((err as { name?: string })?.name === 'AbortError') return;
+      // Real error: keep prior posts on screen so a transient blip during
+      // pagination doesn't blank the feed, but flag honestly so the UI can
+      // surface a retry button.
       if (!cursorDate) {
-        setPosts(MOCK_POSTS);
-        setUsingMock(true);
+        setLoadError(true);
       }
       setHasMore(false);
     } finally {
-      setLoading(false);
-      setLoadingMore(false);
+      if (!ctrl.signal.aborted) {
+        setLoading(false);
+        setLoadingMore(false);
+      }
     }
   }, [ticker, onPostsLoaded]);
 
@@ -166,6 +198,7 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
     setLoading(true);
     setCursor(null);
     setHasMore(true);
+    setLoadError(false);
     setPosts([]);
     setPendingPosts([]);
     fetchPosts();
@@ -233,11 +266,15 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
 
     return () => {
       cancelled = true;
+      fetchAbortRef.current?.abort();
       if (channel) {
         try { supabase.removeChannel(channel); } catch {}
       }
     };
-  }, [ticker]);
+    // retryKey lets the manual retry button re-run the whole effect
+    // without unmounting the component.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ticker, retryKey]);
 
   // Apply client-side filters (computed early so keyboard handler can read it)
   const filteredPostsForKbd = posts.filter(p => {
@@ -714,15 +751,40 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
         );
       })}
 
-      {/* Empty — no posts at all */}
-      {posts.length === 0 && (
+      {/* Error — distinct from the friendly "no posts yet" empty state. The
+          old code silently swapped in MOCK_POSTS on any error, making a 500
+          look identical to a fresh empty account. */}
+      {posts.length === 0 && loadError && !loading && (
+        <div
+          className="text-center py-12 rounded-2xl"
+          style={{ background: 'rgba(13,20,36,0.5)', border: '1px solid rgba(26,40,64,0.5)' }}
+        >
+          <div className="text-3xl mb-2">📡</div>
+          <div className="text-tsua-muted text-sm font-medium mb-3">
+            לא הצלחנו לטעון את הפיד
+          </div>
+          <button
+            onClick={() => { setLoading(true); setRetryKey(k => k + 1); }}
+            className="text-xs font-bold px-4 py-2 rounded-lg transition-colors"
+            style={{ background: 'rgba(0,229,176,0.1)', color: '#00e5b0', border: '1px solid rgba(0,229,176,0.3)' }}
+          >
+            🔄 נסה שוב
+          </button>
+        </div>
+      )}
+
+      {/* Empty — no posts at all (and not an error) */}
+      {posts.length === 0 && !loadError && !loading && (
         <div
           className="text-center py-16 rounded-2xl"
           style={{ background: 'rgba(13,20,36,0.5)', border: '1px solid rgba(26,40,64,0.5)' }}
         >
           <div className="text-4xl mb-3">📭</div>
           <div className="text-tsua-muted text-sm font-medium">
-            {'אין פוסטים עדיין — היה הראשון!'}
+            {ticker
+              ? `אין עדיין פוסטים על $${ticker} — פתח דיון!`
+              : 'אין פוסטים עדיין — היה הראשון!'
+            }
           </div>
         </div>
       )}

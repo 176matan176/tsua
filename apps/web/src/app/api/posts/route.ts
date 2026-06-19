@@ -96,21 +96,49 @@ export async function GET(req: NextRequest) {
 }
 
 // POST /api/posts — create post
-export async function POST(req: NextRequest) {
-  const rl = rateLimit(req, { limit: 10, windowMs: 60 * 1000 });
-  if (!rl.success) {
-    return NextResponse.json({ error: 'יותר מדי בקשות, נסה שוב עוד דקה' }, { status: 429 });
-  }
+//
+// Maximum body length matches the client composer's 280-char limit. The
+// server enforces independently so abusers can't bypass the UI cap and
+// 500-char-spam the feed. Same for stockMentions: the UI's $TICKER picker
+// caps at 5 mentions; the server validates and re-caps server-side.
+const MAX_POST_LENGTH      = 280;
+const MAX_STOCK_MENTIONS   = 5;
+const TICKER_PATTERN       = /^[A-Z0-9.\-]{1,10}$/;
 
+export async function POST(req: NextRequest) {
   const supabase = createSupabase();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  // Rate-limit on user.id when authenticated — keys-by-IP was throttling
+  // every user behind a shared NAT (office wifi, mobile carrier CGNAT).
+  const rl = rateLimit(req, {
+    limit: 10,
+    windowMs: 60 * 1000,
+    identity: user.id,
+  });
+  if (!rl.success) {
+    return NextResponse.json({ error: 'יותר מדי בקשות, נסה שוב עוד דקה' }, { status: 429 });
+  }
 
   const body = await req.json();
   const { text, sentiment, stockMentions, lang, imageUrls, parentId } = body;
 
   if (!text?.trim()) return NextResponse.json({ error: 'Body required' }, { status: 400 });
-  if (text.length > 500) return NextResponse.json({ error: 'Too long' }, { status: 400 });
+  if (text.length > MAX_POST_LENGTH) {
+    return NextResponse.json({ error: 'Too long' }, { status: 400 });
+  }
+
+  // Sanitize stockMentions: cap count, uppercase, drop anything that doesn't
+  // match the ticker shape. Without this, abusers were stuffing 1000 fake
+  // tickers per post and polluting the trending aggregation.
+  const cleanMentions: string[] = Array.isArray(stockMentions)
+    ? Array.from(new Set(
+        stockMentions
+          .map((t: unknown) => String(t).toUpperCase().trim())
+          .filter((t: string) => TICKER_PATTERN.test(t))
+      )).slice(0, MAX_STOCK_MENTIONS)
+    : [];
 
   const { data, error } = await supabase
     .from('posts')
@@ -119,7 +147,7 @@ export async function POST(req: NextRequest) {
       body: text.trim(),
       lang: lang ?? 'he',
       sentiment: sentiment ?? null,
-      stock_mentions: (stockMentions ?? []).map((t: string) => t.toUpperCase()),
+      stock_mentions: cleanMentions,
       image_urls: imageUrls ?? [],
       parent_id: parentId ?? null,
     })
@@ -135,21 +163,32 @@ export async function POST(req: NextRequest) {
   // Update post_count (best-effort)
   try { await supabase.rpc('increment_post_count', { user_id: user.id }); } catch { /* ok */ }
 
-  // If reply, increment parent's reply_count
+  // Atomic reply_count bump. The old read-then-write was racy: two concurrent
+  // replies both read N and wrote N+1, losing a reply from the count forever.
+  // The RPC runs `update set reply_count = reply_count + 1` in a single
+  // statement so Postgres serialises it per-row.
+  //
+  // Requires the atomic_counters_migration.sql to be applied — falls back to
+  // the old behaviour if the RPC isn't there yet (so this commit doesn't
+  // break prod before the migration lands).
   if (parentId) {
-    try {
-      const { data: parent } = await supabase
-        .from('posts')
-        .select('reply_count')
-        .eq('id', parentId)
-        .single();
-      if (parent) {
-        await supabase
+    const rpcRes = await supabase.rpc('increment_reply_count', { p_post_id: parentId });
+    if (rpcRes.error) {
+      // Migration not yet applied — fall back. Still racy, but no worse than before.
+      try {
+        const { data: parent } = await supabase
           .from('posts')
-          .update({ reply_count: (parent.reply_count ?? 0) + 1 })
-          .eq('id', parentId);
-      }
-    } catch { /* ok */ }
+          .select('reply_count')
+          .eq('id', parentId)
+          .single();
+        if (parent) {
+          await supabase
+            .from('posts')
+            .update({ reply_count: (parent.reply_count ?? 0) + 1 })
+            .eq('id', parentId);
+        }
+      } catch { /* ok */ }
+    }
   }
 
   const post = {

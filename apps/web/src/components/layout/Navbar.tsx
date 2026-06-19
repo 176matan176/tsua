@@ -127,6 +127,9 @@ export function Navbar() {
 
   const SearchDropdown = () => (
     <div
+      id="navbar-search-results"
+      role="listbox"
+      aria-label="תוצאות חיפוש"
       className="absolute top-full mt-2 left-0 right-0 rounded-2xl overflow-hidden z-50"
       style={{
         background: 'rgba(8,14,26,0.99)',
@@ -351,17 +354,22 @@ export function Navbar() {
           </Link>
 
           {/* Desktop Search */}
-          <div className="flex-1 max-w-sm" ref={searchRef}>
+          <div role="search" className="flex-1 max-w-sm" ref={searchRef}>
             <div className="relative">
-              <MagnifyingGlassIcon className="absolute start-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 pointer-events-none z-10" style={{ color: 'rgba(90,112,144,0.6)' }} />
+              <MagnifyingGlassIcon aria-hidden="true" className="absolute start-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 pointer-events-none z-10" style={{ color: 'rgba(90,112,144,0.6)' }} />
               <input
                 ref={searchInputRef}
-                type="text"
+                type="search"
                 value={searchQuery}
                 onChange={e => handleSearchChange(e.target.value)}
                 onFocus={() => setSearchOpen(true)}
                 onKeyDown={handleSearchKeyDown}
                 placeholder="$TEVA, NVDA, חיפוש..."
+                aria-label="חפש מניות ומשתמשים"
+                aria-expanded={showDropdown}
+                aria-controls="navbar-search-results"
+                aria-autocomplete="list"
+                role="combobox"
                 className="w-full rounded-lg py-2 ps-9 pe-8 text-[13px] placeholder:text-tsua-muted focus:outline-none transition-all duration-200 font-mono"
                 style={{
                   background: searchOpen ? 'rgba(12,20,36,0.98)' : 'rgba(12,18,32,0.7)',
@@ -373,9 +381,10 @@ export function Navbar() {
               {searchQuery && (
                 <button
                   onClick={clearSearch}
+                  aria-label="נקה חיפוש"
                   className="absolute end-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-md text-tsua-muted hover:text-tsua-text transition-colors"
                 >
-                  <XMarkIcon className="w-3.5 h-3.5" />
+                  <XMarkIcon aria-hidden="true" className="w-3.5 h-3.5" />
                 </button>
               )}
 
@@ -402,6 +411,9 @@ export function Navbar() {
               <div className="relative" ref={menuRef}>
                 <button
                   onClick={() => setMenuOpen(o => !o)}
+                  aria-label={`תפריט משתמש ${displayName}`}
+                  aria-expanded={menuOpen}
+                  aria-haspopup="menu"
                   className="flex items-center gap-2 rounded-xl px-2 py-1.5 transition-all duration-200 hover:opacity-90"
                   style={{
                     background: menuOpen ? 'rgba(15,25,41,0.95)' : 'rgba(15,25,41,0.7)',
@@ -422,6 +434,8 @@ export function Navbar() {
 
                 {menuOpen && (
                   <div
+                    role="menu"
+                    aria-label="תפריט משתמש"
                     className="absolute end-0 top-full mt-2 w-52 rounded-2xl py-1.5 z-50"
                     style={{ background: 'rgba(10,16,30,0.99)', border: '1px solid rgba(26,40,64,0.8)', boxShadow: '0 16px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.03)' }}
                   >
