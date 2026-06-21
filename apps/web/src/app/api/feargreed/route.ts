@@ -14,7 +14,12 @@ import { NextResponse } from 'next/server';
  * spoof a real Chrome request and include the Referer/Origin headers it
  * looks for. The data returns ~once per market day.
  */
-export const revalidate = 1800; // 30 min — CNN updates intraday but slowly
+// Per-request fresh — was `revalidate = 1800` but Vercel CDN was serving
+// 29-minute-old cached responses, so the widget appeared to be "stuck" on
+// the same score across page loads. The upstream CNN call is still cached
+// for 30 min via `next: { revalidate: 1800 }` on the fetch below, so we
+// don't actually hit CNN more often.
+export const dynamic = 'force-dynamic';
 
 interface CNNPayload {
   fear_and_greed?: {

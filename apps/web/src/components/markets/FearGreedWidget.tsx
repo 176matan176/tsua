@@ -103,10 +103,30 @@ export function FearGreedWidget() {
     };
   }, []);
 
+  // Pull the timestamp out so we can show "עודכן XX:XX" in the header.
+  // Users were complaining the widget "wasn't real" — partly because Vercel
+  // was serving stale cache, and partly because there was no visible freshness
+  // signal at all. Now they can see the exact time CNN published the score.
+  const updatedAt = state.status === 'ok' ? state.data.updatedAt : null;
+  // CNN publishes a daily score that doesn't actually move during the day,
+  // so anything from today is fresh. Compare in days to avoid false-stale
+  // amber on a perfectly current intraday display.
+  const isStale = updatedAt !== null && (Date.now() - updatedAt) > 26 * 60 * 60 * 1000;
+
   return (
     <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(15,25,41,0.7)', border: '1px solid rgba(26,40,64,0.8)' }}>
-      <div className="px-4 py-3" style={{ borderBottom: '1px solid rgba(26,40,64,0.6)' }}>
+      <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(26,40,64,0.6)' }}>
         <h3 className="text-sm font-bold text-tsua-text">🧠 מדד פחד וחמדנות</h3>
+        {updatedAt && (
+          <span
+            className="text-[10px] tabular-nums flex items-center gap-1"
+            style={{ color: isStale ? '#ffd166' : 'var(--muted)' }}
+            title={`CNN updated: ${new Date(updatedAt).toLocaleString('he-IL')}`}
+          >
+            {isStale && <span>⚠️</span>}
+            <span>עודכן {new Date(updatedAt).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}</span>
+          </span>
+        )}
       </div>
 
       <div className="px-4 py-4" dir="rtl">
