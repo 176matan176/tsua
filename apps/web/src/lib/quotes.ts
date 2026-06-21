@@ -293,10 +293,17 @@ export async function fetchYahooOwnership(
       return null;
     }
 
-    const insidersPct = Number.isFinite(insidersRaw) ? insidersRaw * 100 : 0;
-    const institutionsPct = Number.isFinite(institutionsRaw) ? institutionsRaw * 100 : 0;
-    // Public/retail is the residual. Cap at 0 so we never go negative if
-    // Yahoo's numbers don't sum cleanly.
+    // Yahoo's numbers occasionally sum past 100% — happens for dual-listed
+    // names like WIX (raw 152% institutional) where the same shares get
+    // counted in two places (ADR conversions, ownership-of-ownership chains).
+    // Clamp each segment so we always render a sane pie:
+    //   insiders     ∈ [0, 100]
+    //   institutions ∈ [0, 100 - insiders]   ← can't fill more than the rest
+    //   public       ∈ [0, 100 - others]
+    const rawInsiders = Number.isFinite(insidersRaw) ? insidersRaw * 100 : 0;
+    const rawInstitutions = Number.isFinite(institutionsRaw) ? institutionsRaw * 100 : 0;
+    const insidersPct = Math.max(0, Math.min(100, rawInsiders));
+    const institutionsPct = Math.max(0, Math.min(100 - insidersPct, rawInstitutions));
     const publicPct = Math.max(0, 100 - insidersPct - institutionsPct);
 
     return {
