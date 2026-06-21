@@ -197,10 +197,11 @@ async function quoteSummaryRaw(
   symbol: string,
   auth: { cookie: string; crumb: string },
   revalidate: number,
+  modules: string = 'summaryDetail',
 ): Promise<Response> {
   const url =
     `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(symbol)}` +
-    `?modules=summaryDetail&crumb=${encodeURIComponent(auth.crumb)}`;
+    `?modules=${encodeURIComponent(modules)}&crumb=${encodeURIComponent(auth.crumb)}`;
   return fetch(url, {
     headers: {
       'User-Agent': YAHOO_UA,
@@ -236,6 +237,74 @@ export async function fetchYahooPE(
     return {
       trailingPE: Number.isFinite(trailing) && trailing > 0 ? trailing : null,
       forwardPE: Number.isFinite(forward) && forward > 0 ? forward : null,
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Ownership breakdown for an equity — pulls Yahoo's `majorHoldersBreakdown`
+ * module which returns the same numbers users see on Yahoo Finance's
+ * "Holders" tab. We use it to render the per-stock ownership pie.
+ *
+ *   - insiders:        officers, directors, employee shareholders (often <5%)
+ *   - institutions:    mutual funds, ETFs, pension funds (Vanguard, BlackRock…)
+ *   - public:          retail + everyone else (computed as 100 - other two)
+ *
+ * Yahoo doesn't expose this module for ETFs (SPY, QQQ, EIS) because the
+ * concept doesn't apply — those holdings ARE the institutional structure.
+ * Returns null in that case; the UI hides the widget gracefully.
+ */
+export interface OwnershipBreakdown {
+  insidersPct: number;          // 0-100
+  institutionsPct: number;      // 0-100
+  publicPct: number;            // 0-100 (derived)
+  institutionsFloatPct: number | null;
+  institutionsCount: number | null;
+}
+
+export async function fetchYahooOwnership(
+  symbol: string,
+  revalidate = 21600, // 6h — ownership shifts slowly (13F filings are quarterly)
+): Promise<OwnershipBreakdown | null> {
+  try {
+    let auth = await getYahooCrumb();
+    if (!auth) return null;
+
+    let r = await quoteSummaryRaw(symbol, auth, revalidate, 'majorHoldersBreakdown');
+    if (r.status === 401) {
+      auth = await getYahooCrumb(true);
+      if (!auth) return null;
+      r = await quoteSummaryRaw(symbol, auth, revalidate, 'majorHoldersBreakdown');
+    }
+    if (!r.ok) return null;
+
+    const json = await r.json();
+    const breakdown = json?.quoteSummary?.result?.[0]?.majorHoldersBreakdown;
+    if (!breakdown) return null;
+
+    const insidersRaw = Number(breakdown.insidersPercentHeld?.raw);
+    const institutionsRaw = Number(breakdown.institutionsPercentHeld?.raw);
+    const institutionsFloatRaw = Number(breakdown.institutionsFloatPercentHeld?.raw);
+    const institutionsCount = Number(breakdown.institutionsCount?.raw);
+
+    if (!Number.isFinite(insidersRaw) && !Number.isFinite(institutionsRaw)) {
+      return null;
+    }
+
+    const insidersPct = Number.isFinite(insidersRaw) ? insidersRaw * 100 : 0;
+    const institutionsPct = Number.isFinite(institutionsRaw) ? institutionsRaw * 100 : 0;
+    // Public/retail is the residual. Cap at 0 so we never go negative if
+    // Yahoo's numbers don't sum cleanly.
+    const publicPct = Math.max(0, 100 - insidersPct - institutionsPct);
+
+    return {
+      insidersPct,
+      institutionsPct,
+      publicPct,
+      institutionsFloatPct: Number.isFinite(institutionsFloatRaw) ? institutionsFloatRaw * 100 : null,
+      institutionsCount: Number.isFinite(institutionsCount) ? institutionsCount : null,
     };
   } catch {
     return null;

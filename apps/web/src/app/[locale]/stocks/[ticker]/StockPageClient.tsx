@@ -8,6 +8,7 @@ import { FeedStream } from '@/components/feed/FeedStream';
 import { CompanyOverview } from '@/components/stocks/CompanyOverview';
 import { KeyStats } from '@/components/stocks/KeyStats';
 import { StockNews } from '@/components/stocks/StockNews';
+import { OwnershipPie } from '@/components/stocks/OwnershipPie';
 
 type Tab = 'feed' | 'news';
 
@@ -58,6 +59,10 @@ export function StockPageClient({ ticker }: { ticker: string }) {
         currency={stockData.currency}
         logo={stockData.logo}
       />
+      {/* Ownership pie — hides itself when Yahoo doesn't have the data
+          (ETFs, most TASE-only listings). Goes below CompanyOverview so
+          the more universal info comes first. */}
+      <OwnershipPie ticker={ticker} />
     </>
   ) : (
     <div

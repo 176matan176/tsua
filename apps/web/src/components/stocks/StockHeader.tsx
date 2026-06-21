@@ -9,7 +9,7 @@ import { BookmarkIcon, BookmarkSlashIcon } from '@heroicons/react/24/outline';
 import { BookmarkIcon as BookmarkSolid } from '@heroicons/react/24/solid';
 import { InfoTooltip } from '@/components/ui/InfoTooltip';
 import { DICTIONARY, type DictEntry } from '@/lib/financialDictionary';
-import { getStockDescription } from '@/lib/stockDescriptions';
+import { getStockDescription, getStockLongDescription } from '@/lib/stockDescriptions';
 
 export interface StockData {
   ticker: string;
@@ -195,7 +195,10 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
   const flash          = priceSource === 'live' ? (livePrice!.flash ?? null) : null;
   const isPositive = (changePercent ?? 0) >= 0;
   const currencySymbol = data?.currency === 'ILS' ? '₪' : '$';
-  const description = getStockDescription(ticker);
+  // Prefer the 35-50-word company background; fall back to the one-line
+  // description for long-tail tickers we haven't covered yet. Both better
+  // than an English description from Yahoo.
+  const description = getStockLongDescription(ticker) ?? getStockDescription(ticker);
 
   // Honest error card when the metadata fetch failed and we have nothing to
   // show — replaces the prior behavior of fabricating fake StockData.
@@ -305,10 +308,12 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
             )}
           </div>
 
-          {/* Hebrew one-line company description */}
+          {/* Hebrew company description — short one-liner OR full 35-50 word
+              background depending on what we have for this ticker. Both render
+              with the same RTL prose styling; the longer copy just wraps. */}
           {description && (
             <p
-              className="mt-2 text-[13px] leading-relaxed max-w-2xl"
+              className="mt-2 text-[13px] leading-relaxed max-w-3xl"
               style={{
                 color: 'var(--muted, #9ab1cc)',
                 fontWeight: 500,
