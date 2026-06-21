@@ -15,7 +15,16 @@ import { fetchYahooPE } from '@/lib/quotes';
  *   3. Curated static fallback so the widget never blanks; refreshed
  *      manually each quarter from public fund-fact-sheet pages.
  */
-export const revalidate = 3600; // 1h — P/E moves slowly
+// Per-request fresh — was `revalidate = 3600` but Vercel CDN happily served
+// 38-second-old cached responses across page loads (same staleness bug we
+// caught on /api/feargreed and /api/markets). Each request now regenerates
+// the JSON; the expensive Yahoo `quoteSummary` upstream call is cached for
+// 15 min inside fetchYahooPE so we don't actually hit Yahoo more often.
+//
+// 15 min on the upstream gives the widget *intraday* P/E movement: trailing
+// EPS is fixed but the price part moves with the market, so P/E shifts ~0.1-
+// 0.5 across the trading day. 1h was masking those moves entirely.
+export const dynamic = 'force-dynamic';
 
 const FINNHUB_KEY = process.env.FINNHUB_API_KEY;
 
@@ -62,7 +71,9 @@ async function fetchFinnhubPE(symbol: string): Promise<number | null> {
 }
 
 async function resolvePE(symbol: string): Promise<{ pe: number; source: 'live' } | null> {
-  const yahoo = await fetchYahooPE(symbol, 3600);
+  // 15 min internal cache so P/E reflects intraday price moves while still
+  // throttling our Yahoo crumb traffic to a handful of calls per hour.
+  const yahoo = await fetchYahooPE(symbol, 900);
   if (yahoo?.trailingPE) {
     return { pe: parseFloat(yahoo.trailingPE.toFixed(1)), source: 'live' };
   }
