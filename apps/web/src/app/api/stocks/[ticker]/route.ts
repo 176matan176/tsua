@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchQuote } from '@/lib/quotes';
+import { fetchQuote, fetchYahooExtendedQuote } from '@/lib/quotes';
 
 // 60s ISR — quote is the freshness-critical field; profile/metrics barely
 // change. Better than force-dynamic which forced every page-view to hit
@@ -39,7 +39,7 @@ export async function GET(
     // Profile + metrics: Finnhub-only (Yahoo doesn't expose these on the public chart API).
     // Profile/metrics may return empty for symbols Finnhub doesn't support — that's fine,
     // the page still renders with the quote.
-    const [quote, profileRes, metricsRes] = await Promise.all([
+    const [quote, profileRes, metricsRes, extended] = await Promise.all([
       fetchQuote(symbol),
       FINNHUB_KEY
         ? fetch(`https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=${FINNHUB_KEY}`, {
@@ -51,6 +51,11 @@ export async function GET(
             next: { revalidate: 3600 },
           }).catch(() => null)
         : null,
+      // Yahoo's v7/finance/quote also gives us pre-market and after-hours
+      // prices + the current market state — values none of our other sources
+      // expose. Returns null silently for symbols Yahoo doesn't cover (most
+      // TASE-only listings); the page renders without the extra block.
+      fetchYahooExtendedQuote(symbol),
     ]);
 
     if (!quote.c) {
@@ -114,6 +119,18 @@ export async function GET(
       pbRatio: num(m['pbAnnual']),
       roeTTM: num(m['roeTTM']),
       revenueGrowthTTM: num(m['revenueGrowthTTMYoy']),
+      // Extended-hours block — null for symbols Yahoo doesn't expose
+      // (most TASE listings). Client uses `marketState` to decide whether
+      // to render the pre-market or after-hours row.
+      marketState: extended?.marketState ?? null,
+      preMarketPrice: extended?.preMarketPrice ?? null,
+      preMarketChange: extended?.preMarketChange ?? null,
+      preMarketChangePct: extended?.preMarketChangePct ?? null,
+      preMarketTime: extended?.preMarketTime ?? null,
+      postMarketPrice: extended?.postMarketPrice ?? null,
+      postMarketChange: extended?.postMarketChange ?? null,
+      postMarketChangePct: extended?.postMarketChangePct ?? null,
+      postMarketTime: extended?.postMarketTime ?? null,
       partial,
     });
 

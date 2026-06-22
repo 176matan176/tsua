@@ -244,6 +244,105 @@ export async function fetchYahooPE(
 }
 
 /**
+ * Extended-hours quote — pulls Yahoo's `v7/finance/quote` endpoint which
+ * exposes the regular session price plus the pre-market and after-hours
+ * prices (when applicable) and the current market state.
+ *
+ * Why we need this: the chart API (fetchYahooQuote) only returns the
+ * regular-session number. From 04:00–09:30 ET and 16:00–20:00 ET US stocks
+ * trade in extended hours and the regular price is stale — Yahoo Finance
+ * shows the pre/post-market price as a sub-line under the headline number.
+ * Mimicking that gives Israeli day-traders the same intra-session signal
+ * (TASE morning hours overlap with US pre-market).
+ *
+ * marketState values: PRE | REGULAR | POST | POSTPOST | CLOSED | PREPRE
+ *   PRE       — pre-market window active
+ *   REGULAR   — normal session
+ *   POST      — after-hours window active
+ *   POSTPOST  — past after-hours but before next pre-market
+ *   CLOSED    — overnight / weekend
+ *   PREPRE    — between sessions in extended hours
+ */
+export interface ExtendedQuote {
+  regularPrice: number;
+  regularChange: number;
+  regularChangePct: number;
+  regularTime: number | null;
+  marketState: string;
+  preMarketPrice: number | null;
+  preMarketChange: number | null;
+  preMarketChangePct: number | null;
+  preMarketTime: number | null;
+  postMarketPrice: number | null;
+  postMarketChange: number | null;
+  postMarketChangePct: number | null;
+  postMarketTime: number | null;
+}
+
+export async function fetchYahooExtendedQuote(
+  symbol: string,
+  revalidate = 60, // 1 min — pre/post-market prices tick in real time
+): Promise<ExtendedQuote | null> {
+  try {
+    let auth = await getYahooCrumb();
+    if (!auth) return null;
+
+    const buildUrl = (crumb: string) =>
+      `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${encodeURIComponent(symbol)}&crumb=${encodeURIComponent(crumb)}`;
+
+    let r = await fetch(buildUrl(auth.crumb), {
+      headers: { 'User-Agent': YAHOO_UA, Accept: 'application/json', Cookie: auth.cookie },
+      next: { revalidate },
+    });
+    // Stale-crumb retry, same pattern as fetchYahooPE.
+    if (r.status === 401) {
+      auth = await getYahooCrumb(true);
+      if (!auth) return null;
+      r = await fetch(buildUrl(auth.crumb), {
+        headers: { 'User-Agent': YAHOO_UA, Accept: 'application/json', Cookie: auth.cookie },
+        next: { revalidate },
+      });
+    }
+    if (!r.ok) return null;
+
+    const json = await r.json();
+    const q = json?.quoteResponse?.result?.[0];
+    if (!q) return null;
+
+    const regularPrice = Number(q.regularMarketPrice);
+    if (!Number.isFinite(regularPrice) || regularPrice <= 0) return null;
+
+    const num = (v: unknown): number | null => {
+      const n = Number(v);
+      return Number.isFinite(n) ? n : null;
+    };
+    const time = (v: unknown): number | null => {
+      const n = Number(v);
+      // Yahoo returns Unix seconds; convert to ms for JS Date consistency.
+      return Number.isFinite(n) && n > 0 ? n * 1000 : null;
+    };
+
+    return {
+      regularPrice,
+      regularChange: num(q.regularMarketChange) ?? 0,
+      regularChangePct: num(q.regularMarketChangePercent) ?? 0,
+      regularTime: time(q.regularMarketTime),
+      marketState: String(q.marketState ?? 'CLOSED'),
+      preMarketPrice: num(q.preMarketPrice),
+      preMarketChange: num(q.preMarketChange),
+      preMarketChangePct: num(q.preMarketChangePercent),
+      preMarketTime: time(q.preMarketTime),
+      postMarketPrice: num(q.postMarketPrice),
+      postMarketChange: num(q.postMarketChange),
+      postMarketChangePct: num(q.postMarketChangePercent),
+      postMarketTime: time(q.postMarketTime),
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Ownership breakdown for an equity — pulls Yahoo's `majorHoldersBreakdown`
  * module which returns the same numbers users see on Yahoo Finance's
  * "Holders" tab. We use it to render the per-stock ownership pie.

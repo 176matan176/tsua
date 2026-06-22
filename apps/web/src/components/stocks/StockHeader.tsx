@@ -46,6 +46,17 @@ export interface StockData {
    *  may be missing. Lets the UI show a subtle "company data unavailable"
    *  hint instead of pretending the company is anonymous. */
   partial?: boolean;
+  /** Extended-hours / market-state fields from Yahoo. All null for symbols
+   *  Yahoo doesn't expose (most TASE listings); the UI hides the row. */
+  marketState?: string | null;
+  preMarketPrice?: number | null;
+  preMarketChange?: number | null;
+  preMarketChangePct?: number | null;
+  preMarketTime?: number | null;
+  postMarketPrice?: number | null;
+  postMarketChange?: number | null;
+  postMarketChangePct?: number | null;
+  postMarketTime?: number | null;
 }
 
 interface StockHeaderProps {
@@ -375,6 +386,63 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
               <span className="text-xs text-tsua-muted self-end pb-1">מחיר לא זמין</span>
             )}
           </div>
+
+          {/* Pre-market / after-hours row — Yahoo-style sub-line under the
+              headline price. Only renders when Yahoo gave us extended data
+              AND the market state matches:
+                PRE / PREPRE  → show pre-market price
+                POST / POSTPOST / CLOSED → show after-hours price (if any)
+              REGULAR or no data → row hidden entirely. */}
+          {(() => {
+            const state = data?.marketState;
+            if (!state || state === 'REGULAR') return null;
+
+            const isPre = state === 'PRE' || state === 'PREPRE';
+            const xPrice = isPre ? data?.preMarketPrice : data?.postMarketPrice;
+            const xChange = isPre ? data?.preMarketChange : data?.postMarketChange;
+            const xChangePct = isPre ? data?.preMarketChangePct : data?.postMarketChangePct;
+            const xTime = isPre ? data?.preMarketTime : data?.postMarketTime;
+            if (xPrice == null || xPrice <= 0) return null;
+
+            const xUp = (xChangePct ?? 0) >= 0;
+            const label = isPre ? 'מסחר מוקדם' : 'מסחר מאוחר';
+            const labelColor = isPre ? '#ffd166' : '#a78bfa';
+            const timeStr = xTime
+              ? new Date(xTime).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })
+              : null;
+
+            return (
+              <div className="mt-2 flex items-center flex-wrap gap-x-3 gap-y-1">
+                <span
+                  className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md"
+                  style={{
+                    background: `${labelColor}22`,
+                    color: labelColor,
+                    border: `1px solid ${labelColor}55`,
+                  }}
+                >
+                  {label}
+                </span>
+                <span
+                  dir="ltr"
+                  className="text-lg font-black font-mono tabular-nums"
+                  style={{ color: '#c8d8f0' }}
+                >
+                  {currencySymbol}{xPrice.toFixed(2)}
+                </span>
+                <span
+                  dir="ltr"
+                  className="text-sm font-bold tabular-nums"
+                  style={{ color: xUp ? '#00e5b0' : '#ff4d6a' }}
+                >
+                  {xUp ? '+' : ''}{(xChange ?? 0).toFixed(2)} ({xUp ? '+' : ''}{(xChangePct ?? 0).toFixed(2)}%)
+                </span>
+                {timeStr && (
+                  <span className="text-[11px] text-tsua-muted">· {timeStr}</span>
+                )}
+              </div>
+            );
+          })()}
         </div>
 
         {/* Actions */}
