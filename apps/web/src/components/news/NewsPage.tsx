@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { he } from 'date-fns/locale';
 
@@ -91,7 +91,10 @@ const SOURCE_COLORS: Record<string, string> = {
   RE: 'bg-red-600',
 };
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'https://tsua-api-production.up.railway.app';
+// Use our internal /api/news route which aggregates from Israeli outlets
+// via Google News RSS (TheMarker, Calcalist, Globes, BizPortal, etc.).
+// Switched off the external Railway API which wasn't returning Israeli sources.
+const NEWS_ENDPOINT = '/api/news';
 
 export function NewsPage() {
   const [source, setSource] = useState<NewsSource>('all');
@@ -103,46 +106,71 @@ export function NewsPage() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchNews = useCallback(async (pageNum: number, replace: boolean) => {
+  // useRef to thread the latest AbortController through the callback so
+  // rapid filter taps (category, source) cancel in-flight requests instead
+  // of racing each other into setArticles.
+  const inFlightRef = useRef<AbortController | null>(null);
+
+  const fetchNews = useCallback(async (pageNum: number, replace: boolean, cat: NewsCategory, src: NewsSource) => {
+    inFlightRef.current?.abort();
+    const ctrl = new AbortController();
+    inFlightRef.current = ctrl;
+
     try {
       if (replace) setLoading(true);
       else setLoadingMore(true);
       setError(null);
 
-      const params = new URLSearchParams({ lang: 'he', page: String(pageNum) });
-      const res = await fetch(`${API_BASE}/api/v1/news?${params}`);
+      const params = new URLSearchParams({
+        category: cat,
+        source: src,
+        page: String(pageNum),
+      });
+      const res = await fetch(`${NEWS_ENDPOINT}?${params}`, { signal: ctrl.signal });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json() as { articles: ApiArticle[]; page: number; hasMore: boolean };
+      if (ctrl.signal.aborted) return;
 
       const mapped = data.articles.map(mapApiArticle);
       setArticles(prev => replace ? mapped : [...prev, ...mapped]);
       setHasMore(data.hasMore);
       setPage(pageNum);
     } catch (err) {
+      if ((err as { name?: string })?.name === 'AbortError') return;
       setError('שגיאה בטעינת חדשות');
       console.error('[NewsPage] fetch error:', err);
     } finally {
-      setLoading(false);
-      setLoadingMore(false);
+      if (!ctrl.signal.aborted) {
+        setLoading(false);
+        setLoadingMore(false);
+      }
     }
   }, []);
 
-  // Refetch when source/category filter changes (reset to page 1)
+  // Refetch when source/category filter changes (reset to page 1). Server-side
+  // filtering means we don't need a separate post-filter on `articles`.
   useEffect(() => {
-    fetchNews(1, true);
-  }, [fetchNews]);
+    fetchNews(1, true, category, source);
+  }, [fetchNews, category, source]);
 
-  const filtered = articles.filter((n) => {
-    const sourceMatch =
-      source === 'all' ||
-      n.source.toLowerCase().replace(/\s/g, '') === source ||
-      sourceToIcon(n.source).toLowerCase() === source.slice(0, 2).toLowerCase();
-    const catMatch = category === 'all' || n.category === category;
-    return sourceMatch && catMatch;
-  });
+  // Auto-refresh every 3 minutes — Israeli economic news moves throughout
+  // the day, especially during TASE trading hours. Plus an immediate refresh
+  // when the tab comes back to focus.
+  useEffect(() => {
+    const interval = setInterval(() => fetchNews(1, true, category, source), 3 * 60 * 1000);
+    const onVis = () => { if (document.visibilityState === 'visible') fetchNews(1, true, category, source); };
+    document.addEventListener('visibilitychange', onVis);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', onVis);
+    };
+  }, [fetchNews, category, source]);
 
-  const breaking = filtered.filter((n) => n.isBreaking);
-  const regular = filtered.filter((n) => !n.isBreaking);
+  // Server already filtered by category+source, so just split into
+  // breaking/regular. We don't have isBreaking from Google News yet —
+  // future enhancement could derive it from publishedAt < 30 min ago.
+  const breaking = articles.filter((n) => n.isBreaking);
+  const regular = articles.filter((n) => !n.isBreaking);
 
   return (
     <div className="space-y-4" dir="rtl">
@@ -206,7 +234,7 @@ export function NewsPage() {
           <p className="text-4xl mb-3">⚠️</p>
           <p>{error}</p>
           <button
-            onClick={() => fetchNews(1, true)}
+            onClick={() => fetchNews(1, true, category, source)}
             className="mt-4 text-xs px-4 py-2 bg-tsua-card border border-tsua-border rounded-full hover:border-tsua-green/40 transition-colors"
           >
             {'נסה שוב'}
@@ -238,7 +266,7 @@ export function NewsPage() {
             ))}
 
             {/* Empty state */}
-            {filtered.length === 0 && (
+            {articles.length === 0 && (
               <div className="text-center py-12 text-tsua-muted">
                 <p className="text-4xl mb-3">📭</p>
                 <p>{'אין חדשות כרגע — נסה שוב בעוד מספר דקות'}</p>
@@ -247,10 +275,10 @@ export function NewsPage() {
           </div>
 
           {/* Load more */}
-          {hasMore && filtered.length > 0 && (
+          {hasMore && articles.length > 0 && (
             <div className="flex justify-center pt-2">
               <button
-                onClick={() => fetchNews(page + 1, false)}
+                onClick={() => fetchNews(page + 1, false, category, source)}
                 disabled={loadingMore}
                 className="text-xs px-6 py-2 bg-tsua-card border border-tsua-border rounded-full text-tsua-muted hover:text-tsua-text hover:border-tsua-green/40 transition-colors disabled:opacity-50"
               >
