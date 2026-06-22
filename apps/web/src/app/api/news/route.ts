@@ -133,67 +133,6 @@ interface OutArticle {
   stockTags: never[];
 }
 
-/**
- * Try to pull a real article summary from the destination page. Google News
- * RSS descriptions are useless — they're just `<a href="..">Title</a>` with
- * the source name, so users were seeing escaped HTML soup under each title
- * instead of an actual preview.
- *
- * Strategy: follow the Google News redirect to the real article, parse
- * `og:description` (or fallback to `<meta name="description">`) from the
- * head. Cached aggressively per URL — once we know an article's preview
- * text, it never changes. 24h cache amortises the cost across users.
- *
- * Failure modes:
- *   - paywall returns thin HTML — og:description usually still present
- *   - bot block — we return empty, UI falls back to no summary
- *   - timeout — same fallback
- */
-async function fetchArticleSummary(googleNewsUrl: string): Promise<string | null> {
-  try {
-    const ctrl = new AbortController();
-    const timeout = setTimeout(() => ctrl.abort(), 3500);
-    const r = await fetch(googleNewsUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        Accept: 'text/html,application/xhtml+xml',
-        'Accept-Language': 'he-IL,he;q=0.9,en;q=0.5',
-      },
-      // Follow the Google redirect to the actual outlet page.
-      redirect: 'follow',
-      signal: ctrl.signal,
-      // 24h cache per URL — descriptions are immutable once published.
-      next: { revalidate: 86400 },
-    });
-    clearTimeout(timeout);
-    if (!r.ok) return null;
-    const html = await r.text();
-    // Look for og:description first (cleanest source), then plain description.
-    // Outlet HTML can be huge — bail after 200KB so a single slow article
-    // doesn't blow up the route's memory.
-    const head = html.slice(0, 200_000);
-    const og = head.match(/<meta\s+(?:property|name)\s*=\s*["']og:description["']\s+content\s*=\s*["']([^"']+)["']/i)
-            ?? head.match(/<meta\s+content\s*=\s*["']([^"']+)["']\s+(?:property|name)\s*=\s*["']og:description["']/i)
-            ?? head.match(/<meta\s+(?:property|name)\s*=\s*["']description["']\s+content\s*=\s*["']([^"']+)["']/i);
-    if (!og?.[1]) return null;
-    const raw = og[1].trim();
-    // Decode common entities and clean up.
-    const decoded = raw
-      .replace(/&amp;/g, '&')
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&quot;/g, '"')
-      .replace(/&#39;/g, "'")
-      .replace(/&nbsp;/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-    if (!decoded || decoded.length < 10) return null;
-    return decoded;
-  } catch {
-    return null;
-  }
-}
-
 /** Fire one Google News RSS query, parse it, and normalize to OutArticle. */
 async function fetchGoogleNewsBatch(query: string): Promise<OutArticle[]> {
   const url = `https://news.google.com/rss/search?q=${encodeURIComponent(query + ' when:14d')}&hl=he&gl=IL&ceid=IL:he`;
@@ -295,19 +234,16 @@ export async function GET(req: NextRequest) {
     const end = start + PAGE_SIZE;
     const sliced = articles.slice(start, end);
 
-    // Enrich each card with a real article preview via og:description.
-    // Parallel fetches with per-URL 24h cache — first user pays once per
-    // article, every subsequent user gets it instantly. Slow articles
-    // (>3.5s) fall back to no summary rather than blocking the response.
-    const enriched = await Promise.all(
-      sliced.map(async (a) => ({
-        ...a,
-        summaryHe: await fetchArticleSummary(a.url),
-      })),
-    );
-
+    // Note: we deliberately don't enrich with article previews. Google News
+    // wraps article URLs in a signed-protobuf indirection layer that doesn't
+    // decode without calling their internal redirect API — fetching the URL
+    // we have just returns the generic Google News interstitial whose
+    // og:description is "...aggregated from sources all over the world".
+    //
+    // The card layout reads cleanly without a summary: brand-colored left
+    // border + Hebrew brand pill + bold title is enough on a list view.
     return NextResponse.json({
-      articles: enriched,
+      articles: sliced,
       page,
       hasMore: end < articles.length,
       totalAvailable: articles.length,
