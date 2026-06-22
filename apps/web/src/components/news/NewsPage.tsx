@@ -251,8 +251,13 @@ export function NewsPage() {
         })}
       </div>
 
-      {/* Sources — secondary filter, smaller pills with brand color hint */}
-      <div className="flex gap-1.5 flex-wrap items-center" style={{ marginTop: '-8px' }}>
+      {/* Sources — secondary filter, smaller pills with brand color hint.
+          Visually separated from the categories above with a thin divider
+          + breathing room so the two rows don't read as one cluttered strip. */}
+      <div
+        className="flex gap-1.5 flex-wrap items-center"
+        style={{ paddingTop: '12px', borderTop: '1px solid rgba(26,40,64,0.5)' }}
+      >
         <span className="text-[10px] text-tsua-muted">מקור:</span>
         {SOURCE_FILTERS.map(({ key, label }) => {
           const active = source === key;

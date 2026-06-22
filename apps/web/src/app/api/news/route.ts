@@ -37,20 +37,22 @@ const CATEGORY_QUERIES: Record<string, string> = {
 };
 
 /**
- * Per-outlet queries that specifically scope to a single source. We run
- * these in PARALLEL with the main category query and merge by URL — Google
- * News's ranking for the general query happens to suppress TheMarker
- * almost entirely (probably because of their paywall), so without a
- * dedicated boost query they barely appear. Same insurance for Ynet's
- * business section.
- *
- * Each outlet gets a topic-flavored query so we pull *finance* coverage
- * specifically, not the general news front page.
+ * Per-outlet site: scopes. Combined with the active category query at
+ * request time so the boost queries actually respect the user's filter —
+ * the previous version ran them with a fixed "שוק ההון OR בורסה" suffix,
+ * which meant clicking "ת"א" still pulled TheMarker articles about Wall
+ * Street, etc.
  */
-const OUTLET_BOOST_QUERIES: Record<string, string> = {
-  themarker: 'site:themarker.com ("שוק ההון" OR "בורסה" OR "מניות" OR "כלכלה")',
-  ynet:      'site:ynet.co.il ("שוק ההון" OR "בורסה" OR "מניות")',
+const OUTLET_BOOST_SITES: Record<string, string> = {
+  themarker: 'site:themarker.com',
+  ynet:      'site:ynet.co.il',
 };
+
+function buildBoostQuery(outletKey: string, category: string): string {
+  const site = OUTLET_BOOST_SITES[outletKey];
+  const categoryTerms = CATEGORY_QUERIES[category] ?? CATEGORY_QUERIES.all;
+  return `${site} ${categoryTerms}`;
+}
 
 // Source filters — Hebrew outlet names that show up in Google News byline.
 const SOURCE_PATTERNS: Record<string, RegExp> = {
@@ -122,13 +124,74 @@ interface OutArticle {
   source: string;
   titleHe: string;
   titleEn: null;
-  summaryHe: string;
+  summaryHe: string | null;
   summaryEn: null;
   url: string;
   imageUrl: null;
   publishedAt: string | null;
   lang: 'he';
   stockTags: never[];
+}
+
+/**
+ * Try to pull a real article summary from the destination page. Google News
+ * RSS descriptions are useless — they're just `<a href="..">Title</a>` with
+ * the source name, so users were seeing escaped HTML soup under each title
+ * instead of an actual preview.
+ *
+ * Strategy: follow the Google News redirect to the real article, parse
+ * `og:description` (or fallback to `<meta name="description">`) from the
+ * head. Cached aggressively per URL — once we know an article's preview
+ * text, it never changes. 24h cache amortises the cost across users.
+ *
+ * Failure modes:
+ *   - paywall returns thin HTML — og:description usually still present
+ *   - bot block — we return empty, UI falls back to no summary
+ *   - timeout — same fallback
+ */
+async function fetchArticleSummary(googleNewsUrl: string): Promise<string | null> {
+  try {
+    const ctrl = new AbortController();
+    const timeout = setTimeout(() => ctrl.abort(), 3500);
+    const r = await fetch(googleNewsUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        Accept: 'text/html,application/xhtml+xml',
+        'Accept-Language': 'he-IL,he;q=0.9,en;q=0.5',
+      },
+      // Follow the Google redirect to the actual outlet page.
+      redirect: 'follow',
+      signal: ctrl.signal,
+      // 24h cache per URL — descriptions are immutable once published.
+      next: { revalidate: 86400 },
+    });
+    clearTimeout(timeout);
+    if (!r.ok) return null;
+    const html = await r.text();
+    // Look for og:description first (cleanest source), then plain description.
+    // Outlet HTML can be huge — bail after 200KB so a single slow article
+    // doesn't blow up the route's memory.
+    const head = html.slice(0, 200_000);
+    const og = head.match(/<meta\s+(?:property|name)\s*=\s*["']og:description["']\s+content\s*=\s*["']([^"']+)["']/i)
+            ?? head.match(/<meta\s+content\s*=\s*["']([^"']+)["']\s+(?:property|name)\s*=\s*["']og:description["']/i)
+            ?? head.match(/<meta\s+(?:property|name)\s*=\s*["']description["']\s+content\s*=\s*["']([^"']+)["']/i);
+    if (!og?.[1]) return null;
+    const raw = og[1].trim();
+    // Decode common entities and clean up.
+    const decoded = raw
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&nbsp;/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (!decoded || decoded.length < 10) return null;
+    return decoded;
+  } catch {
+    return null;
+  }
 }
 
 /** Fire one Google News RSS query, parse it, and normalize to OutArticle. */
@@ -149,14 +212,16 @@ async function fetchGoogleNewsBatch(query: string): Promise<OutArticle[]> {
     const parsed = parseGoogleNewsRss(xml);
     return parsed.map((item, idx) => {
       const { title, source: parsedSource } = splitTitleAndSource(item.title, item.source);
-      const summary = item.description.replace(/<[^>]*>/g, '').trim();
+      // Google News description is always `<a href="..">Title</a>...source.com`
+      // — no actual prose. We populate summaryHe below by fetching each
+      // article's og:description after dedupe+slice (cheaper than 100+ fetches).
       const published = item.pubDate ? new Date(item.pubDate) : null;
       return {
         id: `gnews-${idx}-${Buffer.from(item.link).toString('base64').slice(0, 10)}`,
         source: parsedSource,
         titleHe: title,
         titleEn: null,
-        summaryHe: summary,
+        summaryHe: null,
         summaryEn: null,
         url: item.link,
         imageUrl: null,
@@ -180,14 +245,13 @@ export async function GET(req: NextRequest) {
   const query = CATEGORY_QUERIES[category] ?? CATEGORY_QUERIES.all;
 
   try {
-    // Fire all RSS calls in parallel. The main category query carries most
-    // of the load; the per-outlet boost queries ensure TheMarker and Ynet
-    // are represented (they barely show up in the general query because
-    // Google News deprioritises paywalled / hard-to-crawl outlets).
+    // Fire all RSS calls in parallel. Main category query + per-outlet
+    // boost queries that ALSO carry the category terms — without that,
+    // clicking "ת"א" still pulled TheMarker's Wall Street headlines.
     const batches = await Promise.all([
       fetchGoogleNewsBatch(query),
-      fetchGoogleNewsBatch(OUTLET_BOOST_QUERIES.themarker),
-      fetchGoogleNewsBatch(OUTLET_BOOST_QUERIES.ynet),
+      fetchGoogleNewsBatch(buildBoostQuery('themarker', category)),
+      fetchGoogleNewsBatch(buildBoostQuery('ynet', category)),
     ]);
 
     // Merge + dedupe by URL. Articles with the same link from different
@@ -231,8 +295,19 @@ export async function GET(req: NextRequest) {
     const end = start + PAGE_SIZE;
     const sliced = articles.slice(start, end);
 
+    // Enrich each card with a real article preview via og:description.
+    // Parallel fetches with per-URL 24h cache — first user pays once per
+    // article, every subsequent user gets it instantly. Slow articles
+    // (>3.5s) fall back to no summary rather than blocking the response.
+    const enriched = await Promise.all(
+      sliced.map(async (a) => ({
+        ...a,
+        summaryHe: await fetchArticleSummary(a.url),
+      })),
+    );
+
     return NextResponse.json({
-      articles: sliced,
+      articles: enriched,
       page,
       hasMore: end < articles.length,
       totalAvailable: articles.length,
