@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { he } from 'date-fns/locale';
 
-type NewsSource = 'all' | 'themarker' | 'calcalist' | 'globes' | 'reuters';
+type NewsSource = 'all' | 'themarker' | 'calcalist' | 'globes' | 'bizportal' | 'ynet';
 type NewsCategory = 'all' | 'tase' | 'us' | 'macro' | 'crypto' | 'real-estate';
 
 interface NewsArticle {
@@ -36,15 +36,52 @@ interface ApiArticle {
   stockTags: { stock: { ticker: string; nameEn: string; nameHe: string } }[];
 }
 
+/**
+ * Map a Google News source label to our canonical outlet key + Hebrew name +
+ * brand color. The key drives the colored accent bar; the Hebrew name is
+ * what the user reads — much friendlier than 2-letter initials.
+ */
+interface SourceMeta {
+  key: string;        // canonical short id used for color/styling
+  nameHe: string;     // Hebrew display name
+  color: string;      // brand accent (HEX) for left-border + tint
+}
+
+function classifySource(source: string | null): SourceMeta {
+  const s = (source ?? '').toLowerCase();
+  if (s.includes('themarker') || s.includes('דה') && s.includes('מארקר') || s.includes('הארץ')) {
+    return { key: 'themarker', nameHe: 'TheMarker', color: '#d52b1e' };
+  }
+  if (s.includes('calcalist') || s.includes('כלכליסט')) {
+    return { key: 'calcalist', nameHe: 'כלכליסט', color: '#ff8c00' };
+  }
+  if (s.includes('globes') || s.includes('גלובס')) {
+    return { key: 'globes', nameHe: 'גלובס', color: '#7a3eb2' };
+  }
+  if (s.includes('bizportal') || s.includes('ביזפורטל')) {
+    return { key: 'bizportal', nameHe: 'ביזפורטל', color: '#0099cc' };
+  }
+  if (s.includes('ynet')) {
+    return { key: 'ynet', nameHe: 'Ynet כלכלה', color: '#e63946' };
+  }
+  if (s.includes('מעריב') || s.includes('maariv')) {
+    return { key: 'maariv', nameHe: 'מעריב', color: '#003f87' };
+  }
+  if (s.includes('reuters')) {
+    return { key: 'reuters', nameHe: 'Reuters', color: '#ff8000' };
+  }
+  if (s.includes('investing')) {
+    return { key: 'investing', nameHe: 'Investing.com', color: '#0066b2' };
+  }
+  if (s.includes('bitcoin') || s.includes('ביטקוין')) {
+    return { key: 'bitcoin', nameHe: source ?? 'קריפטו', color: '#f7931a' };
+  }
+  // Long-tail: keep the original name, neutral color.
+  return { key: 'other', nameHe: source ?? 'מקור לא ידוע', color: '#5a7090' };
+}
+
 function sourceToIcon(source: string | null): string {
-  if (!source) return '??';
-  const s = source.toLowerCase();
-  if (s.includes('themarker') || s === 'themarker') return 'TM';
-  if (s.includes('calcalist')) return 'CA';
-  if (s.includes('globes')) return 'GL';
-  if (s.includes('reuters')) return 'RE';
-  // Finnhub fallback sources
-  return source.slice(0, 2).toUpperCase();
+  return classifySource(source).key;
 }
 
 function mapApiArticle(a: ApiArticle): NewsArticle {
@@ -72,7 +109,8 @@ const SOURCE_FILTERS: { key: NewsSource; label: string }[] = [
   { key: 'themarker', label: 'TheMarker' },
   { key: 'calcalist', label: 'כלכליסט' },
   { key: 'globes', label: 'גלובס' },
-  { key: 'reuters', label: 'Reuters' },
+  { key: 'bizportal', label: 'ביזפורטל' },
+  { key: 'ynet', label: 'Ynet' },
 ];
 
 const CATEGORY_FILTERS: { key: NewsCategory; labelHe: string; labelEn: string }[] = [
@@ -173,50 +211,69 @@ export function NewsPage() {
   const regular = articles.filter((n) => !n.isBreaking);
 
   return (
-    <div className="space-y-4" dir="rtl">
+    <div className="space-y-5" dir="rtl">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-tsua-text">
-          {'📰 חדשות שוק'}
-        </h1>
-        <span className="text-xs text-tsua-muted">
-          {'מתעדכן בזמן אמת'}
-          <span className="inline-block w-2 h-2 bg-tsua-green rounded-full mx-1 animate-pulse" />
+      <div className="flex items-end justify-between flex-wrap gap-2">
+        <div>
+          <h1 className="text-2xl font-black text-tsua-text leading-tight">
+            חדשות שוק ההון
+          </h1>
+          <p className="text-xs text-tsua-muted mt-0.5">
+            מאוגד מ-TheMarker, כלכליסט, גלובס, ביזפורטל, Ynet ועוד
+          </p>
+        </div>
+        <span className="text-[11px] text-tsua-muted flex items-center gap-1.5" style={{ background: 'rgba(0,229,176,0.06)', border: '1px solid rgba(0,229,176,0.18)', padding: '4px 10px', borderRadius: '999px' }}>
+          <span className="inline-block w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#00e5b0' }} />
+          חי
         </span>
       </div>
 
-      {/* Source filter */}
-      <div className="flex gap-2 flex-wrap">
-        {SOURCE_FILTERS.map(({ key, label }) => (
-          <button
-            key={key}
-            onClick={() => setSource(key)}
-            className={`text-xs px-3 py-1.5 rounded-full font-medium transition-colors ${
-              source === key
-                ? 'bg-tsua-green text-tsua-bg'
-                : 'bg-tsua-card border border-tsua-border text-tsua-muted hover:text-tsua-text hover:border-tsua-green/40'
-            }`}
-          >
-            {label}
-          </button>
-        ))}
+      {/* Categories — primary filter, large pills */}
+      <div className="flex gap-1.5 flex-wrap">
+        {CATEGORY_FILTERS.map(({ key, labelHe }) => {
+          const active = category === key;
+          return (
+            <button
+              key={key}
+              onClick={() => setCategory(key)}
+              className="text-xs font-bold transition-all"
+              style={{
+                padding: '7px 14px',
+                borderRadius: '999px',
+                background: active ? '#00e5b0' : 'rgba(15,25,41,0.6)',
+                color: active ? '#080d1a' : '#9ab1cc',
+                border: active ? '1px solid transparent' : '1px solid rgba(26,40,64,0.7)',
+              }}
+            >
+              {labelHe}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Category filter */}
-      <div className="flex gap-2 flex-wrap">
-        {CATEGORY_FILTERS.map(({ key, labelHe }) => (
-          <button
-            key={key}
-            onClick={() => setCategory(key)}
-            className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${
-              category === key
-                ? 'bg-tsua-blue/20 text-blue-400 border border-blue-500/40'
-                : 'text-tsua-muted hover:text-tsua-text'
-            }`}
-          >
-            {labelHe}
-          </button>
-        ))}
+      {/* Sources — secondary filter, smaller pills with brand color hint */}
+      <div className="flex gap-1.5 flex-wrap items-center" style={{ marginTop: '-8px' }}>
+        <span className="text-[10px] text-tsua-muted">מקור:</span>
+        {SOURCE_FILTERS.map(({ key, label }) => {
+          const active = source === key;
+          const meta = key !== 'all' ? classifySource(label) : null;
+          return (
+            <button
+              key={key}
+              onClick={() => setSource(key)}
+              className="text-[11px] font-semibold transition-all"
+              style={{
+                padding: '4px 10px',
+                borderRadius: '999px',
+                background: active && meta ? `${meta.color}22` : (active ? 'rgba(0,229,176,0.12)' : 'transparent'),
+                color: active && meta ? meta.color : (active ? '#00e5b0' : '#5a7090'),
+                border: `1px solid ${active && meta ? `${meta.color}55` : (active ? 'rgba(0,229,176,0.3)' : 'rgba(26,40,64,0.6)')}`,
+              }}
+            >
+              {label}
+            </button>
+          );
+        })}
       </div>
 
       {/* Loading skeletons */}
@@ -311,43 +368,80 @@ function SkeletonCard() {
   );
 }
 
+// More than 24h old gets ⚠️ on a financial news feed — stocks move fast,
+// stale headlines are worse than no headlines.
+const STALE_ARTICLE_MS = 24 * 60 * 60 * 1000;
+
 function NewsCard({ article }: { article: NewsArticle }) {
+  const meta = classifySource(article.source);
   const timeAgo = formatDistanceToNow(article.publishedAt, {
     addSuffix: true,
     locale: he,
   });
+  const isStale = Date.now() - article.publishedAt.getTime() > STALE_ARTICLE_MS;
 
   return (
     <a
       href={article.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="block bg-tsua-card border border-tsua-border rounded-2xl p-4 hover:border-tsua-green/40 transition-all hover:bg-tsua-card/80 group"
+      className="block group transition-all hover:translate-x-[-2px]"
+      style={{
+        background: 'rgba(15,25,41,0.7)',
+        border: '1px solid rgba(26,40,64,0.7)',
+        borderInlineStartWidth: '3px',
+        borderInlineStartColor: meta.color,
+        borderRadius: '14px',
+        padding: '14px 16px',
+      }}
     >
-      <div className="flex gap-3">
-        {/* Source badge */}
-        <div className={`w-9 h-9 rounded-xl ${SOURCE_COLORS[article.sourceIcon] || 'bg-tsua-border'} flex items-center justify-center text-white text-xs font-bold shrink-0`}>
-          {article.sourceIcon}
+      <div className="flex items-start gap-3">
+        {/* Outlet badge — Hebrew brand name on a brand-tinted pill, not a
+            cryptic 2-letter monogram. Source identity is half the trust signal
+            on a financial news feed. */}
+        <div className="flex flex-col items-start gap-1 shrink-0" style={{ minWidth: '88px' }}>
+          <span
+            className="text-[11px] font-bold px-2 py-0.5 rounded-md"
+            style={{
+              background: `${meta.color}22`,
+              color: meta.color,
+              border: `1px solid ${meta.color}55`,
+            }}
+          >
+            {meta.nameHe}
+          </span>
+          <span
+            className="text-[10px] flex items-center gap-1"
+            style={{ color: isStale ? '#ffd166' : 'rgba(154,177,204,0.7)' }}
+            title={isStale ? `הכתבה מ-${article.publishedAt.toLocaleString('he-IL')}` : undefined}
+          >
+            {isStale && <span>⚠️</span>}
+            {timeAgo}
+          </span>
         </div>
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1 flex-wrap">
-            <span className="text-xs text-tsua-muted">{article.source}</span>
+          <h3
+            className="text-[14px] font-bold leading-snug text-tsua-text group-hover:text-tsua-accent transition-colors"
+            style={{ marginBottom: article.summary ? '4px' : 0 }}
+          >
+            {article.title}
             {article.ticker && (
-              <span className="text-xs bg-tsua-green/10 text-tsua-green px-2 py-0.5 rounded-md font-mono">
+              <span
+                className="text-[11px] mx-1.5 px-1.5 py-0.5 rounded font-mono align-middle"
+                style={{ background: 'rgba(0,229,176,0.1)', color: '#00e5b0' }}
+                dir="ltr"
+              >
                 ${article.ticker}
               </span>
             )}
-            <span className="text-xs text-tsua-muted">{timeAgo}</span>
-          </div>
-
-          <h3 className="text-sm font-semibold text-tsua-text leading-snug mb-1 group-hover:text-tsua-green transition-colors">
-            {article.title}
           </h3>
 
-          <p className="text-xs text-tsua-muted leading-relaxed line-clamp-2">
-            {article.summary}
-          </p>
+          {article.summary && (
+            <p className="text-[12px] leading-relaxed line-clamp-2 text-tsua-muted">
+              {article.summary}
+            </p>
+          )}
         </div>
       </div>
     </a>

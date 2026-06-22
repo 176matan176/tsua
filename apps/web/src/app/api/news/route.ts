@@ -36,6 +36,22 @@ const CATEGORY_QUERIES: Record<string, string> = {
   'real-estate': '("שוק הדיור" OR "מחירי דירות" OR "נדל\\"ן ישראל" OR "משכנתאות")',
 };
 
+/**
+ * Per-outlet queries that specifically scope to a single source. We run
+ * these in PARALLEL with the main category query and merge by URL — Google
+ * News's ranking for the general query happens to suppress TheMarker
+ * almost entirely (probably because of their paywall), so without a
+ * dedicated boost query they barely appear. Same insurance for Ynet's
+ * business section.
+ *
+ * Each outlet gets a topic-flavored query so we pull *finance* coverage
+ * specifically, not the general news front page.
+ */
+const OUTLET_BOOST_QUERIES: Record<string, string> = {
+  themarker: 'site:themarker.com ("שוק ההון" OR "בורסה" OR "מניות" OR "כלכלה")',
+  ynet:      'site:ynet.co.il ("שוק ההון" OR "בורסה" OR "מניות")',
+};
+
 // Source filters — Hebrew outlet names that show up in Google News byline.
 const SOURCE_PATTERNS: Record<string, RegExp> = {
   themarker:    /TheMarker|דה.מארקר|הארץ/i,
@@ -115,41 +131,24 @@ interface OutArticle {
   stockTags: never[];
 }
 
-export async function GET(req: NextRequest) {
-  const sp = req.nextUrl.searchParams;
-  const category = (sp.get('category') ?? 'all').toLowerCase();
-  const source = (sp.get('source') ?? 'all').toLowerCase();
-  const page = Math.max(1, parseInt(sp.get('page') ?? '1', 10) || 1);
-  const PAGE_SIZE = 25;
-
-  const query = CATEGORY_QUERIES[category] ?? CATEGORY_QUERIES.all;
-  // Google News supports `when:Nd` to restrict to the last N days — 14 keeps
-  // the feed lively without dragging in two-month-old stories on quiet days.
+/** Fire one Google News RSS query, parse it, and normalize to OutArticle. */
+async function fetchGoogleNewsBatch(query: string): Promise<OutArticle[]> {
   const url = `https://news.google.com/rss/search?q=${encodeURIComponent(query + ' when:14d')}&hl=he&gl=IL&ceid=IL:he`;
-
   try {
     const res = await fetch(url, {
       headers: {
-        // RSS is browser-agnostic but some CDNs reject default User-Agents.
-        // Plain Mozilla string is the safest. Accept negotiates RSS/XML.
         'User-Agent': 'Mozilla/5.0 (compatible; TsuaBot/1.0; +https://tsua-rho.vercel.app)',
         Accept: 'application/rss+xml, application/xml, text/xml',
       },
-      // Cache the Google call for 5 minutes — Google publishes ~once a minute
-      // anyway, and this protects us if a popular widget keeps polling.
+      // 5-minute cache shared across users — Google publishes ~once a minute
+      // anyway, and this caps the per-batch network cost.
       next: { revalidate: 300 },
     });
-
-    if (!res.ok) {
-      return NextResponse.json({ articles: [], page, hasMore: false, error: `upstream ${res.status}` }, { status: 502 });
-    }
-
+    if (!res.ok) return [];
     const xml = await res.text();
     const parsed = parseGoogleNewsRss(xml);
-
-    let articles: OutArticle[] = parsed.map((item, idx) => {
+    return parsed.map((item, idx) => {
       const { title, source: parsedSource } = splitTitleAndSource(item.title, item.source);
-      // Strip HTML from description (Google sometimes embeds anchor tags).
       const summary = item.description.replace(/<[^>]*>/g, '').trim();
       const published = item.pubDate ? new Date(item.pubDate) : null;
       return {
@@ -162,10 +161,54 @@ export async function GET(req: NextRequest) {
         url: item.link,
         imageUrl: null,
         publishedAt: published?.toISOString() ?? null,
-        lang: 'he',
+        lang: 'he' as const,
         stockTags: [],
       };
     });
+  } catch {
+    return [];
+  }
+}
+
+export async function GET(req: NextRequest) {
+  const sp = req.nextUrl.searchParams;
+  const category = (sp.get('category') ?? 'all').toLowerCase();
+  const source = (sp.get('source') ?? 'all').toLowerCase();
+  const page = Math.max(1, parseInt(sp.get('page') ?? '1', 10) || 1);
+  const PAGE_SIZE = 25;
+
+  const query = CATEGORY_QUERIES[category] ?? CATEGORY_QUERIES.all;
+
+  try {
+    // Fire all RSS calls in parallel. The main category query carries most
+    // of the load; the per-outlet boost queries ensure TheMarker and Ynet
+    // are represented (they barely show up in the general query because
+    // Google News deprioritises paywalled / hard-to-crawl outlets).
+    const batches = await Promise.all([
+      fetchGoogleNewsBatch(query),
+      fetchGoogleNewsBatch(OUTLET_BOOST_QUERIES.themarker),
+      fetchGoogleNewsBatch(OUTLET_BOOST_QUERIES.ynet),
+    ]);
+
+    // Merge + dedupe by URL. Articles with the same link from different
+    // queries are the same article, so first-wins (keeps the category
+    // query's article ID).
+    const seen = new Set<string>();
+    let articles: OutArticle[] = [];
+    for (const batch of batches) {
+      for (const a of batch) {
+        if (seen.has(a.url)) continue;
+        seen.add(a.url);
+        articles.push(a);
+      }
+    }
+
+    if (articles.length === 0) {
+      return NextResponse.json(
+        { articles: [], page, hasMore: false, error: 'upstream_empty' },
+        { status: 502 },
+      );
+    }
 
     // Optional source filter — applied AFTER parsing so categories+sources
     // can be combined freely without doubling our query count.
@@ -176,8 +219,8 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // Sort by publication time DESC (Google already does this but be defensive
-    // — sometimes the RSS has a stale top item from the cache layer).
+    // Sort by publication time DESC (Google already does this per-batch
+    // but the merge interleaves outlet orderings).
     articles.sort((a, b) => {
       const at = a.publishedAt ? Date.parse(a.publishedAt) : 0;
       const bt = b.publishedAt ? Date.parse(b.publishedAt) : 0;
