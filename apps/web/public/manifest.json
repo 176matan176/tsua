@@ -1,11 +1,12 @@
 {
+  "id": "/?source=pwa",
   "name": "תשואה",
   "short_name": "תשואה",
   "description": "הרשת החברתית הראשונה לשוק ההון הישראלי — שתף ניתוחים, עקוב אחר מניות, קבל התראות בזמן אמת",
-  "start_url": "/",
+  "start_url": "/?source=pwa",
   "scope": "/",
   "display": "standalone",
-  "orientation": "portrait-primary",
+  "orientation": "any",
   "background_color": "#060b16",
   "theme_color": "#00e5b0",
   "lang": "he",
@@ -16,13 +17,25 @@
       "src": "/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "/icons/icon-180.png",
@@ -36,21 +49,21 @@
       "name": "פיד",
       "short_name": "פיד",
       "description": "הפיד הראשי",
-      "url": "/",
+      "url": "/?source=pwa",
       "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "שוק",
       "short_name": "שוק",
       "description": "נתוני שוק בזמן אמת",
-      "url": "/markets",
+      "url": "/markets?source=pwa",
       "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "מעקב",
       "short_name": "מעקב",
       "description": "רשימת המעקב שלי",
-      "url": "/watchlist",
+      "url": "/watchlist?source=pwa",
       "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
     }
   ]

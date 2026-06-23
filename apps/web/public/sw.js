@@ -9,7 +9,7 @@
 // Cache keys are namespaced by VERSION below. Bump the version when the
 // caching logic itself changes — content URLs that include hashes auto-
 // invalidate without a version bump because each new file lands at a new path.
-const VERSION    = 'tsua-v2-2026-04-26';
+const VERSION    = 'tsua-v3-2026-06-22';
 const SHELL      = `${VERSION}-shell`;
 const STATIC     = `${VERSION}-static`;
 const PRECACHE   = ['/', '/manifest.json', '/icons/icon-192.png', '/icons/icon-512.png'];
