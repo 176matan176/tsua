@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchQuotes } from '@/lib/quotes';
 
-// Per-request fresh — clients poll this every 30s for live tickers and
-// expect each poll to return current prices. The expensive part (Yahoo /
-// Finnhub network calls) is cached for 60s inside fetchQuotes via Next.js
-// Data Cache, so we don't double-hit upstream APIs.
+// Per-request fresh — clients poll this every 5s during market hours.
+// The upstream Yahoo/Finnhub call is cached for 10s (was 60s) so prices
+// genuinely tick once every ~10s rather than appearing frozen for a
+// minute at a time. 10s is short enough to feel live and long enough
+// that one user's polling doesn't hammer Finnhub's 60 req/min cap —
+// each ticker hits upstream at most 6x/min even under heavy traffic.
 export const dynamic = 'force-dynamic';
+
+const UPSTREAM_CACHE_SECONDS = 10;
 
 // GET /api/stocks/batch?symbols=TEVA,NVDA,AAPL
 //
@@ -16,7 +20,7 @@ export async function GET(req: NextRequest) {
   if (!symbols) return NextResponse.json({});
 
   const tickers = [...new Set(symbols.split(',').map(s => s.trim().toUpperCase()))].slice(0, 20);
-  const quotes = await fetchQuotes(tickers);
+  const quotes = await fetchQuotes(tickers, UPSTREAM_CACHE_SECONDS);
 
   const data: Record<string, { price: number; change: number; changePercent: number }> = {};
   tickers.forEach((ticker, i) => {
