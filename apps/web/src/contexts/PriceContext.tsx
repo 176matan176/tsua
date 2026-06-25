@@ -105,6 +105,48 @@ export function PriceProvider({ children }: { children: React.ReactNode }) {
     // changes, which the ref alone could never communicate to the effect.
   }, [connected, subVersion]);
 
+  /**
+   * Polling cadence that approximates a "live" feel without paying for a
+   * real-time data feed. Adapts to whether US/TASE markets are actively
+   * trading right now:
+   *
+   *   - Regular session (US 14:30-21:00 UTC, TASE 06:30-15:30 UTC): 5s
+   *   - Extended hours (US pre/post, +-2h around the bell):          10s
+   *   - Overnight + weekends:                                        30s
+   *
+   * The user perception of "Yahoo Finance feels live" comes from the UI
+   * ticking + flashing, not from sub-second feed accuracy. 5s polling +
+   * a clear green/red flash on each change reads identically to most users
+   * vs an actual WebSocket-based system.
+   *
+   * The internal /api/stocks/batch cache is 60s so even at 5s polling we
+   * make at most ~12 cache lookups/min upstream — most resolve from cache.
+   */
+  function getPollIntervalMs(): number {
+    const now = new Date();
+    const day = now.getUTCDay(); // 0=Sun, 6=Sat
+    if (day === 0 || day === 6) return 30_000; // weekend — markets closed
+
+    const totalMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
+    // US regular session ≈ 14:30-21:00 UTC (DST-adjusted, ignoring half-hour
+    // DST drift — 5s during the bigger window is fine even off by 30 min)
+    const usOpen = 14 * 60 + 30;
+    const usClose = 21 * 60;
+    // TASE regular session ≈ 06:30-15:30 UTC
+    const taseOpen = 6 * 60 + 30;
+    const taseClose = 15 * 60 + 30;
+    if ((totalMinutes >= usOpen && totalMinutes <= usClose)
+        || (totalMinutes >= taseOpen && totalMinutes <= taseClose)) {
+      return 5_000;
+    }
+    // US extended hours (pre 09:00-14:30, after 21:00-01:00) — still active
+    if ((totalMinutes >= 9 * 60 && totalMinutes < usOpen)
+        || (totalMinutes > usClose && totalMinutes <= 23 * 60 + 59)) {
+      return 10_000;
+    }
+    return 30_000;
+  }
+
   // Fallback polling when the realtime socket isn't connected.
   //
   // History: this used to require NEXT_PUBLIC_API_URL pointing at an external
@@ -169,22 +211,67 @@ export function PriceProvider({ children }: { children: React.ReactNode }) {
             : null;
           next[ticker] = { ...priceData, flash };
           if (flash) {
+            // 1200ms flash window — long enough that a user looking at the
+            // bar will catch the green/red blink before it fades.
             setTimeout(() => {
               setPrices(p => p[ticker] ? { ...p, [ticker]: { ...p[ticker], flash: null } } : p);
-            }, 800);
+            }, 1200);
           }
         });
         return next;
       });
     }
 
-    // First poll fires immediately so the bar doesn't sit empty for 30s on
-    // a fresh page load. Then the interval keeps it warm.
+    // Recursive setTimeout (not setInterval) so each tick re-evaluates the
+    // cadence — a tab kept open as the bell rings should automatically speed
+    // up from 30s to 5s without a page reload, and slow back down at close.
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
+    function scheduleNext() {
+      if (typeof document !== 'undefined' && document.visibilityState === 'hidden') {
+        // Tab is in the background — pause polling to save battery and avoid
+        // hammering Vercel for nothing. visibilitychange handler resumes us.
+        return;
+      }
+      const ms = getPollIntervalMs();
+      timeoutId = setTimeout(async () => {
+        await poll();
+        scheduleNext();
+      }, ms);
+    }
+
+    function clearScheduled() {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+    }
+
+    function onVisibility() {
+      if (document.visibilityState === 'visible') {
+        // Tab back in focus — refresh immediately so the user sees current
+        // prices instead of whatever was on screen when they left, then
+        // resume normal cadence.
+        clearScheduled();
+        poll();
+        scheduleNext();
+      } else {
+        clearScheduled();
+      }
+    }
+
+    // First poll fires immediately so the bar doesn't sit empty waiting.
     poll();
-    pollIntervalRef.current = setInterval(poll, 30000);
+    scheduleNext();
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', onVisibility);
+    }
 
     return () => {
-      if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+      clearScheduled();
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('visibilitychange', onVisibility);
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connected, subVersion]);
