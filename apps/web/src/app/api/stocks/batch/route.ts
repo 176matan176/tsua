@@ -9,7 +9,9 @@ import { fetchQuotes } from '@/lib/quotes';
 // each ticker hits upstream at most 6x/min even under heavy traffic.
 export const dynamic = 'force-dynamic';
 
-const UPSTREAM_CACHE_SECONDS = 10;
+// 5s upstream — paired with 2s client polling during market hours, prices
+// genuinely tick every 5-10s, matching Yahoo Finance / Apple Stocks feel.
+const UPSTREAM_CACHE_SECONDS = 5;
 
 // GET /api/stocks/batch?symbols=TEVA,NVDA,AAPL
 //

@@ -11,6 +11,7 @@ import { HotStocks } from './HotStocks';
 import { SectorHeatmap as LiveSectorHeatmap } from './SectorHeatmap';
 import { MacroWidget } from './MacroWidget';
 import { useLocale } from 'next-intl';
+import { useLivePrice } from '@/contexts/PriceContext';
 
 interface IndexData {
   symbol: string; nameHe: string; nameEn: string;
@@ -53,9 +54,18 @@ function pct(n: number) {
 }
 
 function IndexCard({ idx }: { idx: IndexData }) {
-  // No-data path: show neutral card with "—" instead of pretending a 0-priced
-  // index moved 0%. Keeps the grid layout stable while signalling honestly.
-  const hasData = idx.price !== null && idx.changePercent !== null;
+  // Overlay live price ticks from the polling context on top of whatever the
+  // /api/markets snapshot returned. When the polling is active (every 2s
+  // during market hours) the card will tick and flash green/red in lockstep
+  // with the LiveMarketBar above, instead of sitting frozen between the
+  // page-level 60s refresh ticks.
+  const live = useLivePrice(idx.symbol);
+  const effectivePrice = live?.price ?? idx.price;
+  const effectiveChange = live?.change ?? idx.change;
+  const effectivePct    = live?.changePercent ?? idx.changePercent;
+  const flash = live?.flash ?? null;
+
+  const hasData = effectivePrice !== null && effectivePct !== null;
   if (!hasData) {
     return (
       <div
@@ -83,15 +93,22 @@ function IndexCard({ idx }: { idx: IndexData }) {
     );
   }
 
-  const changePct = idx.changePercent!;
+  const changePct = effectivePct!;
   const isUp = changePct >= 0;
+  // Tick flash overlays a saturated tint on top of the card's normal styling
+  // for 1.5s after each price change. Pure inline transition — when `flash`
+  // flips back to null, the background fades back through CSS.
+  const flashBg = flash === 'up'
+    ? 'rgba(0,229,176,0.18)'
+    : flash === 'down' ? 'rgba(255,77,106,0.18)' : 'rgba(13,20,36,0.8)';
   return (
     <div
-      className="rounded-2xl p-4 transition-all hover:scale-[1.02]"
+      className="rounded-2xl p-4 hover:scale-[1.02]"
       style={{
-        background: 'rgba(13,20,36,0.8)',
+        background: flashBg,
         border: `1px solid ${isUp ? 'rgba(0,229,176,0.2)' : 'rgba(255,77,106,0.2)'}`,
         boxShadow: isUp ? '0 4px 20px rgba(0,229,176,0.05)' : '0 4px 20px rgba(255,77,106,0.05)',
+        transition: 'background 1.5s ease-out, transform 0.15s ease-out',
       }}
     >
       <div className="flex items-start justify-between mb-3">
@@ -116,15 +133,84 @@ function IndexCard({ idx }: { idx: IndexData }) {
       </div>
       <div
         className="text-2xl font-black font-mono"
-        style={{ color: isUp ? '#00e5b0' : '#ff4d6a' }}
+        style={{
+          color: flash === 'up' ? '#00e5b0' : flash === 'down' ? '#ff4d6a' : (isUp ? '#00e5b0' : '#ff4d6a'),
+          transition: 'color 0.3s ease-out',
+        }}
         dir="ltr"
       >
-        {idx.currency === 'ILS' ? '₪' : '$'}{idx.price!.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        {idx.currency === 'ILS' ? '₪' : '$'}{effectivePrice!.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
       </div>
       <div className="text-xs font-semibold mt-1" style={{ color: isUp ? '#00e5b0' : '#ff4d6a' }} dir="ltr">
-        {isUp ? '+' : ''}{(idx.change ?? 0).toFixed(2)}
+        {isUp ? '+' : ''}{(effectiveChange ?? 0).toFixed(2)}
       </div>
     </div>
+  );
+}
+
+/**
+ * Single row in the gainers / losers table — extracted so it can call
+ * useLivePrice() for each ticker without violating React's rules-of-hooks
+ * (would happen if useLivePrice was called inline inside the parent's map).
+ *
+ * Falls back to the snapshot from /api/markets when the live polling
+ * context hasn't delivered a quote yet.
+ */
+function StockTableRow({ row, isLast, rank }: { row: StockRow; isLast: boolean; rank: number }) {
+  const live = useLivePrice(row.symbol);
+  const price = live?.price ?? row.price;
+  const pct   = live?.changePercent ?? row.changePercent;
+  const flash = live?.flash ?? null;
+  const isUp = pct >= 0;
+  const rowBg = flash === 'up'
+    ? 'rgba(0,229,176,0.10)'
+    : flash === 'down' ? 'rgba(255,77,106,0.10)' : 'transparent';
+
+  return (
+    <Link
+      href={`/he/stocks/${row.symbol}`}
+      className="flex items-center gap-3 px-4 py-3 hover:bg-white/3 group"
+      style={{
+        borderBottom: isLast ? 'none' : '1px solid rgba(26,40,64,0.35)',
+        background: rowBg,
+        transition: 'background 1.5s ease-out',
+      }}
+    >
+      <span className="text-xs text-tsua-muted w-4 shrink-0">{rank}</span>
+      <div
+        className="w-9 h-9 rounded-xl flex items-center justify-center font-black text-xs shrink-0"
+        style={{ background: isUp ? 'rgba(0,229,176,0.08)' : 'rgba(255,77,106,0.08)', color: isUp ? '#00e5b0' : '#ff4d6a', border: `1px solid ${isUp ? 'rgba(0,229,176,0.2)' : 'rgba(255,77,106,0.2)'}` }}
+      >
+        {row.symbol.slice(0, 3)}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-bold text-tsua-text group-hover:text-tsua-accent transition-colors" dir="ltr">
+          ${row.symbol}
+        </div>
+        <div className="text-[10px] text-tsua-muted truncate">
+          {row.nameHe} · {row.exchange}
+        </div>
+      </div>
+      <div className="text-end shrink-0">
+        <div
+          className="text-sm font-bold font-mono"
+          dir="ltr"
+          style={{
+            color: flash === 'up' ? '#00e5b0' : flash === 'down' ? '#ff4d6a' : '#e8f0ff',
+            transition: 'color 0.3s ease-out',
+          }}
+        >
+          ${price.toFixed(2)}
+        </div>
+        <div
+          className="text-xs font-bold"
+          dir="ltr"
+          style={{ color: isUp ? '#00e5b0' : '#ff4d6a' }}
+        >
+          {isUp ? '▲' : '▼'} {Math.abs(pct).toFixed(2)}%
+        </div>
+      </div>
+    </Link>
   );
 }
 
@@ -145,45 +231,14 @@ function StockTable({ stocks, type }: { stocks: StockRow[]; type: 'gainers' | 'l
         </h3>
       </div>
       <div>
-        {stocks.map((s, i) => {
-          const isUp = s.changePercent >= 0;
-          return (
-            <Link
-              key={s.symbol}
-              href={`/he/stocks/${s.symbol}`}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-white/3 transition-colors group"
-              style={{ borderBottom: i < stocks.length - 1 ? '1px solid rgba(26,40,64,0.35)' : 'none' }}
-            >
-              <span className="text-xs text-tsua-muted w-4 shrink-0">{i + 1}</span>
-              <div
-                className="w-9 h-9 rounded-xl flex items-center justify-center font-black text-xs shrink-0"
-                style={{ background: isUp ? 'rgba(0,229,176,0.08)' : 'rgba(255,77,106,0.08)', color: isUp ? '#00e5b0' : '#ff4d6a', border: `1px solid ${isUp ? 'rgba(0,229,176,0.2)' : 'rgba(255,77,106,0.2)'}` }}
-              >
-                {s.symbol.slice(0, 3)}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-bold text-tsua-text group-hover:text-tsua-accent transition-colors" dir="ltr">
-                  ${s.symbol}
-                </div>
-                <div className="text-[10px] text-tsua-muted truncate">
-                  {s.nameHe} · {s.exchange}
-                </div>
-              </div>
-              <div className="text-end shrink-0">
-                <div className="text-sm font-bold font-mono text-tsua-text" dir="ltr">
-                  ${s.price.toFixed(2)}
-                </div>
-                <div
-                  className="text-xs font-bold"
-                  dir="ltr"
-                  style={{ color: isUp ? '#00e5b0' : '#ff4d6a' }}
-                >
-                  {isUp ? '▲' : '▼'} {Math.abs(s.changePercent).toFixed(2)}%
-                </div>
-              </div>
-            </Link>
-          );
-        })}
+        {stocks.map((s, i) => (
+          <StockTableRow
+            key={s.symbol}
+            row={s}
+            isLast={i === stocks.length - 1}
+            rank={i + 1}
+          />
+        ))}
       </div>
     </div>
   );

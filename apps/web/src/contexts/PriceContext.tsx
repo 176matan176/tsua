@@ -137,12 +137,12 @@ export function PriceProvider({ children }: { children: React.ReactNode }) {
     const taseClose = 15 * 60 + 30;
     if ((totalMinutes >= usOpen && totalMinutes <= usClose)
         || (totalMinutes >= taseOpen && totalMinutes <= taseClose)) {
-      return 5_000;
+      return 2_000; // 2s — "pulse like Yahoo Finance" feel
     }
     // US extended hours (pre 09:00-14:30, after 21:00-01:00) — still active
     if ((totalMinutes >= 9 * 60 && totalMinutes < usOpen)
         || (totalMinutes > usClose && totalMinutes <= 23 * 60 + 59)) {
-      return 10_000;
+      return 5_000;
     }
     return 30_000;
   }
@@ -211,11 +211,12 @@ export function PriceProvider({ children }: { children: React.ReactNode }) {
             : null;
           next[ticker] = { ...priceData, flash };
           if (flash) {
-            // 1200ms flash window — long enough that a user looking at the
-            // bar will catch the green/red blink before it fades.
+            // 1500ms flash window — paired with the more saturated background
+            // tint in consumer components, gives the price a clear "pulse"
+            // that the eye reliably catches even when scanning a busy list.
             setTimeout(() => {
               setPrices(p => p[ticker] ? { ...p, [ticker]: { ...p[ticker], flash: null } } : p);
-            }, 1200);
+            }, 1500);
           }
         });
         return next;
