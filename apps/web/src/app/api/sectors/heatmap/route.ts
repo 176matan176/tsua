@@ -9,6 +9,26 @@ export const revalidate = 60;
 const FINNHUB_KEY = process.env.FINNHUB_API_KEY;
 
 /**
+ * Tickers where Finnhub's profile2 endpoint reliably returns the cap in
+ * the local listing currency (DKK, TWD, EUR…) without USD conversion.
+ * For these we skip the live fetch and use the hardcoded MARKET_CAPS
+ * value directly — a manually-maintained snapshot beats a 10x-wrong
+ * live value every time.
+ */
+const FINNHUB_FOREIGN_CAP_BUGGY = new Set([
+  'TSM',   // TWD instead of USD ⇒ \$62T
+  'NVO',   // DKK instead of USD ⇒ \$1.4T
+  'ASML',  // EUR not USD ⇒ inflated
+  'BABA',  // CNY not USD
+  'BIDU',  // CNY not USD
+  'TM',    // JPY not USD
+  'SONY',  // JPY not USD
+  'NU',    // BRL not USD
+  'MELI',  // BRL not USD (sometimes)
+  'SHOP',  // CAD not USD (sometimes)
+]);
+
+/**
  * Fetch a single ticker's market cap from Finnhub's profile2 endpoint.
  * Cached 24h via Next.js Data Cache so we only hit Finnhub once per ticker
  * per day — well within their 60 req/min limit even on cold-cache startup
@@ -22,6 +42,11 @@ const FINNHUB_KEY = process.env.FINNHUB_API_KEY;
  * live; we now do the same.
  */
 async function fetchMarketCap(ticker: string): Promise<number> {
+  // Foreign ADRs where we know Finnhub's value is wrong — skip live fetch.
+  if (FINNHUB_FOREIGN_CAP_BUGGY.has(ticker.toUpperCase())) {
+    return MARKET_CAPS[ticker.toUpperCase()] ?? 0;
+  }
+
   if (FINNHUB_KEY) {
     try {
       const r = await fetch(

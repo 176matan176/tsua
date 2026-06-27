@@ -39,6 +39,10 @@ const ZERO: Quote = { c: 0, d: 0, dp: 0, o: 0, h: 0, l: 0, pc: 0, v: 0 };
  */
 const YAHOO_SYMBOL_ALIASES: Record<string, string> = {
   'TA125.TA': '^TA125.TA',
+  // Berkshire Hathaway B-shares: Finnhub uses BRK.B, Yahoo wants BRK-B.
+  // Without this, BRK.B 404s on Yahoo and drops out of the sector map.
+  'BRK.B': 'BRK-B',
+  'BRK.A': 'BRK-A',
 };
 
 /**
