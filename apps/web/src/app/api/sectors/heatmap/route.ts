@@ -16,16 +16,21 @@ const FINNHUB_KEY = process.env.FINNHUB_API_KEY;
  * live value every time.
  */
 const FINNHUB_FOREIGN_CAP_BUGGY = new Set([
-  'TSM',   // TWD instead of USD ⇒ \$62T
-  'NVO',   // DKK instead of USD ⇒ \$1.4T
-  'ASML',  // EUR not USD ⇒ inflated
-  'BABA',  // CNY not USD
-  'BIDU',  // CNY not USD
-  'TM',    // JPY not USD
-  'SONY',  // JPY not USD
-  'NU',    // BRL not USD
-  'MELI',  // BRL not USD (sometimes)
-  'SHOP',  // CAD not USD (sometimes)
+  // Foreign ADRs where Finnhub returns the cap in local listing currency
+  // (DKK, TWD, EUR…) without converting to USD.
+  'TSM',   // TWD ⇒ \$62T
+  'NVO',   // DKK ⇒ \$1.4T
+  'ASML',  // EUR ⇒ inflated
+  'BABA',  // CNY
+  'BIDU',  // CNY
+  'TM',    // JPY
+  'SONY',  // JPY
+  'NU',    // BRL
+  'MELI',  // BRL (sometimes)
+  'SHOP',  // CAD (sometimes)
+  // US-listed but Finnhub returns implausible 10x values — likely a
+  // shares-outstanding parsing error in their profile2 data.
+  'MU',    // \$1.27T live vs \$130B real (Micron)
 ]);
 
 /**
