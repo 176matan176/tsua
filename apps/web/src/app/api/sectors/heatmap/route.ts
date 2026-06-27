@@ -31,9 +31,19 @@ async function fetchMarketCap(ticker: string): Promise<number> {
       if (r.ok) {
         const j = await r.json();
         const capMillions = Number(j?.marketCapitalization);
-        // Finnhub returns the cap in millions of USD. Skip suspiciously
-        // small values (some delisted entries return 0 or 1).
-        if (Number.isFinite(capMillions) && capMillions > 100) {
+        // Finnhub returns the cap in millions of USD — usually. For foreign-
+        // listed ADRs (TSM, NVO, ASML, NU) it occasionally returns the cap in
+        // the LOCAL currency without converting (TSM came back as ~32M ×
+        // 1_000_000 = \$32T, which would put it above the entire S&P 500
+        // combined). Sanity-window the value to [\$100M, \$8T]; anything
+        // outside falls back to the hardcoded table which we know is sane.
+        const MIN_CAP_MILLIONS = 100;
+        const MAX_CAP_MILLIONS = 8_000_000; // \$8T — bigger than Apple, smaller than Finnhub's foreign-ADR bug
+        if (
+          Number.isFinite(capMillions)
+          && capMillions >= MIN_CAP_MILLIONS
+          && capMillions <= MAX_CAP_MILLIONS
+        ) {
           return capMillions * 1_000_000;
         }
       }
