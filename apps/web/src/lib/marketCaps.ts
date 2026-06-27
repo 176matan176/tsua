@@ -115,6 +115,10 @@ export const MARKET_CAPS: Record<string, number> = {
   EA:      40_000_000_000, TTWO:   30_000_000_000,
   // Communication additions
   WBD:    25_000_000_000, SPOT:   90_000_000_000, ROKU:   15_000_000_000,
+  // SpaceX (IPO 2026-06-12 on NASDAQ). Conservative fallback if Finnhub
+  // returns a buggy value; live cap should be ~\$500B-\$2T depending on
+  // post-IPO trading.
+  SPCX:  500_000_000_000,
 };
 
 export function getMarketCap(ticker: string): number {

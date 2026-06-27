@@ -150,7 +150,12 @@ export const SECTORS: Sector[] = [
     etf: 'XLC',
     color: '#06b6d4',
     description: 'מדיה, רשתות חברתיות, טלקום — מ-Google ועד Netflix.',
-    top: ['META', 'GOOGL', 'NFLX', 'DIS', 'T', 'TMUS', 'VZ', 'CMCSA', 'CHTR', 'EA', 'TTWO', 'WBD', 'SPOT', 'ROKU'],
+    top: [
+      'META', 'GOOGL', 'NFLX', 'DIS', 'T', 'TMUS', 'VZ', 'CMCSA', 'CHTR', 'EA', 'TTWO', 'WBD', 'SPOT', 'ROKU',
+      // SpaceX IPO'd 2026-06-12; Finnhub classifies under Telecommunication
+      // (Starlink is the revenue driver). User pointed out it was missing.
+      'SPCX',
+    ],
   },
 ];
 
