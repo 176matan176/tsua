@@ -29,7 +29,16 @@ export const SECTORS: Sector[] = [
     etf: 'XLK',
     color: '#3b82f6',
     description: 'ענקיות התוכנה, המוליכים למחצה והמחשוב הענני — השחקן הדומיננטי בשוק.',
-    top: ['AAPL', 'MSFT', 'NVDA', 'AVGO', 'ORCL', 'CRM', 'AMD', 'ADBE', 'CSCO', 'ACN', 'IBM', 'INTU', 'NOW', 'QCOM', 'TXN', 'AMAT'],
+    top: [
+      // Mega-cap
+      'AAPL', 'MSFT', 'NVDA',
+      // Semis — was thin, expanded with TSM/ASML (foreign-listed but US-traded) + key US chip names
+      'TSM', 'AVGO', 'ASML', 'AMD', 'QCOM', 'MU', 'TXN', 'INTC', 'ARM', 'LRCX', 'KLAC', 'AMAT', 'SNPS', 'CDNS',
+      // Software / cloud
+      'ORCL', 'CRM', 'ADBE', 'NOW', 'INTU', 'PANW', 'CRWD', 'ANET', 'WDAY', 'PLTR', 'SNOW',
+      // Legacy / infra
+      'IBM', 'CSCO', 'ACN', 'DELL', 'HPQ',
+    ],
   },
   {
     key: 'health',
@@ -39,7 +48,11 @@ export const SECTORS: Sector[] = [
     etf: 'XLV',
     color: '#10b981',
     description: 'חברות תרופות, ביוטכנולוגיה, ציוד רפואי וביטוחי בריאות.',
-    top: ['LLY', 'UNH', 'JNJ', 'ABBV', 'MRK', 'TMO', 'PFE', 'ABT', 'DHR', 'ISRG', 'AMGN', 'GILD', 'BMY', 'CVS'],
+    top: [
+      'LLY', 'NVO',  // GLP-1 leaders
+      'UNH', 'JNJ', 'ABBV', 'MRK', 'TMO', 'PFE', 'ABT', 'DHR', 'ISRG', 'AMGN', 'GILD', 'BMY', 'CVS',
+      'VRTX', 'REGN', 'HCA', 'BSX', 'SYK', 'MDT', 'CI', 'ELV', 'ZTS',
+    ],
   },
   {
     key: 'finance',
@@ -49,7 +62,12 @@ export const SECTORS: Sector[] = [
     etf: 'XLF',
     color: '#f59e0b',
     description: 'בנקים, חברות ביטוח, שוקי הון ונדל"ן פיננסי.',
-    top: ['JPM', 'V', 'BAC', 'MA', 'WFC', 'GS', 'MS', 'BLK', 'AXP', 'C', 'SCHW', 'PGR', 'USB', 'PYPL', 'COF'],
+    top: [
+      'BRK.B',  // Berkshire was the biggest miss — top 5 US company by cap
+      'JPM', 'V', 'BAC', 'MA', 'WFC', 'GS', 'MS', 'BLK', 'AXP', 'C', 'SCHW', 'PGR', 'USB', 'PYPL', 'COF',
+      'BX',     // Blackstone
+      'CB', 'MMC', 'SPGI', 'ICE', 'CME', 'MCO', 'TFC', 'PNC', 'AON',
+    ],
   },
   {
     key: 'discretionary',
@@ -59,7 +77,10 @@ export const SECTORS: Sector[] = [
     etf: 'XLY',
     color: '#ec4899',
     description: 'רכב, אופנה, בידור, מלונות — מה שצרכנים קונים כשכלכלית להם טוב.',
-    top: ['AMZN', 'TSLA', 'HD', 'MCD', 'NKE', 'SBUX', 'LOW', 'BKNG', 'TJX', 'MAR', 'ABNB', 'CMG', 'GM', 'F'],
+    top: [
+      'AMZN', 'TSLA', 'HD', 'MCD', 'NKE', 'SBUX', 'LOW', 'BKNG', 'TJX', 'MAR', 'ABNB', 'CMG', 'GM', 'F',
+      'ORLY', 'AZO', 'LULU', 'ROST', 'YUM', 'DHI', 'LEN', 'HLT', 'MELI', 'RACE',
+    ],
   },
   {
     key: 'staples',
@@ -69,7 +90,7 @@ export const SECTORS: Sector[] = [
     etf: 'XLP',
     color: '#8b5cf6',
     description: 'מזון, משקאות, תרופות ללא מרשם — מוצרים שקונים גם במיתון.',
-    top: ['WMT', 'PG', 'COST', 'KO', 'PEP', 'PM', 'MDLZ', 'CL', 'MO', 'TGT', 'KMB', 'EL'],
+    top: ['WMT', 'PG', 'COST', 'KO', 'PEP', 'PM', 'MDLZ', 'CL', 'MO', 'TGT', 'KMB', 'EL', 'STZ', 'GIS', 'HSY', 'KHC'],
   },
   {
     key: 'energy',
@@ -79,7 +100,7 @@ export const SECTORS: Sector[] = [
     etf: 'XLE',
     color: '#ef4444',
     description: 'נפט, גז טבעי, אנרגיה מתחדשת — תלוי במחירי חומרי גלם גלובליים.',
-    top: ['XOM', 'CVX', 'COP', 'EOG', 'SLB', 'MPC', 'PSX', 'OXY', 'VLO', 'WMB', 'KMI', 'ENB'],
+    top: ['XOM', 'CVX', 'COP', 'EOG', 'SLB', 'MPC', 'PSX', 'OXY', 'VLO', 'WMB', 'KMI', 'ENB', 'LNG', 'TRP', 'HES'],
   },
   {
     key: 'industrials',
@@ -89,7 +110,7 @@ export const SECTORS: Sector[] = [
     etf: 'XLI',
     color: '#64748b',
     description: 'תעופה, ביטחון, מכונות, הובלה — מצב הכלכלה בגדול.',
-    top: ['GE', 'CAT', 'UBER', 'RTX', 'HON', 'BA', 'UNP', 'LMT', 'DE', 'UPS', 'FDX', 'NOC'],
+    top: ['GE', 'CAT', 'UBER', 'RTX', 'HON', 'BA', 'UNP', 'LMT', 'DE', 'UPS', 'FDX', 'NOC', 'ETN', 'EMR', 'CSX', 'NSC'],
   },
   {
     key: 'materials',
@@ -99,7 +120,7 @@ export const SECTORS: Sector[] = [
     etf: 'XLB',
     color: '#a3a3a3',
     description: 'כימיקלים, מתכות, חומרי בנייה — מדד למצב התעשייה הגלובלית.',
-    top: ['LIN', 'SHW', 'APD', 'ECL', 'FCX', 'NEM', 'DD', 'DOW', 'CTVA', 'NUE', 'VMC'],
+    top: ['LIN', 'SHW', 'APD', 'ECL', 'FCX', 'NEM', 'DD', 'DOW', 'CTVA', 'NUE', 'VMC', 'MLM'],
   },
   {
     key: 'utilities',
@@ -109,7 +130,7 @@ export const SECTORS: Sector[] = [
     etf: 'XLU',
     color: '#14b8a6',
     description: 'חשמל, מים, גז — מניות דיבידנד יציבות ("אג"ח דמויות מניות").',
-    top: ['NEE', 'SO', 'DUK', 'CEG', 'AEP', 'SRE', 'D', 'PCG', 'EXC', 'XEL', 'ED'],
+    top: ['NEE', 'SO', 'DUK', 'CEG', 'AEP', 'SRE', 'D', 'PCG', 'EXC', 'XEL', 'ED', 'VST'],
   },
   {
     key: 'realestate',
@@ -119,7 +140,7 @@ export const SECTORS: Sector[] = [
     etf: 'XLRE',
     color: '#f97316',
     description: 'REITs — נדל"ן מסחרי, משרדים, מרכזים לוגיסטיים, דיור.',
-    top: ['PLD', 'AMT', 'EQIX', 'WELL', 'SPG', 'PSA', 'O', 'CCI', 'DLR', 'EXR'],
+    top: ['PLD', 'AMT', 'EQIX', 'WELL', 'SPG', 'PSA', 'O', 'CCI', 'DLR', 'EXR', 'VICI', 'CBRE'],
   },
   {
     key: 'communication',
@@ -129,7 +150,7 @@ export const SECTORS: Sector[] = [
     etf: 'XLC',
     color: '#06b6d4',
     description: 'מדיה, רשתות חברתיות, טלקום — מ-Google ועד Netflix.',
-    top: ['META', 'GOOGL', 'NFLX', 'DIS', 'T', 'TMUS', 'VZ', 'CMCSA', 'CHTR', 'EA', 'TTWO'],
+    top: ['META', 'GOOGL', 'NFLX', 'DIS', 'T', 'TMUS', 'VZ', 'CMCSA', 'CHTR', 'EA', 'TTWO', 'WBD', 'SPOT', 'ROKU'],
   },
 ];
 
