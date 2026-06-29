@@ -1,0 +1,111 @@
+═══════════════════════════════════════════════════════════════════════
+  03 — FILE AUDIT  (COMPREHENSIVE — every file, every color encoding)
+═══════════════════════════════════════════════════════════════════════
+Count = raw hex/rgba color literals in the file (covers inline styles
+single- & multi-line, SVG attrs, named strings). Files marked (+cls) ALSO
+have tailwind named-palette classes (text-white, bg-slate-900) to fix.
+(NEW) = was MISSING from the first draft audit.
+Paths under tsua/apps/web/src/. Order = suggested migration order.
+
+─── TIER 1 — GLOBAL CHROME (on every page, fix first) ─────────────────
+ [61] components/layout/MobileNavDrawer.tsx
+ [60] components/layout/Navbar.tsx                       (+cls)
+ [23] components/layout/Sidebar.tsx                      (+cls)
+ [16] components/layout/NotificationsDropdown.tsx        (+cls)
+ [13] components/layout/TrendingWidget.tsx               (+cls)
+ [12] components/layout/LiveMarketBar.tsx                (+cls)
+ [ 5] components/layout/BottomNav.tsx
+ [ 3] components/layout/MobileRightDrawer.tsx            (NEW)
+
+─── TIER 2 — FEED / CONTENT (seen constantly) ─────────────────────────
+ [76] components/feed/PostCard.tsx                       (+cls)
+ [48] components/feed/FeedStream.tsx                     (+cls)
+ [27] components/feed/PostComposer.tsx                   (+cls)
+ [14] components/posts/PostDetailPage.tsx
+ [ 3] components/feed/renderPostBody.tsx                 (NEW)
+ [ 2] components/feed/MobileComposeSheet.tsx             (NEW)
+
+─── TIER 3 — MAJOR PAGES ──────────────────────────────────────────────
+ [47] components/profile/ProfilePage.tsx                 (+cls)
+ [46] components/portfolio/PortfolioPage.tsx
+ [42] components/leaderboard/LeaderboardPage.tsx
+ [40] components/settings/SettingsPage.tsx               (+cls)
+ [34] components/markets/MarketsPage.tsx                 (+cls)
+ [24] components/admin/AdminDashboard.tsx                (+cls)
+ [23] components/news/NewsPage.tsx                       (+cls)
+ [19] components/watchlist/WatchlistPage.tsx             (+cls)
+ [16] app/[locale]/hot/HotPageClient.tsx
+ [13] components/bookmarks/BookmarksPage.tsx
+ [13] app/[locale]/sectors/[key]/SectorDetailClient.tsx
+ [11] app/[locale]/crypto/[id]/CryptoDetailClient.tsx
+ [ 9] app/[locale]/compare/CompareClient.tsx             (+cls)
+ [ 8] components/reports/ReportsPage.tsx                 (NEW, +cls — palette-only)
+ [ 5] app/[locale]/crypto/page.tsx
+ [ 5] app/[locale]/page.tsx
+ [ 4] app/[locale]/earnings/page.tsx                     (NEW)
+ [ 3] app/[locale]/sectors/page.tsx
+ [ 2] app/[locale]/stocks/[ticker]/StockPageClient.tsx   (NEW)
+
+─── TIER 4 — STOCK / MARKET WIDGETS ───────────────────────────────────
+ [39] components/alerts/PushToggle.tsx
+ [36] components/stream/LiveStream.tsx                   (+cls)
+ [28] components/stocks/StockHeader.tsx                  (+cls)
+ [27] components/alerts/AlertsManager.tsx                (+cls)
+ [20] components/earnings/EarningsCalendar.tsx           (+cls)
+ [19] components/stocks/TrendingDiscussions.tsx
+ [16] components/stocks/TrendingStocks.tsx
+ [16] components/stocks/SentimentMeter.tsx
+ [16] components/stocks/MarketSummary.tsx
+ [12] components/markets/HotStocks.tsx                   (+cls)
+ [12] components/markets/FearGreedWidget.tsx             (+cls)
+ [11] components/markets/CurrencyRates.tsx               (+cls)
+ [11] components/markets/MarketPE.tsx
+ [11] components/stocks/HotStocksWidget.tsx
+ [ 9] components/markets/MacroWidget.tsx
+ [ 4] components/crypto/CryptoGrid.tsx                   (+cls)
+ [ 3] components/stocks/StockNews.tsx                    (+cls)
+ [ 3] components/stocks/KeyStats.tsx                     (+cls)
+ [ 1] components/stocks/CompanyOverview.tsx              (+cls)
+
+─── TIER 5 — AUTH / MODALS / MISC ─────────────────────────────────────
+ [35] components/auth/AuthPage.tsx                       (+cls)
+ [26] components/ui/OnboardingModal.tsx                  (+cls)
+ [24] components/auth/ResetPasswordPage.tsx              (+cls)
+ [18] components/referrals/ReferralsCard.tsx
+ [13] components/auth/ForgotPasswordPage.tsx             (+cls)
+ [13] components/layout/TermsConsent.tsx
+ [ 9] components/ui/InfoTooltip.tsx
+ [ 8] components/pwa/PWAInstallPrompt.tsx
+ [ 5] app/[locale]/error.tsx
+ [ 4] app/[locale]/not-found.tsx
+ [ 1] app/[locale]/terms/page.tsx
+ [ 1] app/[locale]/privacy/page.tsx
+
+─── REVIEW SEPARATELY — likely INTENTIONAL, leave unless you say so ───
+SYSTEM (do NOT touch — these run the theme itself):
+ [18] components/layout/ThemeToggle.tsx     (the toggle's own sun/moon art)
+ [ 2] app/[locale]/layout.tsx               (FOUC boot script)
+ [ 1] contexts/ThemeContext.tsx             (theme-color meta logic)
+
+DATA-VIZ / CHARTS (fixed series colors — confirm before changing):
+ [13] components/charts/StockChart.tsx              (NEW)
+ [12] components/markets/SectorTreemap.tsx
+ [ 9] components/markets/SectorHeatmap.tsx
+ [ 6] components/charts/TradingViewChart.tsx
+ [ 3] components/crypto/Sparkline.tsx
+ [ 3] components/stocks/OwnershipPie.tsx            (NEW)
+ [11] lib/sectors.ts                                (sector color MAP, .ts)
+
+SERVER-RENDERED SHARE IMAGES (fixed palette — leave):
+ [21] app/api/og/stock/[ticker]/route.tsx
+ [14] app/api/og/post/[id]/route.tsx
+ [11] app/api/og/route.tsx
+ [ 5] app/embed/ticker/[ticker]/route.ts
+
+═══════════════════════════════════════════════════════════════════════
+TOTALS
+  Themable (must migrate):  ~1,000 literals + ~65 palette classes,
+                            ~60 files across Tiers 1-5
+  Review/leave (intentional): ~130 literals across ~14 files
+  Grand total touchpoints:  ~1,360 across ~76 files
+═══════════════════════════════════════════════════════════════════════

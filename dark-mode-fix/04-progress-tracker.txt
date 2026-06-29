@@ -1,0 +1,116 @@
+═══════════════════════════════════════════════════════════════════════
+  04 — PROGRESS TRACKER  (COMPREHENSIVE — update as we go)
+═══════════════════════════════════════════════════════════════════════
+Legend:  [ ] todo   [~] in progress   [x] done & verified in BOTH themes
+
+PER-FILE DEFINITION OF DONE (check all before ticking a file):
+  ( ) V1+V2  no hex/rgba left in inline style={{ }} (incl. multi-line)
+  ( ) V3     no fixed tailwind palette classes (text-white, bg-slate-900…)
+  ( ) V4     no literal SVG fill/stroke/stopColor (unless intentional)
+  ( ) V5     no named color strings ('white','black') — 'transparent' ok
+  ( ) text, background, border, AND any hover/active state all swap
+  ( ) toggled theme live in browser — readable + correct in light & dark
+  ( ) removed now-dead [style*="..."] hacks for this file from globals.css
+
+STATUS: not started. Comprehensive plan finalized 2026-06-29.
+        (supersedes the earlier 613/65 draft)
+
+─── TIER 1 — GLOBAL CHROME ────────────────────────────────────────────
+ [ ] MobileNavDrawer.tsx
+ [ ] Navbar.tsx
+ [ ] Sidebar.tsx
+ [ ] NotificationsDropdown.tsx
+ [ ] TrendingWidget.tsx
+ [ ] LiveMarketBar.tsx
+ [ ] BottomNav.tsx
+ [ ] MobileRightDrawer.tsx        (NEW)
+
+─── TIER 2 — FEED / CONTENT ───────────────────────────────────────────
+ [ ] PostCard.tsx
+ [ ] FeedStream.tsx
+ [ ] PostComposer.tsx
+ [ ] PostDetailPage.tsx
+ [ ] renderPostBody.tsx           (NEW)
+ [ ] MobileComposeSheet.tsx       (NEW)
+
+─── TIER 3 — MAJOR PAGES ──────────────────────────────────────────────
+ [ ] ProfilePage.tsx
+ [ ] PortfolioPage.tsx
+ [ ] LeaderboardPage.tsx
+ [ ] SettingsPage.tsx
+ [ ] MarketsPage.tsx
+ [ ] AdminDashboard.tsx
+ [ ] NewsPage.tsx
+ [ ] WatchlistPage.tsx
+ [ ] HotPageClient.tsx
+ [ ] BookmarksPage.tsx
+ [ ] SectorDetailClient.tsx
+ [ ] CryptoDetailClient.tsx
+ [ ] CompareClient.tsx
+ [ ] ReportsPage.tsx              (NEW — palette classes only)
+ [ ] crypto/page.tsx
+ [ ] [locale]/page.tsx
+ [ ] earnings/page.tsx            (NEW)
+ [ ] sectors/page.tsx
+ [ ] StockPageClient.tsx          (NEW)
+
+─── TIER 4 — STOCK / MARKET WIDGETS ───────────────────────────────────
+ [ ] PushToggle.tsx
+ [ ] LiveStream.tsx
+ [ ] StockHeader.tsx
+ [ ] AlertsManager.tsx
+ [ ] EarningsCalendar.tsx
+ [ ] TrendingDiscussions.tsx
+ [ ] TrendingStocks.tsx
+ [ ] SentimentMeter.tsx
+ [ ] MarketSummary.tsx
+ [ ] HotStocks.tsx
+ [ ] FearGreedWidget.tsx
+ [ ] CurrencyRates.tsx
+ [ ] MarketPE.tsx
+ [ ] HotStocksWidget.tsx
+ [ ] MacroWidget.tsx
+ [ ] CryptoGrid.tsx
+ [ ] StockNews.tsx
+ [ ] KeyStats.tsx
+ [ ] CompanyOverview.tsx
+
+─── TIER 5 — AUTH / MODALS / MISC ─────────────────────────────────────
+ [ ] AuthPage.tsx
+ [ ] OnboardingModal.tsx
+ [ ] ResetPasswordPage.tsx
+ [ ] ReferralsCard.tsx
+ [ ] ForgotPasswordPage.tsx
+ [ ] TermsConsent.tsx
+ [ ] InfoTooltip.tsx
+ [ ] PWAInstallPrompt.tsx
+ [ ] error.tsx
+ [ ] not-found.tsx
+ [ ] terms/page.tsx
+ [ ] privacy/page.tsx
+
+─── REVIEW SEPARATELY (decide: keep fixed or theme-ify) ───────────────
+ [ ] ThemeToggle.tsx       — SYSTEM, leave (toggle art)
+ [ ] layout.tsx            — SYSTEM, leave (boot script)
+ [ ] ThemeContext.tsx      — SYSTEM, leave
+ [ ] StockChart.tsx        — chart series colors; theme bg/grid only?
+ [ ] TradingViewChart.tsx  — needs theme-aware chart config?
+ [ ] SectorTreemap.tsx     — data-viz scale, likely keep
+ [ ] SectorHeatmap.tsx     — data-viz scale, likely keep
+ [ ] Sparkline.tsx         — stroke color, likely keep
+ [ ] OwnershipPie.tsx      — pie slices, likely keep
+ [ ] lib/sectors.ts        — sector color map, likely keep
+ [ ] og/stock route        — share image, leave
+ [ ] og/post route         — share image, leave
+ [ ] og/route              — share image, leave
+ [ ] embed/ticker route    — embed widget, decide
+
+─── CLEANUP (as files migrate, finish at the end) ─────────────────────
+ [ ] Delete dead [style*="..."] hacks from globals.css as we go
+ [ ] Final pass: shrink globals.css to palette + structural rules only
+ [ ] Reconcile hex tokens vs --rgb-* triplets (minor shade mismatch)
+ [ ] Run 05-coverage-verification.txt searches — confirm ~0 remaining
+
+─── NOTES LOG ─────────────────────────────────────────────────────────
+(append findings here, e.g. "LeaderboardPage: kept gold/silver/bronze
+medal colors fixed — intentional, not theme surfaces")

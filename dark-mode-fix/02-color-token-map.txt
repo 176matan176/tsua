@@ -1,0 +1,104 @@
+═══════════════════════════════════════════════════════════════════════
+  02 — COLOR -> TOKEN MAP  (the migration cheat sheet)
+═══════════════════════════════════════════════════════════════════════
+
+Source of truth = globals.css lines 15-102. If a color isn't here,
+DON'T guess — check globals.css or flag it in 04-progress-tracker.txt.
+
+Two ways to apply a token:
+  A) className (preferred when it's a plain bg/text/border):
+       className="bg-tsua-card text-tsua-text border border-tsua-border"
+  B) inline var() (when the value is inside a gradient/shadow/computed
+     style that must stay inline):
+       style={{ background: 'var(--card)', color: 'var(--text)' }}
+
+DARK PALETTE VALUES (what you'll find hardcoded) -> REPLACEMENT
+--------------------------------------------------------------
+SURFACES / BACKGROUNDS
+  #060b16  rgb(6,11,22)      page bg     -> var(--bg)     | bg-tsua-bg
+  #0a0f1e  rgb(10,15,30)     bg layer 2  -> var(--bg2)    | bg-tsua-bg-2
+  rgba(15,25,41,a)           card        -> var(--card)   | bg-tsua-card
+  #0d1424  rgb(13,20,36)     card        -> var(--card)   | bg-tsua-card
+  rgba(10,16,30,a)           card/bg2    -> var(--card)   | bg-tsua-card
+  rgba(20,31,48,a) /
+  rgba(20,30,50,a)           card 2      -> var(--card2)  | bg-tsua-card-2
+  #101828  rgb(16,24,40)     card 2      -> var(--card2)  | bg-tsua-card-2
+  near-bg darks: rgba(8,13,24) rgba(8,14,26) rgba(8,13,26)
+                 rgba(5,9,18) rgba(6,11,22) rgba(12,18,32) rgba(12,20,36)
+                             treat as     -> var(--bg) or var(--card)
+                             (pick by role: page surface vs panel)
+
+BORDERS
+  rgba(26,40,64,a)           border      -> var(--border)  | border-tsua-border
+  rgba(36,53,80,a)           border 2    -> var(--border2) | border-tsua-border-2
+
+TEXT
+  #e8f0ff / #e8f4ff          primary text-> var(--text)   | text-tsua-text
+  rgba(168,188,212,a)        secondary   -> var(--text2)  | text-tsua-text-2
+  rgb(90,112,144)            muted       -> var(--muted)  | text-tsua-muted
+  rgb(122,144,176)           muted 2     -> var(--muted2) | text-tsua-muted-2
+
+ACCENTS / SEMANTIC
+  #00e5b0 / rgba(0,229,176,a) brand green-> var(--accent) | text/bg-tsua-green
+  #00a884                    green 2     -> var(--accent2)| ...-tsua-green-2
+  rgb(59,130,246)            blue        -> var(--blue)   | text/bg-tsua-blue
+  rgb(255,77,106)            red/down    -> var(--red)    | text/bg-tsua-red
+  rgb(245,185,66)            gold        -> var(--gold)   | text/bg-tsua-gold
+
+GREEN TINT FILLS (e.g. selected/active)
+  rgba(0,229,176,0.08..0.1)  -> bg-tsua-green-dim  (or var-based rgba)
+
+DECISION RULE FOR EACH HARDCODED COLOR
+--------------------------------------
+1. Is it a theme surface/text/border/accent above? -> use the token.
+2. Is it a fixed brand asset that should NOT change with theme?
+   (logo gradient, chart series color, the toggle knob art, OG images)
+   -> LEAVE IT. Not every color is a theme color. Note it as intentional.
+3. No matching token but it clearly should theme? -> STOP, flag it in
+   04-progress-tracker.txt under "needs a new token / decision".
+
+TAILWIND NAMED-PALETTE CLASSES (V3) -> TOKEN CLASS
+--------------------------------------------------
+These look themable but are FIXED. Map by role, not by exact shade.
+  text-white / text-gray-100        -> text-tsua-text
+  text-gray-300 / text-slate-300    -> text-tsua-text-2
+  text-gray-400/500 / text-slate-400-> text-tsua-muted
+  bg-white                          -> bg-tsua-card   (usually a panel)
+  bg-slate-900/950 / bg-gray-900    -> bg-tsua-bg or bg-tsua-card (by role)
+  bg-slate-800 / bg-gray-800        -> bg-tsua-card-2
+  border-gray-700/800 / border-slate-700 -> border-tsua-border
+  text-green-* / bg-green-*         -> ...-tsua-green
+  text-red-* / bg-red-*             -> ...-tsua-red
+  text-blue-*                       -> ...-tsua-blue
+  EXCEPTION: text-white that sits on a colored badge/button and is meant
+  to stay white in BOTH themes -> keep it (note as intentional).
+
+NAMED COLOR STRINGS (V5)
+------------------------
+  'white'        -> var(--text) or keep if it's on-accent text (decide)
+  'black'        -> var(--text) inverted? usually -> var(--bg)/var(--text)
+  'transparent'  -> FINE, leave as-is
+  'gold'/'silver'-> leaderboard medals: likely intentional, keep + note
+
+SVG PAINT (V4)
+--------------
+  fill="#00e5b0" / stroke="#00e5b0" -> fill="var(--accent)" etc., OR
+  set fill="currentColor" and control via text-tsua-* on a parent.
+  Chart/data-viz series colors (StockChart, Sparkline, OwnershipPie,
+  SectorTreemap/Heatmap) are usually INTENTIONALLY fixed -> review, don't
+  blanket-replace.
+
+GOTCHAS
+-------
+- Alpha matters: bg-tsua-card/80 == rgb(var(--rgb-card) / .8). Keep the
+  same alpha you replaced.
+- Don't half-migrate an element: if you token-ize the background, also
+  token-ize the text + border on it, or it'll look wrong in light.
+- After migrating a file, search globals.css for the literal strings you
+  removed and delete the now-dead [style*="..."] hacks for them.
+
+NOTE / known inconsistency to be aware of:
+  The hex tokens (--card #0d1424) and the rgb triplets (--rgb-card 15 25 41)
+  are slightly different shades in their current setup. Map to the token
+  that matches what the element used (rgba(15,25,41..) -> card token).
+  We can reconcile hex vs rgb later; not blocking the migration.

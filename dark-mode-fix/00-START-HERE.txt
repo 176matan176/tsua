@@ -1,0 +1,52 @@
+═══════════════════════════════════════════════════════════════════════
+  TSUA — DARK / LIGHT MODE FIX
+  Working folder for fixing theme switching, step by step.
+═══════════════════════════════════════════════════════════════════════
+
+WHAT'S WRONG (short version)
+----------------------------
+The theme SYSTEM is fine. The problem is ~1,360 hardcoded colors spread
+across ~76 files, encoded SIX different ways (inline styles, tailwind
+palette classes like text-white, SVG fill/stroke, named strings, .ts
+color maps — see 01-diagnosis.txt "ENCODING VECTORS"). None of them can
+respond to [data-theme="light"], so light mode is currently faked with
+141 brittle CSS attribute-hacks in globals.css. New hardcoded colors keep
+breaking it.
+
+NOTE: an earlier draft of these files only counted ONE pattern (613
+single-line inline styles). The real surface is ~2x that. The audit and
+tracker below are the corrected, comprehensive versions.
+
+THE FIX (short version)
+-----------------------
+Migrate hardcoded inline colors -> the CSS variables / tailwind tokens
+that ALREADY work. As each file is migrated, delete the matching
+attribute-hack from globals.css. End state: theme switching "just works"
+and globals.css shrinks back down.
+
+HOW TO USE THIS FOLDER
+----------------------
+  00-START-HERE.txt        <- you are here (overview + workflow)
+  01-diagnosis.txt         Root cause, in detail, with file references
+  02-color-token-map.txt   Cheat sheet: hardcoded color -> token to use
+  03-file-audit.txt        Every file to migrate, prioritized, with counts
+  04-progress-tracker.txt  Live checklist — update as we finish each file
+
+WORKFLOW (one file at a time)
+-----------------------------
+  1. Pick the top unchecked file in 04-progress-tracker.txt
+  2. Replace its hardcoded inline colors using 02-color-token-map.txt
+  3. Toggle the theme in the browser and confirm it looks right in BOTH
+  4. Remove now-dead [style*="..."] hacks for that file from globals.css
+  5. Tick it off in 04-progress-tracker.txt, note anything weird
+  6. Repeat
+
+GROUND RULES
+------------
+- One file per step. Verify before moving on. No big-bang rewrite.
+- Never invent a token — only use tokens that exist in globals.css.
+- If a color has no matching token, STOP and we decide together whether
+  to add a new token or keep it (some colors are intentionally fixed,
+  e.g. brand gradients, chart series, the toggle knob itself).
+- Don't touch the boot script, ThemeContext, or tailwind.config — those
+  are correct. This is purely a "stop hardcoding colors" cleanup.

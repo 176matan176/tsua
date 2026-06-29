@@ -97,7 +97,10 @@ export default async function RootLayout({ children, params: { locale } }: RootL
 }catch(e){document.documentElement.setAttribute('data-theme','dark');}})();`;
 
   return (
-    <html lang={locale} dir={dir}>
+    // suppressHydrationWarning: the boot script writes data-theme + colorScheme
+    // to <html> before hydration, so these attributes intentionally differ from
+    // the server output. Without this, React treats it as a mismatch.
+    <html lang={locale} dir={dir} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />

@@ -53,9 +53,22 @@ function applyTheme(t: Theme) {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  // Read once during state init — by the time React hydrates, the inline
-  // boot script has already set data-theme. This avoids a re-render flash.
-  const [theme, setThemeState] = useState<Theme>(readInitialTheme);
+  // Initialize to a CONSTANT ('dark') so the server render and the first
+  // client render agree. We must NOT read the DOM here: the boot script has
+  // already written the real theme to <html data-theme>, so reading it during
+  // useState init would make the first client render differ from the server's
+  // (which always sees 'dark'). That mismatch makes React discard the whole
+  // SSR'd document and re-render from JSX — which has no data-theme attribute —
+  // wiping the boot script's value and reverting the app to dark on load.
+  // Instead we adopt the real theme in a mount effect below (post-hydration),
+  // so the visible palette (driven by the already-correct data-theme + CSS
+  // vars) never flips; only the toggle knob settles into place after mount.
+  const [theme, setThemeState] = useState<Theme>('dark');
+
+  // After mount, sync React state to whatever the boot script wrote to <html>.
+  useEffect(() => {
+    setThemeState(readInitialTheme());
+  }, []);
 
   // If the user hasn't picked manually, follow live OS-level theme changes.
   useEffect(() => {

@@ -1,0 +1,100 @@
+═══════════════════════════════════════════════════════════════════════
+  01 — DIAGNOSIS (root cause)
+═══════════════════════════════════════════════════════════════════════
+
+HOW THEMING IS SUPPOSED TO WORK (and does, where used correctly)
+---------------------------------------------------------------
+1. Boot script in layout.tsx (<head>, runs before paint) reads
+   localStorage('tsua-theme') -> OS pref -> default 'dark', and sets
+   <html data-theme="dark|light"> + color-scheme. Prevents FOUC.
+     -> tsua/apps/web/src/app/[locale]/layout.tsx  (lines 90-97)
+
+2. globals.css defines the palette twice, keyed on the attribute:
+     :root, [data-theme="dark"] { --bg, --card, --text, --rgb-*, ... }
+     [data-theme="light"]      { same names, light values }
+     -> tsua/apps/web/src/app/[locale]/globals.css  (lines 15-102)
+
+3. tailwind.config.js maps every tsua.* color to rgb(var(--rgb-*) / a),
+   so bg-tsua-card / text-tsua-text / border-tsua-border auto-swap.
+     -> tsua/apps/web/tailwind.config.js  (lines 16-39)
+
+4. ThemeContext.tsx syncs React state to the DOM attribute and handles
+   toggle clicks + live OS changes + the manual theme-color meta.
+     -> tsua/apps/web/src/contexts/ThemeContext.tsx
+
+=> Anything using bg-tsua-* / text-tsua-* classes OR var(--token) in an
+   inline style switches themes correctly and automatically. GOOD.
+
+THE ACTUAL BUG
+--------------
+613 inline styles across 65 files hardcode literal colors instead of
+tokens, e.g.:
+     style={{ background: 'rgba(15,25,41,0.9)', color: '#e8f0ff' }}
+
+Inline style attributes have the HIGHEST specificity and contain a fixed
+string. There is no variable to flip, so [data-theme="light"] cannot
+touch them. In light mode these elements stay DARK.
+
+THE BAND-AID THAT MADE IT WORSE
+-------------------------------
+To force those dark elements light, globals.css grew ~150 rules that
+match the literal hardcoded string as a substring, e.g.:
+     [data-theme="light"] [style*="background:rgba(15,25,41"] {
+         background: var(--card) !important;
+     }
+   -> globals.css lines 163-255 (and more)
+
+Why this is fragile:
+  - Matches a STRING, not intent. "rgba(15,25,41" misses "rgba(15, 25, 41"
+    (spaces), "rgb(15,25,41", 0.85 vs 0.9 alpha, a 1-off shade, etc.
+  - Only background fixed -> text/border on the same element often missed.
+  - Every new hardcoded color needs a brand-new hack or it stays dark.
+  - !important wars: hard to override later, easy to get specificity bugs.
+  - globals.css is now 666 lines, ~192 light overrides, 141 [style*=] hacks.
+
+ENCODING VECTORS (the 6 ways a color is hardcoded here)
+-------------------------------------------------------
+To "cover everything" we must fix ALL of these, not just inline styles.
+A migrated file = ZERO of these remain (except intentional ones).
+
+  V1. Inline style hex/rgba, single line
+        style={{ background: 'rgba(15,25,41,0.9)' }}
+  V2. Inline style hex/rgba, MULTI-LINE / template literals
+        style={{ boxShadow: `0 0 0 1px rgba(26,40,64,${a})` }}
+        (the original regex missed these — biggest hidden bucket)
+  V3. Tailwind named-palette classes (~65, 30+ files)
+        className="text-white bg-slate-900 border-gray-700"
+        (fixed palette — never swaps with data-theme)
+  V4. SVG paint attributes (~10)
+        fill="#00e5b0"  stroke="rgb(...)"  stopColor="#..."
+  V5. Named CSS color strings (~14)
+        style={{ color: 'white' }}   (transparent is fine, white/black not)
+  V6. Color constants / maps in .ts (~16)
+        lib/sectors.ts sector color map; embed route colors
+
+  CONFIRMED NOT PRESENT (good news):
+    - No `dark:` tailwind variants (0) -> no media-query mode fighting us.
+    - HSL only in data-viz (SectorTreemap) -> intentional, leave.
+
+NUMBERS (corrected, comprehensive snapshot)
+-------------------------------------------
+  Raw hex/rgba literals in .tsx:  1,283 occurrences / 75 files
+  + named-palette classes:        ~65   / 30 files
+  + named color strings:          ~14   / 13 files
+  + .ts color constants:          ~16   / 2 files
+  --------------------------------------------------
+  TOTAL color touchpoints:        ~1,360 across ~76 files
+  globals.css total lines:        666
+  [data-theme="light"] rules:     192
+  [style*="..."] attribute hacks: 141
+
+  (Earlier draft said 613/65 — that counted V1 only. Superseded.)
+
+WHAT "FIXED" LOOKS LIKE
+-----------------------
+  - Components use bg-tsua-* / text-tsua-* / border-tsua-* classes, or
+    var(--token) inside inline styles when a class won't do.
+  - The [style*=] hacks are deleted as their files are migrated.
+  - globals.css shrinks toward just the two palette blocks + a few
+    structural rules.
+  - Toggling theme flips EVERYTHING with no per-element patching.
