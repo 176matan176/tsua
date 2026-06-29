@@ -21,10 +21,10 @@ interface Alert {
 }
 
 const ALERT_TYPES = [
-  { value: 'price_above', labelHe: 'מחיר מעל', labelEn: 'Price Above', icon: '▲', color: '#00e5b0' },
-  { value: 'price_below', labelHe: 'מחיר מתחת', labelEn: 'Price Below', icon: '▼', color: '#ff4d6a' },
-  { value: 'volume_spike', labelHe: 'קפיצת מחזור', labelEn: 'Volume Spike', icon: '⚡', color: '#f5b942' },
-  { value: 'news', labelHe: 'חדשות', labelEn: 'News Alert', icon: '📰', color: '#3b82f6' },
+  { value: 'price_above', labelHe: 'מחיר מעל', labelEn: 'Price Above', icon: '▲', color: 'var(--accent)' },
+  { value: 'price_below', labelHe: 'מחיר מתחת', labelEn: 'Price Below', icon: '▼', color: 'var(--red)' },
+  { value: 'volume_spike', labelHe: 'קפיצת מחזור', labelEn: 'Volume Spike', icon: '⚡', color: 'var(--gold)' },
+  { value: 'news', labelHe: 'חדשות', labelEn: 'News Alert', icon: '📰', color: 'var(--blue)' },
 ];
 
 function CreateAlertModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
@@ -66,7 +66,7 @@ function CreateAlertModal({ onClose, onCreated }: { onClose: () => void; onCreat
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}>
       <div
         className="w-full max-w-sm rounded-2xl p-6 space-y-4 animate-slide-up"
-        style={{ background: 'rgba(13,20,36,0.98)', border: '1px solid rgba(26,40,64,0.9)', boxShadow: '0 24px 64px rgba(0,0,0,0.5)' }}
+        style={{ background: 'rgb(var(--rgb-bg2) / 0.98)', border: '1px solid rgb(var(--rgb-border) / 0.9)', boxShadow: '0 24px 64px rgba(0,0,0,0.5)' }}
       >
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-black text-tsua-text">
@@ -87,9 +87,9 @@ function CreateAlertModal({ onClose, onCreated }: { onClose: () => void; onCreat
             placeholder="TEVA / NVDA / AAPL"
             dir="ltr"
             className="w-full rounded-xl px-4 py-2.5 text-sm font-mono focus:outline-none transition-all"
-            style={{ background: 'rgba(6,11,22,0.8)', border: '1px solid rgba(26,40,64,0.8)', color: '#e8f0ff' }}
-            onFocus={e => { e.currentTarget.style.borderColor = 'rgba(0,229,176,0.4)'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0,229,176,0.07)'; }}
-            onBlur={e => { e.currentTarget.style.borderColor = 'rgba(26,40,64,0.8)'; e.currentTarget.style.boxShadow = 'none'; }}
+            style={{ background: 'rgb(var(--rgb-bg) / 0.8)', border: '1px solid rgb(var(--rgb-border) / 0.8)', color: 'var(--text)' }}
+            onFocus={e => { e.currentTarget.style.borderColor = 'rgb(var(--rgb-accent) / 0.4)'; e.currentTarget.style.boxShadow = '0 0 0 3px rgb(var(--rgb-accent) / 0.07)'; }}
+            onBlur={e => { e.currentTarget.style.borderColor = 'rgb(var(--rgb-border) / 0.8)'; e.currentTarget.style.boxShadow = 'none'; }}
           />
         </div>
 
@@ -104,7 +104,7 @@ function CreateAlertModal({ onClose, onCreated }: { onClose: () => void; onCreat
                 className="py-2 px-3 rounded-xl text-xs font-bold transition-all text-start"
                 style={alertType === t.value
                   ? { background: `${t.color}18`, color: t.color, border: `1px solid ${t.color}40` }
-                  : { background: 'rgba(15,25,41,0.6)', color: '#5a7090', border: '1px solid rgba(26,40,64,0.6)' }
+                  : { background: 'rgb(var(--rgb-card) / 0.6)', color: 'var(--muted)', border: '1px solid rgb(var(--rgb-border) / 0.6)' }
                 }
               >
                 {t.icon} {t.labelHe}
@@ -124,15 +124,15 @@ function CreateAlertModal({ onClose, onCreated }: { onClose: () => void; onCreat
               placeholder="0.00"
               dir="ltr"
               className="w-full rounded-xl px-4 py-2.5 text-sm font-mono focus:outline-none transition-all"
-              style={{ background: 'rgba(6,11,22,0.8)', border: '1px solid rgba(26,40,64,0.8)', color: '#e8f0ff' }}
-              onFocus={e => { e.currentTarget.style.borderColor = 'rgba(0,229,176,0.4)'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0,229,176,0.07)'; }}
-              onBlur={e => { e.currentTarget.style.borderColor = 'rgba(26,40,64,0.8)'; e.currentTarget.style.boxShadow = 'none'; }}
+              style={{ background: 'rgb(var(--rgb-bg) / 0.8)', border: '1px solid rgb(var(--rgb-border) / 0.8)', color: 'var(--text)' }}
+              onFocus={e => { e.currentTarget.style.borderColor = 'rgb(var(--rgb-accent) / 0.4)'; e.currentTarget.style.boxShadow = '0 0 0 3px rgb(var(--rgb-accent) / 0.07)'; }}
+              onBlur={e => { e.currentTarget.style.borderColor = 'rgb(var(--rgb-border) / 0.8)'; e.currentTarget.style.boxShadow = 'none'; }}
             />
           </div>
         )}
 
         {error && (
-          <div className="text-sm rounded-xl px-4 py-2 animate-fade-in" style={{ background: 'rgba(255,77,106,0.1)', border: '1px solid rgba(255,77,106,0.25)', color: '#ff4d6a' }}>
+          <div className="text-sm rounded-xl px-4 py-2 animate-fade-in" style={{ background: 'rgb(var(--rgb-red) / 0.1)', border: '1px solid rgb(var(--rgb-red) / 0.25)', color: 'var(--red)' }}>
             ⚠️ {error}
           </div>
         )}
@@ -140,14 +140,14 @@ function CreateAlertModal({ onClose, onCreated }: { onClose: () => void; onCreat
         <div className="flex gap-2">
           <button onClick={onClose}
             className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-tsua-muted"
-            style={{ background: 'rgba(15,25,41,0.5)', border: '1px solid rgba(26,40,64,0.7)' }}>
+            style={{ background: 'rgb(var(--rgb-card) / 0.5)', border: '1px solid rgb(var(--rgb-border) / 0.7)' }}>
             {'ביטול'}
           </button>
           <button
             onClick={submit}
             disabled={!ticker.trim() || loading}
             className="flex-1 py-2.5 rounded-xl text-sm font-black text-tsua-bg transition-all disabled:opacity-40"
-            style={{ background: 'linear-gradient(135deg, #00e5b0, #00c49a)' }}>
+            style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent2))' }}>
             {loading ? '...' : 'צור התראה'}
           </button>
         </div>
@@ -192,7 +192,7 @@ export function AlertsManager() {
         <BellSolid className="w-12 h-12 mb-4 opacity-20 text-tsua-muted" />
         <h2 className="text-lg font-black text-tsua-text mb-2">{'התראות מחיר'}</h2>
         <p className="text-tsua-muted text-sm mb-6">{'התחבר כדי ליצור התראות'}</p>
-        <Link href={`/${locale}/login`} className="px-6 py-2.5 rounded-xl text-tsua-bg font-black text-sm" style={{ background: 'linear-gradient(135deg,#00e5b0,#00c49a)' }}>
+        <Link href={`/${locale}/login`} className="px-6 py-2.5 rounded-xl text-tsua-bg font-black text-sm" style={{ background: 'linear-gradient(135deg,var(--accent),var(--accent2))' }}>
           {'כניסה'}
         </Link>
       </div>
@@ -217,7 +217,7 @@ export function AlertsManager() {
           <button
             onClick={() => setShowCreate(true)}
             className="flex items-center gap-1.5 text-sm font-bold px-4 py-2 rounded-xl text-tsua-bg transition-all hover:opacity-90 active:scale-95"
-            style={{ background: 'linear-gradient(135deg, #00e5b0, #00c49a)', boxShadow: '0 4px 12px rgba(0,229,176,0.25)' }}
+            style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent2))', boxShadow: '0 4px 12px rgb(var(--rgb-accent) / 0.25)' }}
           >
             <PlusIcon className="w-4 h-4" />
             {'התראה חדשה'}
@@ -231,7 +231,7 @@ export function AlertsManager() {
         {loading && (
           <div className="space-y-2">
             {[1,2,3].map(i => (
-              <div key={i} className="h-16 rounded-2xl animate-pulse" style={{ background: 'rgba(13,20,36,0.7)', border: '1px solid rgba(26,40,64,0.7)' }} />
+              <div key={i} className="h-16 rounded-2xl animate-pulse" style={{ background: 'rgb(var(--rgb-bg2) / 0.7)', border: '1px solid rgb(var(--rgb-border) / 0.7)' }} />
             ))}
           </div>
         )}
@@ -244,8 +244,8 @@ export function AlertsManager() {
               key={alert.id}
               className="rounded-2xl p-4 flex items-center justify-between gap-3 transition-all"
               style={{
-                background: 'rgba(13,20,36,0.7)',
-                border: alert.is_active ? '1px solid rgba(26,40,64,0.7)' : '1px solid rgba(26,40,64,0.4)',
+                background: 'rgb(var(--rgb-bg2) / 0.7)',
+                border: alert.is_active ? '1px solid rgb(var(--rgb-border) / 0.7)' : '1px solid rgb(var(--rgb-border) / 0.4)',
                 opacity: alert.is_active ? 1 : 0.6,
               }}
             >
@@ -260,11 +260,11 @@ export function AlertsManager() {
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
                     <span dir="ltr" className="font-black text-tsua-text font-mono text-sm">${alert.ticker}</span>
-                    <span className="text-xs font-semibold" style={{ color: typeInfo?.color ?? '#5a7090' }}>
+                    <span className="text-xs font-semibold" style={{ color: typeInfo?.color ?? 'var(--muted)' }}>
                       {typeInfo?.labelHe}
                     </span>
                     {alert.threshold && (
-                      <span dir="ltr" className="text-xs font-bold font-mono" style={{ color: '#e8f0ff' }}>
+                      <span dir="ltr" className="text-xs font-bold font-mono" style={{ color: 'var(--text)' }}>
                         ${alert.threshold.toLocaleString()}
                       </span>
                     )}
@@ -283,8 +283,8 @@ export function AlertsManager() {
                   onClick={() => toggleAlert(alert.id, alert.is_active)}
                   className="text-[11px] font-bold px-2.5 py-1 rounded-full transition-all hover:opacity-80"
                   style={alert.is_active
-                    ? { background: 'rgba(0,229,176,0.12)', color: '#00e5b0', border: '1px solid rgba(0,229,176,0.2)' }
-                    : { background: 'rgba(90,112,144,0.12)', color: '#5a7090', border: '1px solid rgba(90,112,144,0.2)' }
+                    ? { background: 'rgb(var(--rgb-accent) / 0.12)', color: 'var(--accent)', border: '1px solid rgb(var(--rgb-accent) / 0.2)' }
+                    : { background: 'rgb(var(--rgb-muted) / 0.12)', color: 'var(--muted)', border: '1px solid rgb(var(--rgb-muted) / 0.2)' }
                   }
                 >
                   {alert.is_active ? '● פעיל' : '○ הופעל'}
@@ -305,7 +305,7 @@ export function AlertsManager() {
         {!loading && alerts.length === 0 && (
           <div
             className="flex flex-col items-center justify-center py-16 rounded-2xl text-center"
-            style={{ background: 'rgba(13,20,36,0.5)', border: '1px solid rgba(26,40,64,0.5)' }}
+            style={{ background: 'rgb(var(--rgb-bg2) / 0.5)', border: '1px solid rgb(var(--rgb-border) / 0.5)' }}
           >
             <BellIcon className="w-12 h-12 mb-3 text-tsua-muted opacity-30" />
             <p className="text-tsua-muted text-sm font-medium mb-4">
@@ -314,7 +314,7 @@ export function AlertsManager() {
             <button
               onClick={() => setShowCreate(true)}
               className="text-sm font-bold px-4 py-2 rounded-xl text-tsua-bg"
-              style={{ background: 'linear-gradient(135deg, #00e5b0, #00c49a)' }}
+              style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent2))' }}
             >
               + {'צור התראה ראשונה'}
             </button>

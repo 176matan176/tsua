@@ -41,7 +41,7 @@ export function ForgotPasswordPage() {
         <div className="flex flex-col items-center mb-8">
           <div
             className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4"
-            style={{ background: 'linear-gradient(135deg, #00e5b0, #3b82f6)', boxShadow: '0 0 32px rgba(0,229,176,0.4)' }}
+            style={{ background: 'linear-gradient(135deg, var(--accent), var(--blue))', boxShadow: '0 0 32px rgb(var(--rgb-accent) / 0.4)' }}
           >
             <span className="text-white font-black text-2xl">ת</span>
           </div>
@@ -55,16 +55,16 @@ export function ForgotPasswordPage() {
 
         <div
           className="rounded-2xl p-6"
-          style={{ background: 'rgba(13,20,36,0.9)', border: '1px solid rgba(26,40,64,0.8)', boxShadow: '0 8px 40px rgba(0,0,0,0.3)' }}
+          style={{ background: 'rgb(var(--rgb-bg2) / 0.9)', border: '1px solid rgb(var(--rgb-border) / 0.8)', boxShadow: '0 8px 40px rgba(0,0,0,0.3)' }}
         >
           {sent ? (
             /* Success state */
             <div className="text-center space-y-4">
               <div
                 className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto"
-                style={{ background: 'rgba(0,229,176,0.1)', border: '1px solid rgba(0,229,176,0.3)' }}
+                style={{ background: 'rgb(var(--rgb-accent) / 0.1)', border: '1px solid rgb(var(--rgb-accent) / 0.3)' }}
               >
-                <EnvelopeIcon className="w-7 h-7" style={{ color: '#00e5b0' }} />
+                <EnvelopeIcon className="w-7 h-7" style={{ color: 'var(--accent)' }} />
               </div>
               <div>
                 <h2 className="font-black text-tsua-text text-lg mb-1">
@@ -79,7 +79,7 @@ export function ForgotPasswordPage() {
                 <button
                   onClick={() => setSent(false)}
                   className="font-semibold hover:text-tsua-accent transition-colors"
-                  style={{ color: '#00e5b0' }}
+                  style={{ color: 'var(--accent)' }}
                 >
                   {'שלח שוב'}
                 </button>
@@ -102,16 +102,16 @@ export function ForgotPasswordPage() {
                     placeholder="your@email.com"
                     className="w-full rounded-xl py-2.5 ps-9 pe-4 text-sm placeholder:text-tsua-muted focus:outline-none transition-all"
                     style={{
-                      background: 'rgba(15,25,41,0.6)',
-                      border: '1px solid rgba(26,40,64,0.8)',
-                      color: '#e8f0ff',
+                      background: 'rgb(var(--rgb-card) / 0.6)',
+                      border: '1px solid rgb(var(--rgb-border) / 0.8)',
+                      color: 'var(--text)',
                     }}
                     onFocus={e => {
-                      e.target.style.border = '1px solid rgba(0,229,176,0.4)';
-                      e.target.style.boxShadow = '0 0 0 3px rgba(0,229,176,0.08)';
+                      e.target.style.border = '1px solid rgb(var(--rgb-accent) / 0.4)';
+                      e.target.style.boxShadow = '0 0 0 3px rgb(var(--rgb-accent) / 0.08)';
                     }}
                     onBlur={e => {
-                      e.target.style.border = '1px solid rgba(26,40,64,0.8)';
+                      e.target.style.border = '1px solid rgb(var(--rgb-border) / 0.8)';
                       e.target.style.boxShadow = 'none';
                     }}
                   />
@@ -121,7 +121,7 @@ export function ForgotPasswordPage() {
               {error && (
                 <div
                   className="text-xs px-3 py-2 rounded-xl"
-                  style={{ background: 'rgba(255,77,106,0.08)', border: '1px solid rgba(255,77,106,0.2)', color: '#ff4d6a' }}
+                  style={{ background: 'rgb(var(--rgb-red) / 0.08)', border: '1px solid rgb(var(--rgb-red) / 0.2)', color: 'var(--red)' }}
                 >
                   {error}
                 </div>
@@ -131,7 +131,7 @@ export function ForgotPasswordPage() {
                 type="submit"
                 disabled={loading || !email.trim()}
                 className="w-full py-2.5 rounded-xl text-sm font-black text-tsua-bg transition-all disabled:opacity-50 active:scale-[0.98] flex items-center justify-center gap-2"
-                style={{ background: 'linear-gradient(135deg, #00e5b0, #00c49a)', boxShadow: '0 4px 16px rgba(0,229,176,0.3)' }}
+                style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent2))', boxShadow: '0 4px 16px rgb(var(--rgb-accent) / 0.3)' }}
               >
                 {loading ? (
                   <>

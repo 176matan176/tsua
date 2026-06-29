@@ -63,7 +63,7 @@ function FilterChip({
   active,
   onClick,
   label,
-  activeColor = '#00e5b0',
+  activeColor = 'var(--accent)',
   title,
 }: {
   active: boolean;
@@ -79,8 +79,8 @@ function FilterChip({
       className="text-[11px] font-bold px-3 py-1.5 rounded-lg transition-all"
       style={{
         background: active ? `${activeColor}1f` : 'transparent',
-        color: active ? activeColor : '#5a7090',
-        border: `1px solid ${active ? `${activeColor}66` : 'rgba(26,40,64,0.7)'}`,
+        color: active ? activeColor : 'var(--muted)',
+        border: `1px solid ${active ? `${activeColor}66` : 'rgb(var(--rgb-border) / 0.7)'}`,
       }}
     >
       {label}
@@ -461,17 +461,17 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
           <div
             key={i}
             className="rounded-2xl p-5 animate-pulse"
-            style={{ background: 'rgba(13,20,36,0.7)', border: '1px solid rgba(26,40,64,0.7)', minHeight: '130px' }}
+            style={{ background: 'rgb(var(--rgb-bg2) / 0.7)', border: '1px solid rgb(var(--rgb-border) / 0.7)', minHeight: '130px' }}
           >
             <div className="flex gap-3">
-              <div className="w-11 h-11 rounded-full shrink-0" style={{ background: 'rgba(26,40,64,0.8)' }} />
+              <div className="w-11 h-11 rounded-full shrink-0" style={{ background: 'rgb(var(--rgb-border) / 0.8)' }} />
               <div className="flex-1 space-y-2 pt-1">
                 <div className="flex gap-2">
-                  <div className="h-3 w-24 rounded" style={{ background: 'rgba(26,40,64,0.8)' }} />
-                  <div className="h-3 w-16 rounded" style={{ background: 'rgba(26,40,64,0.6)' }} />
+                  <div className="h-3 w-24 rounded" style={{ background: 'rgb(var(--rgb-border) / 0.8)' }} />
+                  <div className="h-3 w-16 rounded" style={{ background: 'rgb(var(--rgb-border) / 0.6)' }} />
                 </div>
-                <div className="h-3 w-full rounded" style={{ background: 'rgba(26,40,64,0.6)' }} />
-                <div className="h-3 w-3/4 rounded" style={{ background: 'rgba(26,40,64,0.5)' }} />
+                <div className="h-3 w-full rounded" style={{ background: 'rgb(var(--rgb-border) / 0.6)' }} />
+                <div className="h-3 w-3/4 rounded" style={{ background: 'rgb(var(--rgb-border) / 0.5)' }} />
               </div>
             </div>
           </div>
@@ -531,7 +531,7 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
             width: '36px',
             height: '36px',
             borderRadius: '50%',
-            background: 'rgba(13,20,36,0.95)',
+            background: 'rgb(var(--rgb-bg2) / 0.95)',
             border: `1px solid rgba(0,229,176,${0.2 + pullProgress * 0.4})`,
             boxShadow: `0 4px 16px rgba(0,229,176,${0.15 + pullProgress * 0.25})`,
             opacity: pullProgress,
@@ -541,15 +541,15 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
             <span
               className="block w-4 h-4 rounded-full border-2 animate-spin"
               style={{
-                borderColor: 'rgba(0,229,176,0.25)',
-                borderTopColor: '#00e5b0',
+                borderColor: 'rgb(var(--rgb-accent) / 0.25)',
+                borderTopColor: 'var(--accent)',
               }}
             />
           ) : (
             <span
               style={{
                 fontSize: '16px',
-                color: '#00e5b0',
+                color: 'var(--accent)',
                 transform: `rotate(${pullProgress * 180}deg)`,
                 transition: 'transform 0.15s linear',
                 display: 'inline-block',
@@ -566,28 +566,28 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
       {showShortcutsHelp && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center"
-          style={{ background: 'rgba(6,11,22,0.85)', backdropFilter: 'blur(6px)' }}
+          style={{ background: 'rgb(var(--rgb-bg) / 0.85)', backdropFilter: 'blur(6px)' }}
           onClick={() => setShowShortcutsHelp(false)}
         >
           <div
             className="rounded-2xl max-w-sm w-full mx-4 p-6"
             style={{
-              background: 'rgba(13,20,36,0.98)',
-              border: '1px solid rgba(0,229,176,0.25)',
-              boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,229,176,0.15)',
+              background: 'rgb(var(--rgb-bg2) / 0.98)',
+              border: '1px solid rgb(var(--rgb-accent) / 0.25)',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgb(var(--rgb-accent) / 0.15)',
             }}
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
-              <span className="text-[15px] font-black" style={{ color: '#e8f0ff' }}>
+              <span className="text-[15px] font-black" style={{ color: 'var(--text)' }}>
                 ⌨️  קיצורי מקלדת
               </span>
               <button
                 onClick={() => setShowShortcutsHelp(false)}
                 className="text-[13px] font-bold transition-colors"
-                style={{ color: '#5a7090' }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#e8f0ff')}
-                onMouseLeave={e => (e.currentTarget.style.color = '#5a7090')}
+                style={{ color: 'var(--muted)' }}
+                onMouseEnter={e => (e.currentTarget.style.color = 'var(--text)')}
+                onMouseLeave={e => (e.currentTarget.style.color = 'var(--muted)')}
               >
                 ✕
               </button>
@@ -610,9 +610,9 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
                         key={k}
                         className="text-[11px] font-mono font-bold px-2 py-1 rounded-md min-w-[28px] text-center"
                         style={{
-                          background: 'rgba(0,229,176,0.12)',
-                          color: '#00e5b0',
-                          border: '1px solid rgba(0,229,176,0.3)',
+                          background: 'rgb(var(--rgb-accent) / 0.12)',
+                          color: 'var(--accent)',
+                          border: '1px solid rgb(var(--rgb-accent) / 0.3)',
                         }}
                       >
                         {k}
@@ -630,7 +630,7 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
       {showFilters && !loading && posts.length > 0 && (
         <div
           className="flex flex-wrap items-center gap-2 p-2.5 rounded-xl"
-          style={{ background: 'rgba(13,20,36,0.5)', border: '1px solid rgba(26,40,64,0.5)' }}
+          style={{ background: 'rgb(var(--rgb-bg2) / 0.5)', border: '1px solid rgb(var(--rgb-border) / 0.5)' }}
         >
           {/* Sentiment filters */}
           <FilterChip
@@ -642,22 +642,22 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
             active={sentimentFilter === 'bullish'}
             onClick={() => setSentimentFilter('bullish')}
             label="📈 שורי"
-            activeColor="#00e5b0"
+            activeColor="var(--accent)"
           />
           <FilterChip
             active={sentimentFilter === 'bearish'}
             onClick={() => setSentimentFilter('bearish')}
             label="📉 דובי"
-            activeColor="#ff4d6a"
+            activeColor="var(--red)"
           />
           <FilterChip
             active={sentimentFilter === 'neutral'}
             onClick={() => setSentimentFilter('neutral')}
             label="◯ נייטרלי"
-            activeColor="#5a7090"
+            activeColor="var(--muted)"
           />
 
-          <div className="mx-1 h-5 w-px" style={{ background: 'rgba(26,40,64,0.7)' }} />
+          <div className="mx-1 h-5 w-px" style={{ background: 'rgb(var(--rgb-border) / 0.7)' }} />
 
           {/* Language filters */}
           <FilterChip
@@ -683,9 +683,9 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
             <button
               onClick={() => { setSentimentFilter('all'); setLangFilter('all'); }}
               className="ms-auto text-[11px] font-bold transition-colors"
-              style={{ color: '#5a7090' }}
+              style={{ color: 'var(--muted)' }}
               onMouseEnter={(e) => e.currentTarget.style.color = '#e5ecf5'}
-              onMouseLeave={(e) => e.currentTarget.style.color = '#5a7090'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--muted)'}
             >
               נקה ✕
             </button>
@@ -699,9 +699,9 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
           onClick={showPending}
           className="sticky top-4 z-30 mx-auto flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all hover:scale-105 active:scale-95"
           style={{
-            background: 'linear-gradient(135deg, #00e5b0, #00a884)',
-            color: '#060b16',
-            boxShadow: '0 8px 24px rgba(0, 229, 176, 0.35), 0 0 0 1px rgba(0, 229, 176, 0.4)',
+            background: 'linear-gradient(135deg, var(--accent), var(--accent2))',
+            color: 'var(--bg)',
+            boxShadow: '0 8px 24px rgb(var(--rgb-accent) / 0.35), 0 0 0 1px rgb(var(--rgb-accent) / 0.4)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -724,7 +724,7 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
       {usingMock && (
         <div
           className="text-center text-xs text-tsua-muted py-2.5 rounded-xl"
-          style={{ background: 'rgba(26,40,64,0.25)', border: '1px solid rgba(26,40,64,0.4)' }}
+          style={{ background: 'rgb(var(--rgb-border) / 0.25)', border: '1px solid rgb(var(--rgb-border) / 0.4)' }}
         >
           {'📋 מציג פוסטים לדוגמה — התחבר ופרסם את הראשון!'}
         </div>
@@ -738,7 +738,7 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
             ref={el => { postRefs.current[i] = el; }}
             className="rounded-2xl transition-shadow"
             style={isFocused ? {
-              boxShadow: '0 0 0 2px rgba(0,229,176,0.55), 0 8px 28px rgba(0,229,176,0.18)',
+              boxShadow: '0 0 0 2px rgb(var(--rgb-accent) / 0.55), 0 8px 28px rgb(var(--rgb-accent) / 0.18)',
               borderRadius: '18px',
             } : undefined}
           >
@@ -757,7 +757,7 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
       {posts.length === 0 && loadError && !loading && (
         <div
           className="text-center py-12 rounded-2xl"
-          style={{ background: 'rgba(13,20,36,0.5)', border: '1px solid rgba(26,40,64,0.5)' }}
+          style={{ background: 'rgb(var(--rgb-bg2) / 0.5)', border: '1px solid rgb(var(--rgb-border) / 0.5)' }}
         >
           <div className="text-3xl mb-2">📡</div>
           <div className="text-tsua-muted text-sm font-medium mb-3">
@@ -766,7 +766,7 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
           <button
             onClick={() => { setLoading(true); setRetryKey(k => k + 1); }}
             className="text-xs font-bold px-4 py-2 rounded-lg transition-colors"
-            style={{ background: 'rgba(0,229,176,0.1)', color: '#00e5b0', border: '1px solid rgba(0,229,176,0.3)' }}
+            style={{ background: 'rgb(var(--rgb-accent) / 0.1)', color: 'var(--accent)', border: '1px solid rgb(var(--rgb-accent) / 0.3)' }}
           >
             🔄 נסה שוב
           </button>
@@ -777,7 +777,7 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
       {posts.length === 0 && !loadError && !loading && (
         <div
           className="text-center py-16 rounded-2xl"
-          style={{ background: 'rgba(13,20,36,0.5)', border: '1px solid rgba(26,40,64,0.5)' }}
+          style={{ background: 'rgb(var(--rgb-bg2) / 0.5)', border: '1px solid rgb(var(--rgb-border) / 0.5)' }}
         >
           <div className="text-4xl mb-3">📭</div>
           <div className="text-tsua-muted text-sm font-medium">
@@ -793,7 +793,7 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
       {posts.length > 0 && filteredPosts.length === 0 && (
         <div
           className="text-center py-12 rounded-2xl"
-          style={{ background: 'rgba(13,20,36,0.5)', border: '1px solid rgba(26,40,64,0.5)' }}
+          style={{ background: 'rgb(var(--rgb-bg2) / 0.5)', border: '1px solid rgb(var(--rgb-border) / 0.5)' }}
         >
           <div className="text-3xl mb-2">🔍</div>
           <div className="text-tsua-muted text-sm font-medium mb-3">
@@ -802,7 +802,7 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
           <button
             onClick={() => { setSentimentFilter('all'); setLangFilter('all'); }}
             className="text-xs font-bold px-4 py-2 rounded-lg transition-colors"
-            style={{ background: 'rgba(0,229,176,0.1)', color: '#00e5b0', border: '1px solid rgba(0,229,176,0.3)' }}
+            style={{ background: 'rgb(var(--rgb-accent) / 0.1)', color: 'var(--accent)', border: '1px solid rgb(var(--rgb-accent) / 0.3)' }}
           >
             נקה סינון
           </button>
@@ -816,9 +816,9 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
           disabled={loadingMore}
           className="w-full py-3 rounded-2xl text-sm font-semibold transition-all hover:opacity-80"
           style={{
-            background: 'rgba(26,40,64,0.3)',
-            border: '1px solid rgba(26,40,64,0.6)',
-            color: '#5a7090',
+            background: 'rgb(var(--rgb-border) / 0.3)',
+            border: '1px solid rgb(var(--rgb-border) / 0.6)',
+            color: 'var(--muted)',
           }}
         >
           {loadingMore ? 'טוען...' : 'טען עוד פוסטים'}

@@ -35,7 +35,7 @@ function StatRow({ label, value, highlight, color, term }: {
         {label}
         {term && <InfoTooltip term={term} />}
       </span>
-      <span className="text-xs font-bold font-mono" style={{ color: color ?? (highlight ? '#00e5b0' : '#c8d8f0') }} dir="ltr">
+      <span className="text-xs font-bold font-mono" style={{ color: color ?? (highlight ? 'var(--accent)' : 'var(--text2)') }} dir="ltr">
         {value ?? '—'}
       </span>
     </div>
@@ -89,7 +89,7 @@ export function KeyStats({
         { label: 'רווח למניה (EPS)',   value: fmt(eps, 2, sym), term: DICTIONARY.eps },
         { label: 'תשואת דיבידנד',     value: dividendYield != null ? `${dividendYield.toFixed(2)}%` : null, term: DICTIONARY.dividend },
         { label: 'בטא',               value: fmt(beta, 2), term: DICTIONARY.beta,
-          color: beta != null ? (beta > 1.5 ? '#ff4d6a' : beta < 0.8 ? '#00e5b0' : '#c8d8f0') : undefined },
+          color: beta != null ? (beta > 1.5 ? 'var(--red)' : beta < 0.8 ? 'var(--accent)' : 'var(--text2)') : undefined },
       ],
     },
     {
@@ -99,7 +99,7 @@ export function KeyStats({
           highlight: roeTTM != null && roeTTM > 15, term: DICTIONARY.roe },
         { label: 'צמיחת הכנסות',        value: revenueGrowthTTM != null ? `${revenueGrowthTTM.toFixed(1)}%` : null,
           term: DICTIONARY.revenue,
-          color: revenueGrowthTTM != null ? (revenueGrowthTTM >= 0 ? '#00e5b0' : '#ff4d6a') : undefined },
+          color: revenueGrowthTTM != null ? (revenueGrowthTTM >= 0 ? 'var(--accent)' : 'var(--red)') : undefined },
       ].filter(r => r.value),
     },
   ];

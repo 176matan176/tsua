@@ -67,16 +67,16 @@ export function OnboardingModal() {
         className="relative w-full max-w-[360px] rounded-2xl overflow-hidden"
         dir="rtl"
         style={{
-          background: '#060b16',
-          border: '1px solid rgba(0,229,176,0.35)',
-          boxShadow: '0 0 0 1px rgba(0,229,176,0.08), 0 0 80px rgba(0,229,176,0.12), 0 32px 80px rgba(0,0,0,0.85)',
+          background: 'var(--bg)',
+          border: '1px solid rgb(var(--rgb-accent) / 0.35)',
+          boxShadow: '0 0 0 1px rgb(var(--rgb-accent) / 0.08), 0 0 80px rgb(var(--rgb-accent) / 0.12), 0 32px 80px rgba(0,0,0,0.85)',
           animation: closing ? 'modalDown 0.28s ease-in forwards' : 'modalUp 0.35s cubic-bezier(0.34,1.56,0.64,1)',
         }}
       >
         {/* Terminal header bar */}
         <div
           className="flex items-center gap-2 px-4 py-2.5"
-          style={{ background: '#0a0f1e', borderBottom: '1px solid rgba(0,229,176,0.12)' }}
+          style={{ background: 'var(--bg2)', borderBottom: '1px solid rgb(var(--rgb-accent) / 0.12)' }}
         >
           <div className="flex gap-1.5 items-center">
             <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#ff5f57' }} />
@@ -85,14 +85,14 @@ export function OnboardingModal() {
           </div>
           <span
             className="flex-1 text-center text-[10px] font-mono tracking-widest uppercase"
-            style={{ color: 'rgba(0,229,176,0.45)' }}
+            style={{ color: 'rgb(var(--rgb-accent) / 0.45)' }}
           >
             tsua.co — v1.0
           </span>
           <button
             onClick={dismiss}
             className="transition-opacity hover:opacity-60"
-            style={{ color: 'rgba(90,112,144,0.5)' }}
+            style={{ color: 'rgb(var(--rgb-muted) / 0.5)' }}
           >
             <XMarkIcon className="w-3.5 h-3.5" />
           </button>
@@ -105,14 +105,14 @@ export function OnboardingModal() {
             <div className="relative inline-block mb-3">
               <div
                 className="absolute inset-0 rounded-full blur-2xl"
-                style={{ background: 'rgba(0,229,176,0.2)', transform: 'scale(1.4)' }}
+                style={{ background: 'rgb(var(--rgb-accent) / 0.2)', transform: 'scale(1.4)' }}
               />
               <div
                 className="relative text-[44px] font-black tracking-[-0.03em]"
                 style={{
-                  color: '#00e5b0',
+                  color: 'var(--accent)',
                   fontFamily: "'Heebo', sans-serif",
-                  textShadow: '0 0 30px rgba(0,229,176,0.5)',
+                  textShadow: '0 0 30px rgb(var(--rgb-accent) / 0.5)',
                 }}
               >
                 תשואה
@@ -120,7 +120,7 @@ export function OnboardingModal() {
             </div>
             <p
               className="text-[13px] font-semibold leading-relaxed"
-              style={{ color: 'rgba(168,188,212,0.85)' }}
+              style={{ color: 'rgb(var(--rgb-text2) / 0.85)' }}
             >
               הפלטפורמה הסוציאלית למשקיעים הישראלים
             </p>
@@ -133,25 +133,25 @@ export function OnboardingModal() {
                 key={i}
                 className="flex items-center gap-3 px-3.5 py-3 rounded-xl"
                 style={{
-                  background: 'rgba(0,229,176,0.04)',
-                  border: '1px solid rgba(0,229,176,0.1)',
+                  background: 'rgb(var(--rgb-accent) / 0.04)',
+                  border: '1px solid rgb(var(--rgb-accent) / 0.1)',
                   animationDelay: `${0.1 + i * 0.07}s`,
                   animation: 'featureIn 0.4s ease-out both',
                 }}
               >
                 <span className="text-[22px] shrink-0 leading-none">{f.icon}</span>
                 <div className="min-w-0">
-                  <div className="text-[13px] font-bold mb-0.5" style={{ color: '#e8f0ff' }}>
+                  <div className="text-[13px] font-bold mb-0.5" style={{ color: 'var(--text)' }}>
                     {f.title}
                   </div>
-                  <div className="text-[11px] leading-relaxed" style={{ color: 'rgba(90,112,144,0.85)' }}>
+                  <div className="text-[11px] leading-relaxed" style={{ color: 'rgb(var(--rgb-muted) / 0.85)' }}>
                     {f.desc}
                   </div>
                 </div>
                 {/* Accent dot */}
                 <div
                   className="w-1.5 h-1.5 rounded-full shrink-0 ms-auto"
-                  style={{ background: 'rgba(0,229,176,0.5)' }}
+                  style={{ background: 'rgb(var(--rgb-accent) / 0.5)' }}
                 />
               </div>
             ))}
@@ -164,10 +164,10 @@ export function OnboardingModal() {
               onClick={dismiss}
               className="flex items-center justify-center gap-2 w-full py-3 rounded-xl font-black text-[14px] transition-all hover:brightness-110 active:scale-[0.98]"
               style={{
-                background: 'linear-gradient(135deg, #00e5b0 0%, #009e7a 100%)',
+                background: 'linear-gradient(135deg, var(--accent) 0%, #009e7a 100%)',
                 color: '#03110c',
                 letterSpacing: '-0.02em',
-                boxShadow: '0 4px 24px rgba(0,229,176,0.3), 0 1px 0 rgba(255,255,255,0.1) inset',
+                boxShadow: '0 4px 24px rgb(var(--rgb-accent) / 0.3), 0 1px 0 rgba(255,255,255,0.1) inset',
               }}
             >
               הצטרף חינם
@@ -179,8 +179,8 @@ export function OnboardingModal() {
               onClick={dismiss}
               className="flex items-center justify-center w-full py-2.5 rounded-xl font-semibold text-[13px] transition-all hover:bg-white/5 active:scale-[0.98]"
               style={{
-                color: 'rgba(168,188,212,0.8)',
-                border: '1px solid rgba(26,40,64,0.9)',
+                color: 'rgb(var(--rgb-text2) / 0.8)',
+                border: '1px solid rgb(var(--rgb-border) / 0.9)',
               }}
             >
               כבר יש לי חשבון
@@ -200,7 +200,7 @@ export function OnboardingModal() {
         <div
           className="h-[2px] w-full"
           style={{
-            background: 'linear-gradient(90deg, transparent 0%, rgba(0,229,176,0.4) 50%, transparent 100%)',
+            background: 'linear-gradient(90deg, transparent 0%, rgb(var(--rgb-accent) / 0.4) 50%, transparent 100%)',
           }}
         />
       </div>

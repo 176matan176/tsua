@@ -76,7 +76,7 @@ export function InfoTooltip({ term, text, size = 14, placement = 'top' }: InfoTo
           style={{
             width: size,
             height: size,
-            color: show ? '#00e5b0' : 'rgba(90,112,144,0.7)',
+            color: show ? 'var(--accent)' : 'rgb(var(--rgb-muted) / 0.7)',
             transition: 'color 0.15s',
           }}
         />
@@ -86,9 +86,9 @@ export function InfoTooltip({ term, text, size = 14, placement = 'top' }: InfoTo
           role="tooltip"
           className={`absolute ${placementClass} z-50 w-64 rounded-xl p-3 leading-relaxed`}
           style={{
-            background: 'rgba(10,16,30,0.98)',
-            border: '1px solid rgba(0,229,176,0.25)',
-            color: '#c8d8f0',
+            background: 'rgb(var(--rgb-card) / 0.98)',
+            border: '1px solid rgb(var(--rgb-accent) / 0.25)',
+            color: 'var(--text2)',
             boxShadow: '0 8px 32px rgba(0,0,0,0.7)',
           }}
           dir="rtl"
@@ -96,11 +96,11 @@ export function InfoTooltip({ term, text, size = 14, placement = 'top' }: InfoTo
           {hasEntry ? (
             <>
               <div className="flex items-center gap-1.5 mb-1">
-                <span className="text-[11px] font-black" style={{ color: '#00e5b0' }}>
+                <span className="text-[11px] font-black" style={{ color: 'var(--accent)' }}>
                   {term!.term}
                 </span>
               </div>
-              <div className="text-[11px] font-semibold mb-2" style={{ color: '#c8d8f0' }}>
+              <div className="text-[11px] font-semibold mb-2" style={{ color: 'var(--text2)' }}>
                 {term!.short}
               </div>
               <div className="text-[11px] opacity-80 leading-snug">
@@ -109,9 +109,9 @@ export function InfoTooltip({ term, text, size = 14, placement = 'top' }: InfoTo
               {term!.example && (
                 <div
                   className="mt-2 pt-2 text-[10px] leading-snug"
-                  style={{ borderTop: '1px solid rgba(0,229,176,0.15)', color: '#8aa0c0' }}
+                  style={{ borderTop: '1px solid rgb(var(--rgb-accent) / 0.15)', color: '#8aa0c0' }}
                 >
-                  <span className="font-bold" style={{ color: '#00e5b0' }}>דוגמה: </span>
+                  <span className="font-bold" style={{ color: 'var(--accent)' }}>דוגמה: </span>
                   {term!.example}
                 </div>
               )}

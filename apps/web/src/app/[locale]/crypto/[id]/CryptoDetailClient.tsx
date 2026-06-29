@@ -54,7 +54,7 @@ function formatSupply(n: number | null, symbol: string): string {
 function ChangeCell({ pct }: { pct: number | null }) {
   if (pct == null) return <span className="text-tsua-muted">—</span>;
   const isUp = pct >= 0;
-  const color = isUp ? '#00e5b0' : '#ff4d6a';
+  const color = isUp ? 'var(--accent)' : 'var(--red)';
   return (
     <span style={{ color }} className="font-bold font-mono" dir="ltr">
       {isUp ? '+' : ''}{pct.toFixed(2)}%
@@ -92,8 +92,8 @@ export function CryptoDetailClient({ coinId }: { coinId: string }) {
   if (loading && !data) {
     return (
       <div className="space-y-4">
-        <div className="h-40 rounded-2xl animate-pulse" style={{ background: 'rgba(26,40,64,0.4)' }} />
-        <div className="h-48 rounded-2xl animate-pulse" style={{ background: 'rgba(26,40,64,0.4)' }} />
+        <div className="h-40 rounded-2xl animate-pulse" style={{ background: 'rgb(var(--rgb-border) / 0.4)' }} />
+        <div className="h-48 rounded-2xl animate-pulse" style={{ background: 'rgb(var(--rgb-border) / 0.4)' }} />
       </div>
     );
   }
@@ -116,7 +116,7 @@ export function CryptoDetailClient({ coinId }: { coinId: string }) {
       <header
         className="rounded-2xl p-6"
         style={{
-          background: `linear-gradient(135deg, ${isUp24h ? 'rgba(0,229,176,0.08)' : 'rgba(255,77,106,0.08)'} 0%, var(--card) 60%)`,
+          background: `linear-gradient(135deg, ${isUp24h ? 'rgb(var(--rgb-accent) / 0.08)' : 'rgb(var(--rgb-red) / 0.08)'} 0%, var(--card) 60%)`,
           border: '1px solid var(--border)',
         }}
       >
@@ -130,7 +130,7 @@ export function CryptoDetailClient({ coinId }: { coinId: string }) {
               <div className="flex items-center gap-2 flex-wrap">
                 <h1 className="text-2xl font-black text-tsua-text">{data.nameHe}</h1>
                 <span dir="ltr" className="text-sm font-mono font-bold text-tsua-muted px-2 py-0.5 rounded-lg"
-                  style={{ background: 'rgba(26,40,64,0.5)' }}
+                  style={{ background: 'rgb(var(--rgb-border) / 0.5)' }}
                 >
                   {data.symbol}
                 </span>
@@ -165,14 +165,14 @@ export function CryptoDetailClient({ coinId }: { coinId: string }) {
               <span className="font-bold">טווח 24 שעות</span>
               <span dir="ltr"><span className="text-tsua-muted">שיא</span> {formatPrice(data.high24h)}</span>
             </div>
-            <div className="h-1.5 rounded-full relative" style={{ background: 'rgba(26,40,64,0.6)' }}>
+            <div className="h-1.5 rounded-full relative" style={{ background: 'rgb(var(--rgb-border) / 0.6)' }}>
               <div
                 className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full"
                 style={{
                   left: `${((data.price - data.low24h) / (data.high24h - data.low24h)) * 100}%`,
                   transform: `translate(-50%, -50%)`,
-                  background: '#00e5b0',
-                  boxShadow: '0 0 8px rgba(0,229,176,0.6)',
+                  background: 'var(--accent)',
+                  boxShadow: '0 0 8px rgb(var(--rgb-accent) / 0.6)',
                 }}
               />
             </div>
@@ -223,7 +223,7 @@ export function CryptoDetailClient({ coinId }: { coinId: string }) {
           <Stat
             label="מרחק משיא"
             value={data.athChangePercent != null ? `${data.athChangePercent.toFixed(1)}%` : '—'}
-            color={data.athChangePercent != null ? (data.athChangePercent >= 0 ? '#00e5b0' : '#ff4d6a') : undefined}
+            color={data.athChangePercent != null ? (data.athChangePercent >= 0 ? 'var(--accent)' : 'var(--red)') : undefined}
           />
           <Stat label="תאריך שיא" value={data.athDate ? new Date(data.athDate).toLocaleDateString('he-IL') : '—'} />
           <Stat label="היצע במחזור" value={formatSupply(data.circulatingSupply, data.symbol)} />
@@ -245,7 +245,7 @@ function Stat({ label, value, highlight, color }: { label: string; value: string
       <div
         className="text-sm font-semibold text-tsua-text truncate font-mono"
         dir="ltr"
-        style={{ color: color ?? (highlight ? '#00e5b0' : '#c8d8f0') }}
+        style={{ color: color ?? (highlight ? 'var(--accent)' : 'var(--text2)') }}
       >
         {value}
       </div>

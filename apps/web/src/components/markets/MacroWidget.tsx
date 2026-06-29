@@ -38,20 +38,20 @@ function IndicatorCard({ ind }: { ind: MacroIndicator }) {
 
   // Color logic: for inflation/unemployment, higher is "worse" (red-ish);
   // for interest rate, we stay neutral — context matters.
-  let valueColor = '#c8d8f0';
+  let valueColor = 'var(--text2)';
   if (ind.key.endsWith('-cpi')) {
     // Inflation above 3% is warning; above 5% is concern
     if (ind.value != null) {
-      if (ind.value > 5) valueColor = '#ff4d6a';
+      if (ind.value > 5) valueColor = 'var(--red)';
       else if (ind.value > 3) valueColor = '#f58220';
-      else if (ind.value >= 1) valueColor = '#00e5b0';
+      else if (ind.value >= 1) valueColor = 'var(--accent)';
       else valueColor = '#f58220'; // deflation also concerning
     }
   } else if (ind.key.endsWith('-unemp')) {
     if (ind.value != null) {
-      if (ind.value > 6) valueColor = '#ff4d6a';
+      if (ind.value > 6) valueColor = 'var(--red)';
       else if (ind.value > 4.5) valueColor = '#f58220';
-      else valueColor = '#00e5b0';
+      else valueColor = 'var(--accent)';
     }
   }
 
@@ -149,7 +149,7 @@ export function MacroWidget() {
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 p-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-20 rounded-xl animate-pulse" style={{ background: 'rgba(26,40,64,0.4)' }} />
+            <div key={i} className="h-20 rounded-xl animate-pulse" style={{ background: 'rgb(var(--rgb-border) / 0.4)' }} />
           ))}
         </div>
       </div>

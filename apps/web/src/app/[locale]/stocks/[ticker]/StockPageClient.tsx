@@ -101,8 +101,8 @@ export function StockPageClient({ ticker }: { ticker: string }) {
                 onClick={() => setTab(t as Tab)}
                 className="flex-1 py-2 text-xs font-bold rounded-lg transition-all"
                 style={tab === t
-                  ? { background: 'linear-gradient(135deg, #00e5b0, #00c49a)', color: '#080d1a' }
-                  : { color: '#5a7090' }
+                  ? { background: 'linear-gradient(135deg, var(--accent), var(--accent2))', color: '#080d1a' }
+                  : { color: 'var(--muted)' }
                 }
               >
                 {label}

@@ -34,9 +34,9 @@ function StockPill({ ticker, exchange }: { ticker: string; exchange: string }) {
         className="inline-flex items-center gap-0 cursor-pointer transition-all duration-150 hover:scale-[1.03] active:scale-95 overflow-hidden"
         style={{
           borderRadius: '8px',
-          border: `1px solid ${isFlashing ? (live?.flash === 'up' ? 'rgba(0,229,176,0.5)' : 'rgba(255,77,106,0.5)') : 'rgba(26,40,64,0.9)'}`,
+          border: `1px solid ${isFlashing ? (live?.flash === 'up' ? 'rgb(var(--rgb-accent) / 0.5)' : 'rgb(var(--rgb-red) / 0.5)') : 'rgb(var(--rgb-border) / 0.9)'}`,
           boxShadow: isFlashing
-            ? (live?.flash === 'up' ? '0 0 16px rgba(0,229,176,0.2)' : '0 0 16px rgba(255,77,106,0.2)')
+            ? (live?.flash === 'up' ? '0 0 16px rgb(var(--rgb-accent) / 0.2)' : '0 0 16px rgb(var(--rgb-red) / 0.2)')
             : 'none',
         }}
       >
@@ -44,9 +44,9 @@ function StockPill({ ticker, exchange }: { ticker: string; exchange: string }) {
         <span
           className="px-2.5 py-1.5 text-[11px] font-black tracking-wider"
           style={{
-            background: 'rgba(8,14,26,0.95)',
-            color: '#00e5b0',
-            borderRight: '1px solid rgba(26,40,64,0.6)',
+            background: 'rgb(var(--rgb-bg) / 0.95)',
+            color: 'var(--accent)',
+            borderRight: '1px solid rgb(var(--rgb-border) / 0.6)',
             fontFamily: 'monospace',
           }}
         >
@@ -56,20 +56,20 @@ function StockPill({ ticker, exchange }: { ticker: string; exchange: string }) {
         {live ? (
           <span
             className="px-2 py-1.5 flex items-center gap-1.5"
-            style={{ background: 'rgba(12,18,32,0.95)' }}
+            style={{ background: 'rgb(var(--rgb-bg2) / 0.95)' }}
           >
             <span className="text-[11px] font-bold font-mono tabular-nums" style={{ color: '#a0b4cc' }}>
               {live.price >= 1000 ? live.price.toLocaleString('en', { maximumFractionDigits: 0 }) : live.price.toFixed(2)}
             </span>
             <span
               className="text-[10px] font-black font-mono tabular-nums"
-              style={{ color: isUp ? '#00e5b0' : '#ff4d6a' }}
+              style={{ color: isUp ? 'var(--accent)' : 'var(--red)' }}
             >
               {isUp ? '+' : ''}{changePercent.toFixed(2)}%
             </span>
           </span>
         ) : (
-          <span className="px-2 py-1.5 text-[10px]" style={{ background: 'rgba(12,18,32,0.95)', color: 'rgba(90,112,144,0.6)' }}>
+          <span className="px-2 py-1.5 text-[10px]" style={{ background: 'rgb(var(--rgb-bg2) / 0.95)', color: 'rgb(var(--rgb-muted) / 0.6)' }}>
             {exchange === 'TASE' ? 'ת"א' : exchange}
           </span>
         )}
@@ -116,10 +116,10 @@ function ReplyComposer({
   }
 
   return (
-    <div className="flex gap-2.5 mt-3 pt-3" style={{ borderTop: '1px solid rgba(26,40,64,0.4)' }}>
+    <div className="flex gap-2.5 mt-3 pt-3" style={{ borderTop: '1px solid rgb(var(--rgb-border) / 0.4)' }}>
       <div
         className="w-8 h-8 rounded-full flex items-center justify-center font-black text-xs shrink-0 text-tsua-bg"
-        style={{ background: 'linear-gradient(135deg, #00e5b0, #3b82f6)' }}
+        style={{ background: 'linear-gradient(135deg, var(--accent), var(--blue))' }}
       >
         {initial}
       </div>
@@ -133,16 +133,16 @@ function ReplyComposer({
           maxLength={280}
           className="w-full resize-none rounded-xl px-3 py-2 text-sm placeholder:text-tsua-muted focus:outline-none transition-all"
           style={{
-            background: 'rgba(15,25,41,0.6)',
-            border: '1px solid rgba(26,40,64,0.6)',
-            color: '#e8f0ff',
+            background: 'rgb(var(--rgb-card) / 0.6)',
+            border: '1px solid rgb(var(--rgb-border) / 0.6)',
+            color: 'var(--text)',
           }}
           onFocus={e => {
-            e.target.style.border = '1px solid rgba(0,229,176,0.3)';
-            e.target.style.boxShadow = '0 0 0 3px rgba(0,229,176,0.06)';
+            e.target.style.border = '1px solid rgb(var(--rgb-accent) / 0.3)';
+            e.target.style.boxShadow = '0 0 0 3px rgb(var(--rgb-accent) / 0.06)';
           }}
           onBlur={e => {
-            e.target.style.border = '1px solid rgba(26,40,64,0.6)';
+            e.target.style.border = '1px solid rgb(var(--rgb-border) / 0.6)';
             e.target.style.boxShadow = 'none';
           }}
           autoFocus
@@ -160,7 +160,7 @@ function ReplyComposer({
               onClick={submit}
               disabled={!text.trim() || loading}
               className="text-xs font-bold px-4 py-1 rounded-lg text-tsua-bg transition-all disabled:opacity-40 active:scale-95"
-              style={{ background: 'linear-gradient(135deg, #00e5b0, #00c49a)' }}
+              style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent2))' }}
             >
               {loading ? 'שולח...' : 'שלח'}
             </button>
@@ -368,20 +368,20 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
     setRepliesLoaded(true);
   }
 
-  const sentimentColor = isBullish ? '#00e5b0' : isBearish ? '#ff4d6a' : null;
+  const sentimentColor = isBullish ? 'var(--accent)' : isBearish ? 'var(--red)' : null;
 
   return (
     <article
       className={`group relative transition-all duration-200 ${!isReply ? 'hover:-translate-y-px' : ''} ${isFresh ? 'tsua-fresh-post' : ''}`}
       style={{
         background: isReply
-          ? 'rgba(8,13,24,0.6)'
+          ? 'rgb(var(--rgb-bg) / 0.6)'
           : isBullish
-          ? 'linear-gradient(135deg, rgba(0,229,176,0.03) 0%, rgba(10,16,30,0.92) 40%)'
+          ? 'linear-gradient(135deg, rgb(var(--rgb-accent) / 0.03) 0%, rgb(var(--rgb-card) / 0.92) 40%)'
           : isBearish
-          ? 'linear-gradient(135deg, rgba(255,77,106,0.03) 0%, rgba(10,16,30,0.92) 40%)'
-          : 'rgba(10,16,30,0.88)',
-        border: `1px solid ${isReply ? 'rgba(26,40,64,0.35)' : sentimentColor ? `rgba(${isBullish ? '0,229,176' : '255,77,106'},0.18)` : 'rgba(26,40,64,0.65)'}`,
+          ? 'linear-gradient(135deg, rgb(var(--rgb-red) / 0.03) 0%, rgb(var(--rgb-card) / 0.92) 40%)'
+          : 'rgb(var(--rgb-card) / 0.88)',
+        border: `1px solid ${isReply ? 'rgb(var(--rgb-border) / 0.35)' : sentimentColor ? `rgba(${isBullish ? '0,229,176' : '255,77,106'},0.18)` : 'rgb(var(--rgb-border) / 0.65)'}`,
         borderRadius: '12px',
         borderInlineStart: sentimentColor ? `3px solid ${sentimentColor}` : undefined,
         boxShadow: !isReply
@@ -394,7 +394,7 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
         if (!isReply) {
           (e.currentTarget as HTMLElement).style.boxShadow = sentimentColor
             ? `0 6px 32px rgba(0,0,0,0.3), 0 0 0 1px ${sentimentColor}22`
-            : '0 6px 32px rgba(0,0,0,0.28), 0 0 0 1px rgba(0,229,176,0.1)';
+            : '0 6px 32px rgba(0,0,0,0.28), 0 0 0 1px rgb(var(--rgb-accent) / 0.1)';
         }
       }}
       onMouseLeave={e => {
@@ -416,9 +416,9 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
                   style={{
                     borderRadius: '10px',
                     background: isBullish
-                      ? 'linear-gradient(135deg, #00e5b0 0%, #006b52 100%)'
+                      ? 'linear-gradient(135deg, var(--accent) 0%, #006b52 100%)'
                       : isBearish
-                      ? 'linear-gradient(135deg, #ff4d6a 0%, #8b1a2e 100%)'
+                      ? 'linear-gradient(135deg, var(--red) 0%, #8b1a2e 100%)'
                       : 'linear-gradient(135deg, #1e3a5f 0%, #0d2240 100%)',
                     color: '#fff',
                     boxShadow: sentimentColor ? `0 0 16px ${sentimentColor}30` : 'none',
@@ -430,12 +430,12 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
                 {/* Online dot */}
                 <span
                   className="absolute -bottom-0.5 -end-0.5 w-2.5 h-2.5 rounded-full border-2"
-                  style={{ background: '#00e5b0', borderColor: '#060b16' }}
+                  style={{ background: 'var(--accent)', borderColor: 'var(--bg)' }}
                 />
               </div>
             </Link>
             {showReplies && replies.length > 0 && (
-              <div className="w-px flex-1 mt-2 min-h-4" style={{ background: 'linear-gradient(180deg, rgba(26,40,64,0.8), transparent)' }} />
+              <div className="w-px flex-1 mt-2 min-h-4" style={{ background: 'linear-gradient(180deg, rgb(var(--rgb-border) / 0.8), transparent)' }} />
             )}
           </div>
 
@@ -455,14 +455,14 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
                 {post.author.isVerified && (
                   <span
                     className="w-[15px] h-[15px] rounded-full flex items-center justify-center text-[8px] font-black shrink-0"
-                    style={{ background: 'linear-gradient(135deg, #00e5b0, #0090ff)', color: '#060b16' }}
+                    style={{ background: 'linear-gradient(135deg, var(--accent), #0090ff)', color: 'var(--bg)' }}
                   >✓</span>
                 )}
 
                 {post.author.rating && (
                   <span
                     className="text-[10px] font-bold px-1.5 py-0.5 shrink-0"
-                    style={{ borderRadius: '5px', background: 'rgba(245,185,66,0.1)', color: '#f5b942', border: '1px solid rgba(245,185,66,0.18)' }}
+                    style={{ borderRadius: '5px', background: 'rgb(var(--rgb-gold) / 0.1)', color: 'var(--gold)', border: '1px solid rgb(var(--rgb-gold) / 0.18)' }}
                   >
                     ★ {post.author.rating}
                   </span>
@@ -475,7 +475,7 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
                   className="shrink-0 text-[10px] font-black px-2 py-1 flex items-center gap-1"
                   style={{
                     borderRadius: '6px',
-                    background: isBullish ? 'rgba(0,229,176,0.1)' : 'rgba(255,77,106,0.1)',
+                    background: isBullish ? 'rgb(var(--rgb-accent) / 0.1)' : 'rgb(var(--rgb-red) / 0.1)',
                     color: sentimentColor,
                     border: `1px solid ${sentimentColor}30`,
                     boxShadow: `0 0 12px ${sentimentColor}18`,
@@ -489,16 +489,16 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
 
             {/* Metadata line */}
             <div className="flex items-center gap-1.5 mb-3">
-              <span className="text-[11px] font-mono" style={{ color: 'rgba(90,112,144,0.8)' }}>
+              <span className="text-[11px] font-mono" style={{ color: 'rgb(var(--rgb-muted) / 0.8)' }}>
                 @{post.author.username}
               </span>
-              <span style={{ color: 'rgba(26,40,64,0.8)' }}>·</span>
+              <span style={{ color: 'rgb(var(--rgb-border) / 0.8)' }}>·</span>
               <Link
                 href={`/${locale}/posts/${post.id}`}
                 className="text-[11px] font-mono transition-colors hover:underline"
-                style={{ color: 'rgba(90,112,144,0.7)' }}
+                style={{ color: 'rgb(var(--rgb-muted) / 0.7)' }}
                 onMouseEnter={e => (e.currentTarget.style.color = '#a0b4cc')}
-                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(90,112,144,0.7)')}
+                onMouseLeave={e => (e.currentTarget.style.color = 'rgb(var(--rgb-muted) / 0.7)')}
                 onClick={e => e.stopPropagation()}
               >
                 {timeAgo}
@@ -523,7 +523,7 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
             {post.imageUrls && post.imageUrls.length > 0 && (
               <div
                 className={`mt-3 grid gap-1 overflow-hidden ${post.imageUrls.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}
-                style={{ borderRadius: '8px', border: '1px solid rgba(26,40,64,0.5)' }}
+                style={{ borderRadius: '8px', border: '1px solid rgb(var(--rgb-border) / 0.5)' }}
               >
                 {post.imageUrls.map((url, i) => (
                   <img
@@ -549,7 +549,7 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
             {/* Action row */}
             <div
               className="flex items-center gap-0 mt-3 pt-3 -mx-1"
-              style={{ borderTop: '1px solid rgba(26,40,64,0.4)' }}
+              style={{ borderTop: '1px solid rgb(var(--rgb-border) / 0.4)' }}
             >
               {/* Like */}
               <button
@@ -558,12 +558,12 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
               >
                 <span className={`transition-all duration-200 ${likeAnim ? 'scale-[1.3]' : 'scale-100'}`}>
                   {liked
-                    ? <HeartSolid className="w-[17px] h-[17px] text-tsua-red" style={{ filter: 'drop-shadow(0 0 5px rgba(255,77,106,0.6))' }} />
-                    : <HeartIcon className="w-[17px] h-[17px] group-hover/like:text-tsua-red transition-colors" style={{ color: 'rgba(90,112,144,0.7)' }} />
+                    ? <HeartSolid className="w-[17px] h-[17px] text-tsua-red" style={{ filter: 'drop-shadow(0 0 5px rgb(var(--rgb-red) / 0.6))' }} />
+                    : <HeartIcon className="w-[17px] h-[17px] group-hover/like:text-tsua-red transition-colors" style={{ color: 'rgb(var(--rgb-muted) / 0.7)' }} />
                   }
                 </span>
                 {likeCount > 0 && (
-                  <span className={`text-[11px] font-bold font-mono tabular-nums transition-colors ${liked ? 'text-tsua-red' : 'group-hover/like:text-tsua-red'}`} style={{ color: liked ? undefined : 'rgba(90,112,144,0.7)' }}>
+                  <span className={`text-[11px] font-bold font-mono tabular-nums transition-colors ${liked ? 'text-tsua-red' : 'group-hover/like:text-tsua-red'}`} style={{ color: liked ? undefined : 'rgb(var(--rgb-muted) / 0.7)' }}>
                     {likeCount}
                   </span>
                 )}
@@ -576,12 +576,12 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
               >
                 <ChatBubbleOvalLeftIcon
                   className="w-[17px] h-[17px] transition-colors group-hover/reply:text-blue-400"
-                  style={{ color: showReplies ? '#60a5fa' : 'rgba(90,112,144,0.7)' }}
+                  style={{ color: showReplies ? '#60a5fa' : 'rgb(var(--rgb-muted) / 0.7)' }}
                 />
                 {replyCount > 0 && (
                   <span
                     className="text-[11px] font-bold font-mono tabular-nums transition-colors group-hover/reply:text-blue-400"
-                    style={{ color: showReplies ? '#60a5fa' : 'rgba(90,112,144,0.7)' }}
+                    style={{ color: showReplies ? '#60a5fa' : 'rgb(var(--rgb-muted) / 0.7)' }}
                   >
                     {replyCount}
                   </span>
@@ -595,11 +595,11 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
                   className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all duration-200 hover:bg-green-500/8 group/repost"
                 >
                   {reposted
-                    ? <ArrowPathSolid className="w-[17px] h-[17px]" style={{ color: '#00e5b0' }} />
-                    : <ArrowPathIcon className="w-[17px] h-[17px] group-hover/repost:text-tsua-green transition-colors" style={{ color: 'rgba(90,112,144,0.7)' }} />
+                    ? <ArrowPathSolid className="w-[17px] h-[17px]" style={{ color: 'var(--accent)' }} />
+                    : <ArrowPathIcon className="w-[17px] h-[17px] group-hover/repost:text-tsua-green transition-colors" style={{ color: 'rgb(var(--rgb-muted) / 0.7)' }} />
                   }
                   {repostCount > 0 && (
-                    <span className="text-[11px] font-bold font-mono tabular-nums transition-colors" style={{ color: reposted ? '#00e5b0' : 'rgba(90,112,144,0.7)' }}>
+                    <span className="text-[11px] font-bold font-mono tabular-nums transition-colors" style={{ color: reposted ? 'var(--accent)' : 'rgb(var(--rgb-muted) / 0.7)' }}>
                       {repostCount}
                     </span>
                   )}
@@ -614,7 +614,7 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
                   onClick={handleShare}
                   aria-label="שתף"
                   className="p-2.5 rounded-lg transition-all duration-200 hover:bg-white/5 active:scale-95"
-                  style={{ color: shareOpen ? '#00e5b0' : 'rgba(90,112,144,0.7)' }}
+                  style={{ color: shareOpen ? 'var(--accent)' : 'rgb(var(--rgb-muted) / 0.7)' }}
                 >
                   <ArrowUpTrayIcon className="w-[17px] h-[17px]" />
                 </button>
@@ -630,16 +630,16 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
                     <div
                       className="absolute bottom-full mb-2 end-0 z-50 rounded-xl overflow-hidden min-w-[180px] max-w-[calc(100vw-32px)]"
                       style={{
-                        background: 'rgba(13,20,36,0.98)',
-                        border: '1px solid rgba(26,40,64,0.8)',
-                        boxShadow: '0 12px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(0,229,176,0.08)',
+                        background: 'rgb(var(--rgb-bg2) / 0.98)',
+                        border: '1px solid rgb(var(--rgb-border) / 0.8)',
+                        boxShadow: '0 12px 32px rgba(0,0,0,0.4), 0 0 0 1px rgb(var(--rgb-accent) / 0.08)',
                         backdropFilter: 'blur(8px)',
                       }}
                     >
                       <button
                         onClick={shareWhatsApp}
                         className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-[12px] font-semibold transition-colors hover:bg-[rgba(37,211,102,0.1)]"
-                        style={{ color: '#e8f0ff' }}
+                        style={{ color: 'var(--text)' }}
                       >
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="#25D366" aria-hidden="true">
                           <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12.057 22h-.04A9.96 9.96 0 0 1 7.1 20.6L2 22l1.42-5.103A9.954 9.954 0 0 1 2 11.99c0-5.495 4.477-9.961 9.971-9.961 2.667 0 5.166 1.04 7.041 2.928 1.875 1.888 2.929 4.395 2.93 7.058-.003 5.495-4.481 9.957-9.971 9.957l.085.026z"/>
@@ -650,9 +650,9 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
                       <button
                         onClick={shareTwitter}
                         className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-[12px] font-semibold transition-colors hover:bg-white/5"
-                        style={{ color: '#e8f0ff', borderTop: '1px solid rgba(26,40,64,0.5)' }}
+                        style={{ color: 'var(--text)', borderTop: '1px solid rgb(var(--rgb-border) / 0.5)' }}
                       >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="#e8f0ff" aria-hidden="true">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--text)" aria-hidden="true">
                           <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                         </svg>
                         <span>X (טוויטר)</span>
@@ -661,9 +661,9 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
                       <button
                         onClick={shareCopy}
                         className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-[12px] font-semibold transition-colors hover:bg-white/5"
-                        style={{ color: '#e8f0ff', borderTop: '1px solid rgba(26,40,64,0.5)' }}
+                        style={{ color: 'var(--text)', borderTop: '1px solid rgb(var(--rgb-border) / 0.5)' }}
                       >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00e5b0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                           <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
                           <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
                         </svg>
@@ -674,7 +674,7 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
                         <button
                           onClick={shareNative}
                           className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-[12px] font-semibold transition-colors hover:bg-white/5"
-                          style={{ color: '#e8f0ff', borderTop: '1px solid rgba(26,40,64,0.5)' }}
+                          style={{ color: 'var(--text)', borderTop: '1px solid rgb(var(--rgb-border) / 0.5)' }}
                         >
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a0b4cc" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                             <circle cx="18" cy="5" r="3"/>
@@ -696,7 +696,7 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
                         <button
                           onClick={() => { setShareOpen(false); setReportOpen(true); }}
                           className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-[12px] font-semibold transition-colors hover:bg-red-500/8"
-                          style={{ color: '#ff8c8c', borderTop: '2px solid rgba(26,40,64,0.7)' }}
+                          style={{ color: '#ff8c8c', borderTop: '2px solid rgb(var(--rgb-border) / 0.7)' }}
                         >
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                             <line x1="4" y1="22" x2="4" y2="15"/>
@@ -712,7 +712,7 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
                 {shareToast && (
                   <div
                     className="absolute bottom-full mb-2 end-0 z-50 text-[10px] font-bold px-2 py-1 whitespace-nowrap"
-                    style={{ borderRadius: '6px', background: 'rgba(0,229,176,0.12)', color: '#00e5b0', border: '1px solid rgba(0,229,176,0.25)' }}
+                    style={{ borderRadius: '6px', background: 'rgb(var(--rgb-accent) / 0.12)', color: 'var(--accent)', border: '1px solid rgb(var(--rgb-accent) / 0.25)' }}
                   >
                     הועתק ✓
                   </div>
@@ -726,8 +726,8 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
                 className="p-2.5 rounded-lg transition-all duration-200 hover:bg-yellow-500/8 active:scale-95"
               >
                 {bookmarked
-                  ? <BookmarkSolid className="w-[17px] h-[17px]" style={{ color: '#f5b942', filter: 'drop-shadow(0 0 4px rgba(245,185,66,0.4))' }} />
-                  : <BookmarkIcon className="w-[17px] h-[17px]" style={{ color: 'rgba(90,112,144,0.7)' }} />
+                  ? <BookmarkSolid className="w-[17px] h-[17px]" style={{ color: 'var(--gold)', filter: 'drop-shadow(0 0 4px rgb(var(--rgb-gold) / 0.4))' }} />
+                  : <BookmarkIcon className="w-[17px] h-[17px]" style={{ color: 'rgb(var(--rgb-muted) / 0.7)' }} />
                 }
               </button>
             </div>
@@ -823,7 +823,7 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
             {reportSent ? (
               <div className="py-6 text-center">
                 <div className="text-3xl mb-2">✓</div>
-                <div className="text-sm font-bold" style={{ color: '#00e5b0' }}>הדיווח נשלח</div>
+                <div className="text-sm font-bold" style={{ color: 'var(--accent)' }}>הדיווח נשלח</div>
                 <div className="text-xs text-tsua-muted mt-1">תודה שעוזרים לשמור על הקהילה</div>
               </div>
             ) : (
@@ -850,7 +850,7 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
             )}
 
             {reportError && !reportSent && (
-              <p className="text-xs mt-3 text-center" style={{ color: '#ff4d6a' }}>
+              <p className="text-xs mt-3 text-center" style={{ color: 'var(--red)' }}>
                 שליחת הדיווח נכשלה — נסה שוב
               </p>
             )}

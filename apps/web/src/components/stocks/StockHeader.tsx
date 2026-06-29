@@ -68,7 +68,7 @@ function SkeletonPulse({ className }: { className: string }) {
   return (
     <div
       className={`rounded animate-pulse ${className}`}
-      style={{ background: 'rgba(26,40,64,0.6)' }}
+      style={{ background: 'rgb(var(--rgb-border) / 0.6)' }}
     />
   );
 }
@@ -217,7 +217,7 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
     return (
       <div
         className="rounded-2xl p-5 text-center"
-        style={{ background: 'rgba(13,20,36,0.9)', border: '1px solid rgba(255,77,106,0.3)' }}
+        style={{ background: 'rgb(var(--rgb-bg2) / 0.9)', border: '1px solid rgb(var(--rgb-red) / 0.3)' }}
       >
         <div className="text-3xl mb-2">📡</div>
         <h2 className="text-base font-bold text-tsua-text">לא ניתן לטעון נתוני {ticker}</h2>
@@ -234,7 +234,7 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
     return (
       <div
         className="rounded-2xl p-5"
-        style={{ background: 'rgba(13,20,36,0.9)', border: '1px solid rgba(26,40,64,0.8)' }}
+        style={{ background: 'rgb(var(--rgb-bg2) / 0.9)', border: '1px solid rgb(var(--rgb-border) / 0.8)' }}
       >
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="space-y-2 flex-1">
@@ -262,17 +262,17 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
   }
 
   const flashStyle = flash === 'up'
-    ? { background: 'rgba(0,229,176,0.06)', transition: 'background 0.3s' }
+    ? { background: 'rgb(var(--rgb-accent) / 0.06)', transition: 'background 0.3s' }
     : flash === 'down'
-    ? { background: 'rgba(255,77,106,0.06)', transition: 'background 0.3s' }
+    ? { background: 'rgb(var(--rgb-red) / 0.06)', transition: 'background 0.3s' }
     : { transition: 'background 0.5s' };
 
   return (
     <div
       className="rounded-2xl p-5"
       style={{
-        background: 'rgba(13,20,36,0.9)',
-        border: '1px solid rgba(26,40,64,0.8)',
+        background: 'rgb(var(--rgb-bg2) / 0.9)',
+        border: '1px solid rgb(var(--rgb-border) / 0.8)',
         boxShadow: '0 4px 24px rgba(0,0,0,0.2)',
         ...flashStyle,
       }}
@@ -284,18 +284,18 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
               <img src={data.logo} alt={data.name} className="w-9 h-9 rounded-xl object-contain bg-white p-0.5 shrink-0" />
             )}
             <h1 className="text-xl font-black text-tsua-text">{data?.name ?? ticker}</h1>
-            <span dir="ltr" className="text-tsua-muted font-mono text-sm px-2 py-0.5 rounded-lg" style={{ background: 'rgba(26,40,64,0.6)', border: '1px solid rgba(26,40,64,0.8)' }}>
+            <span dir="ltr" className="text-tsua-muted font-mono text-sm px-2 py-0.5 rounded-lg" style={{ background: 'rgb(var(--rgb-border) / 0.6)', border: '1px solid rgb(var(--rgb-border) / 0.8)' }}>
               ${ticker}
             </span>
             {/* Exchange badge */}
-            <span className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{ background: 'rgba(0,229,176,0.08)', color: '#00e5b0', border: '1px solid rgba(0,229,176,0.2)' }}>
+            <span className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{ background: 'rgb(var(--rgb-accent) / 0.08)', color: 'var(--accent)', border: '1px solid rgb(var(--rgb-accent) / 0.2)' }}>
               {data?.currency === 'ILS'
                 ? 'בורסה תל אביב'
                 : (data?.exchange || 'NYSE/NASDAQ')}
             </span>
             {/* Industry badge if available */}
             {data?.industry && (
-              <span className="hidden sm:inline text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: 'rgba(59,130,246,0.08)', color: '#60a5fa', border: '1px solid rgba(59,130,246,0.2)' }}>
+              <span className="hidden sm:inline text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: 'rgb(var(--rgb-blue) / 0.08)', color: '#60a5fa', border: '1px solid rgb(var(--rgb-blue) / 0.2)' }}>
                 {data.industry}
               </span>
             )}
@@ -303,7 +303,7 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
                 REST fallback so the user knows whether the price is sub-second
                 live or pinned to the last server-side fetch. */}
             {priceSource === 'live' && (
-              <span className="flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(0,229,176,0.08)', color: '#00e5b0', border: '1px solid rgba(0,229,176,0.2)' }}>
+              <span className="flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgb(var(--rgb-accent) / 0.08)', color: 'var(--accent)', border: '1px solid rgb(var(--rgb-accent) / 0.2)' }}>
                 <span className="w-1.5 h-1.5 rounded-full bg-tsua-green animate-pulse inline-block" />
                 LIVE
               </span>
@@ -311,7 +311,7 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
             {priceSource === 'rest' && (
               <span
                 className="flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full"
-                style={{ background: 'rgba(245,185,66,0.1)', color: '#f5b942', border: '1px solid rgba(245,185,66,0.25)' }}
+                style={{ background: 'rgb(var(--rgb-gold) / 0.1)', color: 'var(--gold)', border: '1px solid rgb(var(--rgb-gold) / 0.25)' }}
                 title="חיבור זמן־אמת לא פעיל — המחיר עודכן בעת טעינת הדף"
               >
                 ⏱️ מחיר מעוכב
@@ -341,7 +341,7 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
           {data?.partial && (
             <p
               className="mt-2 text-[11px] flex items-center gap-1"
-              style={{ color: '#ffd166' }}
+              style={{ color: 'var(--gold)' }}
               title="קריאת פרופיל לחברה נכשלה — חלק מהשדות עשויים להיות חסרים"
             >
               <span>⚠️</span>
@@ -355,7 +355,7 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
             <span
               dir="ltr"
               className="text-4xl font-black font-mono transition-colors duration-300"
-              style={{ color: flash === 'up' ? '#00e5b0' : flash === 'down' ? '#ff4d6a' : '#e8f0ff' }}
+              style={{ color: flash === 'up' ? 'var(--accent)' : flash === 'down' ? 'var(--red)' : 'var(--text)' }}
             >
               {price !== null
                 ? `${currencySymbol}${price.toFixed(2)}`
@@ -366,7 +366,7 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
                 <span
                   dir="ltr"
                   className="text-lg font-bold"
-                  style={{ color: isPositive ? '#00e5b0' : '#ff4d6a' }}
+                  style={{ color: isPositive ? 'var(--accent)' : 'var(--red)' }}
                 >
                   {isPositive ? '+' : ''}{(change ?? 0).toFixed(2)}
                 </span>
@@ -374,9 +374,9 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
                   dir="ltr"
                   className="text-sm font-bold px-2 py-0.5 rounded-lg"
                   style={{
-                    background: isPositive ? 'rgba(0,229,176,0.1)' : 'rgba(255,77,106,0.1)',
-                    color: isPositive ? '#00e5b0' : '#ff4d6a',
-                    border: `1px solid ${isPositive ? 'rgba(0,229,176,0.2)' : 'rgba(255,77,106,0.2)'}`,
+                    background: isPositive ? 'rgb(var(--rgb-accent) / 0.1)' : 'rgb(var(--rgb-red) / 0.1)',
+                    color: isPositive ? 'var(--accent)' : 'var(--red)',
+                    border: `1px solid ${isPositive ? 'rgb(var(--rgb-accent) / 0.2)' : 'rgb(var(--rgb-red) / 0.2)'}`,
                   }}
                 >
                   {isPositive ? '▲' : '▼'} {Math.abs(changePercent ?? 0).toFixed(2)}%
@@ -406,7 +406,7 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
 
             const xUp = (xChangePct ?? 0) >= 0;
             const label = isPre ? 'מסחר מוקדם' : 'מסחר מאוחר';
-            const labelColor = isPre ? '#ffd166' : '#a78bfa';
+            const labelColor = isPre ? 'var(--gold)' : '#a78bfa';
             const timeStr = xTime
               ? new Date(xTime).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })
               : null;
@@ -426,14 +426,14 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
                 <span
                   dir="ltr"
                   className="text-lg font-black font-mono tabular-nums"
-                  style={{ color: '#c8d8f0' }}
+                  style={{ color: 'var(--text2)' }}
                 >
                   {currencySymbol}{xPrice.toFixed(2)}
                 </span>
                 <span
                   dir="ltr"
                   className="text-sm font-bold tabular-nums"
-                  style={{ color: xUp ? '#00e5b0' : '#ff4d6a' }}
+                  style={{ color: xUp ? 'var(--accent)' : 'var(--red)' }}
                 >
                   {xUp ? '+' : ''}{(xChange ?? 0).toFixed(2)} ({xUp ? '+' : ''}{(xChangePct ?? 0).toFixed(2)}%)
                 </span>
@@ -455,8 +455,8 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
               aria-pressed={inWatchlist}
               className="flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-xl transition-all hover:scale-105 active:scale-95 disabled:opacity-60"
               style={inWatchlist
-                ? { background: 'rgba(0,229,176,0.1)', border: '1px solid rgba(0,229,176,0.3)', color: '#00e5b0' }
-                : { background: 'rgba(15,25,41,0.6)', border: '1px solid rgba(26,40,64,0.8)', color: '#5a7090' }
+                ? { background: 'rgb(var(--rgb-accent) / 0.1)', border: '1px solid rgb(var(--rgb-accent) / 0.3)', color: 'var(--accent)' }
+                : { background: 'rgb(var(--rgb-card) / 0.6)', border: '1px solid rgb(var(--rgb-border) / 0.8)', color: 'var(--muted)' }
               }
             >
               {inWatchlist
@@ -472,7 +472,7 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
             <Link
               href={`/${locale}/login`}
               className="flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-xl transition-all"
-              style={{ background: 'rgba(15,25,41,0.6)', border: '1px solid rgba(26,40,64,0.8)', color: '#5a7090' }}
+              style={{ background: 'rgb(var(--rgb-card) / 0.6)', border: '1px solid rgb(var(--rgb-border) / 0.8)', color: 'var(--muted)' }}
             >
               <BookmarkIcon className="w-4 h-4" />
               {'הוסף למעקב'}
@@ -481,7 +481,7 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
           <Link
             href={`/${locale}/alerts`}
             className="flex items-center gap-1.5 text-sm font-bold px-4 py-2 rounded-xl transition-all hover:scale-105 active:scale-95"
-            style={{ background: 'rgba(0,229,176,0.08)', border: '1px solid rgba(0,229,176,0.3)', color: '#00e5b0' }}
+            style={{ background: 'rgb(var(--rgb-accent) / 0.08)', border: '1px solid rgb(var(--rgb-accent) / 0.3)', color: 'var(--accent)' }}
           >
             🔔 {'התראה'}
           </Link>
@@ -491,7 +491,7 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
       {/* Stats row */}
       <div
         className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4"
-        style={{ borderTop: '1px solid rgba(26,40,64,0.5)' }}
+        style={{ borderTop: '1px solid rgb(var(--rgb-border) / 0.5)' }}
       >
         {([
           { label: 'פתיחה',     value: data?.open    ? `${currencySymbol}${data.open.toFixed(2)}` : '—', term: DICTIONARY.open },

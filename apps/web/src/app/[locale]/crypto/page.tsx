@@ -26,7 +26,7 @@ export default function CryptoPage() {
         </div>
 
         <div className="mt-4 p-3 rounded-xl text-[11px] leading-relaxed"
-          style={{ background: 'rgba(247,147,26,0.05)', border: '1px solid rgba(247,147,26,0.15)', color: '#c8d8f0' }}
+          style={{ background: 'rgba(247,147,26,0.05)', border: '1px solid rgba(247,147,26,0.15)', color: 'var(--text2)' }}
         >
           <span className="font-bold" style={{ color: '#f7931a' }}>⚠️ חשוב:</span>{' '}
           קריפטו הוא נכס תנודתי במיוחד. מחירים יכולים לנוע ב-10%+ ביום. הנתונים כאן הם למטרת מידע בלבד —

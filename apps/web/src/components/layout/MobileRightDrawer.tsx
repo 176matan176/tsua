@@ -101,7 +101,7 @@ export function MobileRightDrawer({ isOpen, onClose }: Props) {
                   onClick={() => setStreamTopic(i)}
                   className="text-[11px] px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all duration-200 shrink-0"
                   style={streamTopic === i
-                    ? { background: 'rgba(0,229,176,0.15)', color: '#00e5b0', border: '1px solid rgba(0,229,176,0.25)' }
+                    ? { background: 'rgb(var(--rgb-accent) / 0.15)', color: 'var(--accent)', border: '1px solid rgb(var(--rgb-accent) / 0.25)' }
                     : { background: 'var(--surface2)', color: 'var(--muted)', border: '1px solid var(--border)' }
                   }
                 >

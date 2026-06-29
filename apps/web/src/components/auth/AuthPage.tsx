@@ -121,11 +121,11 @@ export function AuthPage({ mode }: AuthPageProps) {
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div
           className="absolute -top-40 -start-40 w-96 h-96 rounded-full opacity-10 blur-3xl"
-          style={{ background: 'radial-gradient(circle, #00e5b0, transparent 70%)' }}
+          style={{ background: 'radial-gradient(circle, var(--accent), transparent 70%)' }}
         />
         <div
           className="absolute -bottom-40 -end-40 w-96 h-96 rounded-full opacity-8 blur-3xl"
-          style={{ background: 'radial-gradient(circle, #3b82f6, transparent 70%)' }}
+          style={{ background: 'radial-gradient(circle, var(--blue), transparent 70%)' }}
         />
       </div>
 
@@ -137,8 +137,8 @@ export function AuthPage({ mode }: AuthPageProps) {
             <div
               className="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center mb-4 transition-transform hover:scale-105"
               style={{
-                background: 'linear-gradient(135deg, #00e5b0, #3b82f6)',
-                boxShadow: '0 0 40px rgba(0,229,176,0.35), 0 8px 32px rgba(0,0,0,0.3)',
+                background: 'linear-gradient(135deg, var(--accent), var(--blue))',
+                boxShadow: '0 0 40px rgb(var(--rgb-accent) / 0.35), 0 8px 32px rgba(0,0,0,0.3)',
               }}
             >
               <span className="text-white font-black text-3xl">ת</span>
@@ -160,8 +160,8 @@ export function AuthPage({ mode }: AuthPageProps) {
         <div
           className="rounded-2xl p-6 space-y-5"
           style={{
-            background: 'rgba(13,20,36,0.85)',
-            border: '1px solid rgba(26,40,64,0.8)',
+            background: 'rgb(var(--rgb-bg2) / 0.85)',
+            border: '1px solid rgb(var(--rgb-border) / 0.8)',
             backdropFilter: 'blur(20px)',
             boxShadow: '0 24px 64px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.02)',
           }}
@@ -173,13 +173,13 @@ export function AuthPage({ mode }: AuthPageProps) {
               <div
                 className="rounded-xl px-3 py-2.5 text-[12px] flex items-center gap-2"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(0,229,176,0.08), rgba(59,130,246,0.05))',
-                  border: '1px solid rgba(0,229,176,0.25)',
-                  color: '#b3c2d6',
+                  background: 'linear-gradient(135deg, rgb(var(--rgb-accent) / 0.08), rgb(var(--rgb-blue) / 0.05))',
+                  border: '1px solid rgb(var(--rgb-accent) / 0.25)',
+                  color: 'var(--text2)',
                 }}
               >
                 <span style={{ fontSize: '18px' }}>🎁</span>
-                <span>הוזמנת על ידי <strong style={{ color: '#00e5b0' }}>@{referrerName}</strong> — נהנה מברכת פנים חמה!</span>
+                <span>הוזמנת על ידי <strong style={{ color: 'var(--accent)' }}>@{referrerName}</strong> — נהנה מברכת פנים חמה!</span>
               </div>
             )}
 
@@ -222,13 +222,13 @@ export function AuthPage({ mode }: AuthPageProps) {
                   required
                   minLength={6}
                   className="w-full rounded-xl px-4 py-2.5 pe-10 text-sm placeholder:text-tsua-muted focus:outline-none transition-all duration-200"
-                  style={{ background: 'rgba(6,11,22,0.8)', border: '1px solid rgba(26,40,64,0.8)', color: '#e8f0ff' }}
+                  style={{ background: 'rgb(var(--rgb-bg) / 0.8)', border: '1px solid rgb(var(--rgb-border) / 0.8)', color: 'var(--text)' }}
                   onFocus={e => {
-                    e.currentTarget.style.borderColor = 'rgba(0,229,176,0.4)';
-                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0,229,176,0.07)';
+                    e.currentTarget.style.borderColor = 'rgb(var(--rgb-accent) / 0.4)';
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgb(var(--rgb-accent) / 0.07)';
                   }}
                   onBlur={e => {
-                    e.currentTarget.style.borderColor = 'rgba(26,40,64,0.8)';
+                    e.currentTarget.style.borderColor = 'rgb(var(--rgb-border) / 0.8)';
                     e.currentTarget.style.boxShadow = 'none';
                   }}
                   dir="ltr"
@@ -249,7 +249,7 @@ export function AuthPage({ mode }: AuthPageProps) {
                 <Link
                   href={`/${locale}/forgot-password`}
                   className="text-xs text-tsua-muted hover:text-tsua-accent transition-colors"
-                  style={{ color: '#5a7090' }}
+                  style={{ color: 'var(--muted)' }}
                 >
                   שכחת סיסמה?
                 </Link>
@@ -260,7 +260,7 @@ export function AuthPage({ mode }: AuthPageProps) {
             {error && (
               <div
                 className="rounded-xl px-4 py-2.5 text-sm font-medium animate-fade-in flex items-center gap-2"
-                style={{ background: 'rgba(255,77,106,0.1)', border: '1px solid rgba(255,77,106,0.25)', color: '#ff4d6a' }}
+                style={{ background: 'rgb(var(--rgb-red) / 0.1)', border: '1px solid rgb(var(--rgb-red) / 0.25)', color: 'var(--red)' }}
               >
                 <span>⚠</span> {error}
               </div>
@@ -270,7 +270,7 @@ export function AuthPage({ mode }: AuthPageProps) {
             {success && (
               <div
                 className="rounded-xl px-4 py-2.5 text-sm font-medium animate-fade-in flex items-center gap-2"
-                style={{ background: 'rgba(0,229,176,0.1)', border: '1px solid rgba(0,229,176,0.25)', color: '#00e5b0' }}
+                style={{ background: 'rgb(var(--rgb-accent) / 0.1)', border: '1px solid rgb(var(--rgb-accent) / 0.25)', color: 'var(--accent)' }}
               >
                 <span>✓</span> {success}
               </div>
@@ -282,9 +282,9 @@ export function AuthPage({ mode }: AuthPageProps) {
               disabled={loading}
               className="w-full py-3 rounded-xl text-sm font-black transition-all duration-200 hover:opacity-90 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
               style={{
-                background: 'linear-gradient(135deg, #00e5b0, #00c49a)',
-                color: '#060b16',
-                boxShadow: loading ? 'none' : '0 4px 20px rgba(0,229,176,0.35)',
+                background: 'linear-gradient(135deg, var(--accent), var(--accent2))',
+                color: 'var(--bg)',
+                boxShadow: loading ? 'none' : '0 4px 20px rgb(var(--rgb-accent) / 0.35)',
               }}
             >
               {loading
@@ -300,9 +300,9 @@ export function AuthPage({ mode }: AuthPageProps) {
 
           {/* Divider */}
           <div className="flex items-center gap-3">
-            <div className="flex-1 h-px" style={{ background: 'rgba(26,40,64,0.7)' }} />
+            <div className="flex-1 h-px" style={{ background: 'rgb(var(--rgb-border) / 0.7)' }} />
             <span className="text-xs text-tsua-muted font-medium">או</span>
-            <div className="flex-1 h-px" style={{ background: 'rgba(26,40,64,0.7)' }} />
+            <div className="flex-1 h-px" style={{ background: 'rgb(var(--rgb-border) / 0.7)' }} />
           </div>
 
           {/* Google OAuth */}
@@ -317,7 +317,7 @@ export function AuthPage({ mode }: AuthPageProps) {
             style={{
               background: 'rgba(255,255,255,0.04)',
               border: '1px solid rgba(255,255,255,0.1)',
-              color: '#c8d8f0',
+              color: 'var(--text2)',
             }}
           >
             <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
@@ -338,7 +338,7 @@ export function AuthPage({ mode }: AuthPageProps) {
           <Link
             href={`/${locale}/${mode === 'login' ? 'signup' : 'login'}`}
             className="font-black hover:underline transition-colors"
-            style={{ color: '#00e5b0' }}
+            style={{ color: 'var(--accent)' }}
           >
             {mode === 'login'
               ? 'הירשם חינם'
@@ -376,13 +376,13 @@ function InputField({
         maxLength={maxLength}
         dir={dir}
         className="w-full rounded-xl px-4 py-2.5 text-sm placeholder:text-tsua-muted focus:outline-none transition-all duration-200"
-        style={{ background: 'rgba(6,11,22,0.8)', border: '1px solid rgba(26,40,64,0.8)', color: '#e8f0ff' }}
+        style={{ background: 'rgb(var(--rgb-bg) / 0.8)', border: '1px solid rgb(var(--rgb-border) / 0.8)', color: 'var(--text)' }}
         onFocus={e => {
-          e.currentTarget.style.borderColor = 'rgba(0,229,176,0.4)';
-          e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0,229,176,0.07)';
+          e.currentTarget.style.borderColor = 'rgb(var(--rgb-accent) / 0.4)';
+          e.currentTarget.style.boxShadow = '0 0 0 3px rgb(var(--rgb-accent) / 0.07)';
         }}
         onBlur={e => {
-          e.currentTarget.style.borderColor = 'rgba(26,40,64,0.8)';
+          e.currentTarget.style.borderColor = 'rgb(var(--rgb-border) / 0.8)';
           e.currentTarget.style.boxShadow = 'none';
         }}
       />

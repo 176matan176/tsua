@@ -11,9 +11,9 @@ import { XMarkIcon, CameraIcon } from '@heroicons/react/24/outline';
 type Tab = 'posts' | 'portfolio';
 
 const BADGE_CONFIG = {
-  legend: { emoji: '👑', labelHe: 'אגדה',  labelEn: 'Legend', color: '#f5b942', bg: 'rgba(245,185,66,0.12)', border: 'rgba(245,185,66,0.3)' },
-  expert:  { emoji: '⭐', labelHe: 'מומחה', labelEn: 'Expert',  color: '#3b82f6', bg: 'rgba(59,130,246,0.12)', border: 'rgba(59,130,246,0.3)' },
-  rising:  { emoji: '🚀', labelHe: 'עולה',  labelEn: 'Rising',  color: '#00e5b0', bg: 'rgba(0,229,176,0.12)', border: 'rgba(0,229,176,0.3)' },
+  legend: { emoji: '👑', labelHe: 'אגדה',  labelEn: 'Legend', color: 'var(--gold)', bg: 'rgb(var(--rgb-gold) / 0.12)', border: 'rgb(var(--rgb-gold) / 0.3)' },
+  expert:  { emoji: '⭐', labelHe: 'מומחה', labelEn: 'Expert',  color: 'var(--blue)', bg: 'rgb(var(--rgb-blue) / 0.12)', border: 'rgb(var(--rgb-blue) / 0.3)' },
+  rising:  { emoji: '🚀', labelHe: 'עולה',  labelEn: 'Rising',  color: 'var(--accent)', bg: 'rgb(var(--rgb-accent) / 0.12)', border: 'rgb(var(--rgb-accent) / 0.3)' },
 };
 
 interface ProfileData {
@@ -114,10 +114,10 @@ function EditProfileModal({
     >
       <div
         className="w-full max-w-md rounded-2xl overflow-hidden"
-        style={{ background: 'rgba(10,16,30,0.99)', border: '1px solid rgba(26,40,64,0.8)', boxShadow: '0 24px 64px rgba(0,0,0,0.8)' }}
+        style={{ background: 'rgb(var(--rgb-card) / 0.99)', border: '1px solid rgb(var(--rgb-border) / 0.8)', boxShadow: '0 24px 64px rgba(0,0,0,0.8)' }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid rgba(26,40,64,0.6)' }}>
+        <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid rgb(var(--rgb-border) / 0.6)' }}>
           <h2 className="text-base font-black text-tsua-text">
             {'עריכת פרופיל'}
           </h2>
@@ -135,7 +135,7 @@ function EditProfileModal({
               ) : (
                 <div
                   className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black text-tsua-bg"
-                  style={{ background: 'linear-gradient(135deg, #00e5b0, #3b82f6)' }}
+                  style={{ background: 'linear-gradient(135deg, var(--accent), var(--blue))' }}
                 >
                   {(displayName || profile.username).charAt(0).toUpperCase()}
                 </div>
@@ -145,7 +145,7 @@ function EditProfileModal({
                 onClick={() => avatarFileRef.current?.click()}
                 disabled={avatarUploading}
                 className="absolute -bottom-1.5 -end-1.5 w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-110 disabled:opacity-50"
-                style={{ background: 'rgba(0,229,176,1)', boxShadow: '0 2px 8px rgba(0,229,176,0.4)' }}
+                style={{ background: 'rgb(var(--rgb-accent) / 1)', boxShadow: '0 2px 8px rgb(var(--rgb-accent) / 0.4)' }}
               >
                 {avatarUploading
                   ? <span className="w-3 h-3 border-2 border-tsua-bg border-t-transparent rounded-full animate-spin block" />
@@ -167,7 +167,7 @@ function EditProfileModal({
                 onClick={() => avatarFileRef.current?.click()}
                 disabled={avatarUploading}
                 className="text-xs font-semibold px-3 py-1.5 rounded-xl transition-all disabled:opacity-50"
-                style={{ background: 'rgba(0,229,176,0.1)', color: '#00e5b0', border: '1px solid rgba(0,229,176,0.2)' }}
+                style={{ background: 'rgb(var(--rgb-accent) / 0.1)', color: 'var(--accent)', border: '1px solid rgb(var(--rgb-accent) / 0.2)' }}
               >
                 {avatarUploading ? 'מעלה...' : 'העלה תמונה'}
               </button>
@@ -196,16 +196,16 @@ function EditProfileModal({
               placeholder={profile.username}
               className="w-full rounded-xl px-3 py-2 text-sm placeholder:text-tsua-muted focus:outline-none transition-all"
               style={{
-                background: 'rgba(15,25,41,0.6)',
-                border: '1px solid rgba(26,40,64,0.6)',
-                color: '#e8f0ff',
+                background: 'rgb(var(--rgb-card) / 0.6)',
+                border: '1px solid rgb(var(--rgb-border) / 0.6)',
+                color: 'var(--text)',
               }}
               onFocus={e => {
-                e.target.style.border = '1px solid rgba(0,229,176,0.3)';
-                e.target.style.boxShadow = '0 0 0 3px rgba(0,229,176,0.06)';
+                e.target.style.border = '1px solid rgb(var(--rgb-accent) / 0.3)';
+                e.target.style.boxShadow = '0 0 0 3px rgb(var(--rgb-accent) / 0.06)';
               }}
               onBlur={e => {
-                e.target.style.border = '1px solid rgba(26,40,64,0.6)';
+                e.target.style.border = '1px solid rgb(var(--rgb-border) / 0.6)';
                 e.target.style.boxShadow = 'none';
               }}
             />
@@ -224,16 +224,16 @@ function EditProfileModal({
               placeholder="ספר על עצמך..."
               className="w-full resize-none rounded-xl px-3 py-2 text-sm placeholder:text-tsua-muted focus:outline-none transition-all"
               style={{
-                background: 'rgba(15,25,41,0.6)',
-                border: '1px solid rgba(26,40,64,0.6)',
-                color: '#e8f0ff',
+                background: 'rgb(var(--rgb-card) / 0.6)',
+                border: '1px solid rgb(var(--rgb-border) / 0.6)',
+                color: 'var(--text)',
               }}
               onFocus={e => {
-                e.target.style.border = '1px solid rgba(0,229,176,0.3)';
-                e.target.style.boxShadow = '0 0 0 3px rgba(0,229,176,0.06)';
+                e.target.style.border = '1px solid rgb(var(--rgb-accent) / 0.3)';
+                e.target.style.boxShadow = '0 0 0 3px rgb(var(--rgb-accent) / 0.06)';
               }}
               onBlur={e => {
-                e.target.style.border = '1px solid rgba(26,40,64,0.6)';
+                e.target.style.border = '1px solid rgb(var(--rgb-border) / 0.6)';
                 e.target.style.boxShadow = 'none';
               }}
             />
@@ -241,7 +241,7 @@ function EditProfileModal({
           </div>
 
           {error && (
-            <div className="text-xs text-red-400 px-3 py-2 rounded-xl" style={{ background: 'rgba(255,77,106,0.08)', border: '1px solid rgba(255,77,106,0.2)' }}>
+            <div className="text-xs text-red-400 px-3 py-2 rounded-xl" style={{ background: 'rgb(var(--rgb-red) / 0.08)', border: '1px solid rgb(var(--rgb-red) / 0.2)' }}>
               {error}
             </div>
           )}
@@ -252,7 +252,7 @@ function EditProfileModal({
           <button
             onClick={onClose}
             className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-tsua-muted hover:text-tsua-text transition-colors"
-            style={{ background: 'rgba(15,25,41,0.5)', border: '1px solid rgba(26,40,64,0.7)' }}
+            style={{ background: 'rgb(var(--rgb-card) / 0.5)', border: '1px solid rgb(var(--rgb-border) / 0.7)' }}
           >
             {'ביטול'}
           </button>
@@ -260,7 +260,7 @@ function EditProfileModal({
             onClick={handleSave}
             disabled={saving}
             className="flex-1 py-2.5 rounded-xl text-sm font-black text-tsua-bg transition-all disabled:opacity-50 active:scale-95"
-            style={{ background: 'linear-gradient(135deg, #00e5b0, #00c49a)', boxShadow: '0 4px 16px rgba(0,229,176,0.25)' }}
+            style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent2))', boxShadow: '0 4px 16px rgb(var(--rgb-accent) / 0.25)' }}
           >
             {saving ? 'שומר...' : 'שמור שינויים'}
           </button>
@@ -317,12 +317,12 @@ export function ProfilePage({ username }: { username: string }) {
   if (loading) {
     return (
       <div className="space-y-4 animate-pulse">
-        <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(26,40,64,0.8)' }}>
-          <div className="h-32" style={{ background: 'rgba(26,40,64,0.5)' }} />
-          <div className="px-4 pb-4 pt-2 space-y-2" style={{ background: 'rgba(15,25,41,0.9)' }}>
-            <div className="w-16 h-16 rounded-2xl -mt-8" style={{ background: 'rgba(26,40,64,0.8)' }} />
-            <div className="w-32 h-4 rounded" style={{ background: 'rgba(26,40,64,0.7)' }} />
-            <div className="w-48 h-3 rounded" style={{ background: 'rgba(26,40,64,0.5)' }} />
+        <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid rgb(var(--rgb-border) / 0.8)' }}>
+          <div className="h-32" style={{ background: 'rgb(var(--rgb-border) / 0.5)' }} />
+          <div className="px-4 pb-4 pt-2 space-y-2" style={{ background: 'rgb(var(--rgb-card) / 0.9)' }}>
+            <div className="w-16 h-16 rounded-2xl -mt-8" style={{ background: 'rgb(var(--rgb-border) / 0.8)' }} />
+            <div className="w-32 h-4 rounded" style={{ background: 'rgb(var(--rgb-border) / 0.7)' }} />
+            <div className="w-48 h-3 rounded" style={{ background: 'rgb(var(--rgb-border) / 0.5)' }} />
           </div>
         </div>
       </div>
@@ -353,27 +353,27 @@ export function ProfilePage({ username }: { username: string }) {
       )}
 
       {/* Cover + Avatar + Info */}
-      <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(26,40,64,0.8)' }}>
+      <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid rgb(var(--rgb-border) / 0.8)' }}>
         {/* Cover */}
         <div
           className="h-28 md:h-36"
           style={{
-            background: 'linear-gradient(135deg, rgba(0,229,176,0.15), rgba(59,130,246,0.15))',
+            background: 'linear-gradient(135deg, rgb(var(--rgb-accent) / 0.15), rgb(var(--rgb-blue) / 0.15))',
           }}
         >
           <div className="h-full w-full" style={{
-            background: 'radial-gradient(ellipse at 30% 50%, rgba(0,229,176,0.12), transparent 60%), radial-gradient(ellipse at 70% 50%, rgba(59,130,246,0.1), transparent 60%)'
+            background: 'radial-gradient(ellipse at 30% 50%, rgb(var(--rgb-accent) / 0.12), transparent 60%), radial-gradient(ellipse at 70% 50%, rgb(var(--rgb-blue) / 0.1), transparent 60%)'
           }} />
         </div>
 
-        <div className="px-4 pb-4" style={{ background: 'rgba(13,20,36,0.95)' }}>
+        <div className="px-4 pb-4" style={{ background: 'rgb(var(--rgb-bg2) / 0.95)' }}>
           <div className="flex items-end justify-between -mt-8 mb-3">
             {/* Avatar */}
             <div
               className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black text-tsua-bg shrink-0"
               style={{
-                background: 'linear-gradient(135deg, #00e5b0, #3b82f6)',
-                boxShadow: '0 0 24px rgba(0,229,176,0.3), 0 0 0 4px rgba(13,20,36,1)',
+                background: 'linear-gradient(135deg, var(--accent), var(--blue))',
+                boxShadow: '0 0 24px rgb(var(--rgb-accent) / 0.3), 0 0 0 4px rgb(var(--rgb-bg2) / 1)',
               }}
             >
               {initial}
@@ -385,7 +385,7 @@ export function ProfilePage({ username }: { username: string }) {
                 <button
                   onClick={() => setEditOpen(true)}
                   className="text-sm font-semibold px-4 py-1.5 rounded-xl text-tsua-muted hover:text-tsua-text transition-all hover:border-tsua-accent/40"
-                  style={{ background: 'rgba(15,25,41,0.6)', border: '1px solid rgba(26,40,64,0.8)' }}
+                  style={{ background: 'rgb(var(--rgb-card) / 0.6)', border: '1px solid rgb(var(--rgb-border) / 0.8)' }}
                 >
                   {'✏️ עריכת פרופיל'}
                 </button>
@@ -395,8 +395,8 @@ export function ProfilePage({ username }: { username: string }) {
                   disabled={followLoading}
                   className="text-sm font-bold px-4 py-1.5 rounded-xl transition-all active:scale-95 disabled:opacity-60"
                   style={profile.isFollowing
-                    ? { background: 'rgba(15,25,41,0.6)', border: '1px solid rgba(26,40,64,0.8)', color: '#5a7090' }
-                    : { background: 'linear-gradient(135deg, #00e5b0, #00c49a)', color: '#080d1a', boxShadow: '0 4px 12px rgba(0,229,176,0.25)' }
+                    ? { background: 'rgb(var(--rgb-card) / 0.6)', border: '1px solid rgb(var(--rgb-border) / 0.8)', color: 'var(--muted)' }
+                    : { background: 'linear-gradient(135deg, var(--accent), var(--accent2))', color: '#080d1a', boxShadow: '0 4px 12px rgb(var(--rgb-accent) / 0.25)' }
                   }
                 >
                   {profile.isFollowing ? '✓ עוקב' : '+ עקוב'}
@@ -405,7 +405,7 @@ export function ProfilePage({ username }: { username: string }) {
                 <Link
                   href={`/${locale}/login`}
                   className="text-sm font-bold px-4 py-1.5 rounded-xl text-tsua-bg"
-                  style={{ background: 'linear-gradient(135deg, #00e5b0, #00c49a)' }}
+                  style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent2))' }}
                 >
                   {'+ עקוב'}
                 </Link>
@@ -417,7 +417,7 @@ export function ProfilePage({ username }: { username: string }) {
           <div className="flex items-center gap-2 flex-wrap">
             <h1 className="text-lg font-black text-tsua-text">{profile.display_name ?? profile.username}</h1>
             {profile.is_verified && (
-              <span className="w-5 h-5 rounded-full inline-flex items-center justify-center text-[10px] font-black text-tsua-bg" style={{ background: 'linear-gradient(135deg, #00e5b0, #3b82f6)' }}>✓</span>
+              <span className="w-5 h-5 rounded-full inline-flex items-center justify-center text-[10px] font-black text-tsua-bg" style={{ background: 'linear-gradient(135deg, var(--accent), var(--blue))' }}>✓</span>
             )}
             {profile.rating && profile.rating >= 9 && (
               <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: BADGE_CONFIG.legend.bg, color: BADGE_CONFIG.legend.color, border: `1px solid ${BADGE_CONFIG.legend.border}` }}>
@@ -450,7 +450,7 @@ export function ProfilePage({ username }: { username: string }) {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 p-1 rounded-xl" style={{ background: 'rgba(15,25,41,0.6)', border: '1px solid rgba(26,40,64,0.8)' }}>
+      <div className="flex gap-1 p-1 rounded-xl" style={{ background: 'rgb(var(--rgb-card) / 0.6)', border: '1px solid rgb(var(--rgb-border) / 0.8)' }}>
         {([
           ['posts', '📝 פוסטים'],
           ['portfolio', '💼 תיק'],
@@ -460,8 +460,8 @@ export function ProfilePage({ username }: { username: string }) {
             onClick={() => setTab(t)}
             className="flex-1 text-xs font-semibold py-2 rounded-lg transition-all"
             style={tab === t
-              ? { background: 'linear-gradient(135deg, #00e5b0, #00c49a)', color: '#080d1a' }
-              : { color: '#5a7090' }
+              ? { background: 'linear-gradient(135deg, var(--accent), var(--accent2))', color: '#080d1a' }
+              : { color: 'var(--muted)' }
             }
           >
             {label}
@@ -477,7 +477,7 @@ export function ProfilePage({ username }: { username: string }) {
           ) : (
             <div
               className="rounded-2xl p-10 text-center"
-              style={{ background: 'rgba(13,20,36,0.5)', border: '1px solid rgba(26,40,64,0.5)' }}
+              style={{ background: 'rgb(var(--rgb-bg2) / 0.5)', border: '1px solid rgb(var(--rgb-border) / 0.5)' }}
             >
               <div className="text-3xl mb-2">📝</div>
               <div className="text-tsua-muted text-sm">
@@ -494,7 +494,7 @@ export function ProfilePage({ username }: { username: string }) {
       {tab === 'portfolio' && (
         <div
           className="rounded-2xl p-8 text-center"
-          style={{ background: 'rgba(13,20,36,0.5)', border: '1px solid rgba(26,40,64,0.5)' }}
+          style={{ background: 'rgb(var(--rgb-bg2) / 0.5)', border: '1px solid rgb(var(--rgb-border) / 0.5)' }}
         >
           <div className="text-3xl mb-2">💼</div>
           <div className="text-tsua-muted text-sm mb-4">
@@ -506,7 +506,7 @@ export function ProfilePage({ username }: { username: string }) {
             <Link
               href={`/${locale}/portfolio`}
               className="inline-block text-sm font-bold px-5 py-2 rounded-xl text-tsua-bg"
-              style={{ background: 'linear-gradient(135deg, #00e5b0, #00c49a)' }}
+              style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent2))' }}
             >
               {'לתיק שלי →'}
             </Link>

@@ -57,22 +57,22 @@ function NavLink({ href, icon: Icon, label, locale, pathname, onClose, badge }: 
       className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all active:scale-[0.98]"
       style={isActive
         ? {
-            background: 'rgba(0,229,176,0.1)',
-            border: '1px solid rgba(0,229,176,0.22)',
-            color: 'var(--text, #e8f4ff)',
+            background: 'rgb(var(--rgb-accent) / 0.1)',
+            border: '1px solid rgb(var(--rgb-accent) / 0.22)',
+            color: 'var(--text, var(--text))',
           }
-        : { color: 'var(--text, #e8f4ff)' }
+        : { color: 'var(--text, var(--text))' }
       }
     >
       <div
         className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
         style={{
-          background: isActive ? 'rgba(0,229,176,0.2)' : 'var(--surface2, rgba(15,25,41,0.5))',
-          border: isActive ? '1px solid rgba(0,229,176,0.35)' : '1px solid var(--border, rgba(26,40,64,0.6))',
-          boxShadow: isActive ? '0 0 10px rgba(0,229,176,0.15)' : 'none',
+          background: isActive ? 'rgb(var(--rgb-accent) / 0.2)' : 'var(--surface2, rgb(var(--rgb-card) / 0.5))',
+          border: isActive ? '1px solid rgb(var(--rgb-accent) / 0.35)' : '1px solid var(--border, rgb(var(--rgb-border) / 0.6))',
+          boxShadow: isActive ? '0 0 10px rgb(var(--rgb-accent) / 0.15)' : 'none',
         }}
       >
-        <Icon style={{ color: isActive ? '#00e5b0' : 'var(--accent, #00e5b0)', width: 18, height: 18 }} />
+        <Icon style={{ color: isActive ? 'var(--accent)' : 'var(--accent, var(--accent))', width: 18, height: 18 }} />
       </div>
       <span
         className="text-sm flex-1 truncate"
@@ -84,15 +84,15 @@ function NavLink({ href, icon: Icon, label, locale, pathname, onClose, badge }: 
         <span
           className="text-[10px] font-black px-1.5 py-0.5 rounded-md shrink-0"
           style={{
-            background: 'rgba(0,229,176,0.15)',
-            color: '#00e5b0',
-            border: '1px solid rgba(0,229,176,0.3)',
+            background: 'rgb(var(--rgb-accent) / 0.15)',
+            color: 'var(--accent)',
+            border: '1px solid rgb(var(--rgb-accent) / 0.3)',
           }}
         >
           {badge}
         </span>
       )}
-      <span style={{ color: 'var(--muted, #5a7090)' }} className="text-xs opacity-50">←</span>
+      <span style={{ color: 'var(--muted, var(--muted))' }} className="text-xs opacity-50">←</span>
     </Link>
   );
 }
@@ -192,8 +192,8 @@ export function MobileNavDrawer({ isOpen, onClose }: Props) {
         style={{
           // Hamburger is on the START (right in RTL) → drawer comes from the same side
           insetInlineStart: 0,
-          background: 'var(--card, rgba(8,14,26,0.99))',
-          borderInlineEnd: '1px solid var(--border, rgba(26,40,64,0.6))',
+          background: 'var(--card, rgb(var(--rgb-bg) / 0.99))',
+          borderInlineEnd: '1px solid var(--border, rgb(var(--rgb-border) / 0.6))',
           boxShadow: '16px 0 48px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.02)',
           animation: 'slideInStart 0.28s cubic-bezier(0.32,0.72,0,1)',
         }}
@@ -202,7 +202,7 @@ export function MobileNavDrawer({ isOpen, onClose }: Props) {
         {/* Header with logo + close */}
         <div
           className="shrink-0 px-4 py-4"
-          style={{ borderBottom: '1px solid var(--border2, rgba(26,40,64,0.6))' }}
+          style={{ borderBottom: '1px solid var(--border2, rgb(var(--rgb-border) / 0.6))' }}
         >
           <div className="flex items-center justify-between mb-3">
             <Link
@@ -213,20 +213,20 @@ export function MobileNavDrawer({ isOpen, onClose }: Props) {
               <div
                 className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
                 style={{
-                  background: 'linear-gradient(135deg, #00e5b0 0%, #0090cc 100%)',
-                  boxShadow: '0 0 14px rgba(0,229,176,0.35)',
+                  background: 'linear-gradient(135deg, var(--accent) 0%, #0090cc 100%)',
+                  boxShadow: '0 0 14px rgb(var(--rgb-accent) / 0.35)',
                 }}
               >
                 <span style={{ color: '#03120d', fontWeight: 900, fontSize: '16px', fontFamily: 'Heebo, Arial, sans-serif' }}>ת</span>
               </div>
               <div className="flex flex-col leading-none gap-0.5">
-                <span style={{ color: 'var(--text, #e8f4ff)', fontWeight: 900, fontSize: '16px', letterSpacing: '-0.02em' }}>תשואה</span>
+                <span style={{ color: 'var(--text, var(--text))', fontWeight: 900, fontSize: '16px', letterSpacing: '-0.02em' }}>תשואה</span>
                 <div className="flex items-center gap-1">
                   <span
                     className="w-1 h-1 rounded-full animate-pulse"
-                    style={{ background: '#00e5b0', boxShadow: '0 0 4px rgba(0,229,176,0.8)' }}
+                    style={{ background: 'var(--accent)', boxShadow: '0 0 4px rgb(var(--rgb-accent) / 0.8)' }}
                   />
-                  <span style={{ color: 'rgba(0,229,176,0.7)', fontSize: '8px', fontFamily: 'monospace', letterSpacing: '0.12em' }}>LIVE</span>
+                  <span style={{ color: 'rgb(var(--rgb-accent) / 0.7)', fontSize: '8px', fontFamily: 'monospace', letterSpacing: '0.12em' }}>LIVE</span>
                 </div>
               </div>
             </Link>
@@ -234,9 +234,9 @@ export function MobileNavDrawer({ isOpen, onClose }: Props) {
               onClick={close}
               className="p-2.5 rounded-lg transition-all active:scale-90"
               style={{
-                color: 'var(--muted, #5a7090)',
-                border: '1px solid var(--border, rgba(26,40,64,0.7))',
-                background: 'var(--surface2, rgba(15,25,41,0.5))',
+                color: 'var(--muted, var(--muted))',
+                border: '1px solid var(--border, rgb(var(--rgb-border) / 0.7))',
+                background: 'var(--surface2, rgb(var(--rgb-card) / 0.5))',
               }}
               aria-label="סגור"
             >
@@ -245,36 +245,36 @@ export function MobileNavDrawer({ isOpen, onClose }: Props) {
           </div>
 
           {loading ? (
-            <div className="h-12 rounded-xl animate-pulse" style={{ background: 'rgba(26,40,64,0.5)' }} />
+            <div className="h-12 rounded-xl animate-pulse" style={{ background: 'rgb(var(--rgb-border) / 0.5)' }} />
           ) : user ? (
             <Link
               href={`/${locale}/profile/${displayName}`}
               onClick={close}
               className="flex items-center gap-3 p-2 rounded-xl transition-all active:scale-[0.98]"
               style={{
-                background: 'linear-gradient(135deg, rgba(0,229,176,0.08), rgba(59,130,246,0.05))',
-                border: '1px solid rgba(0,229,176,0.18)',
+                background: 'linear-gradient(135deg, rgb(var(--rgb-accent) / 0.08), rgb(var(--rgb-blue) / 0.05))',
+                border: '1px solid rgb(var(--rgb-accent) / 0.18)',
               }}
             >
               <div
                 className="w-11 h-11 rounded-full flex items-center justify-center font-black text-base shrink-0"
                 style={{
-                  background: 'linear-gradient(135deg, #00e5b0, #3b82f6)',
-                  color: '#060b16',
-                  boxShadow: '0 0 12px rgba(0,229,176,0.25)',
+                  background: 'linear-gradient(135deg, var(--accent), var(--blue))',
+                  color: 'var(--bg)',
+                  boxShadow: '0 0 12px rgb(var(--rgb-accent) / 0.25)',
                 }}
               >
                 {initial}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-sm font-black truncate" style={{ color: 'var(--text, #e8f4ff)' }}>
+                <div className="text-sm font-black truncate" style={{ color: 'var(--text, var(--text))' }}>
                   {displayName}
                 </div>
-                <div className="text-[11px] truncate" style={{ color: 'var(--muted, #5a7090)' }}>
+                <div className="text-[11px] truncate" style={{ color: 'var(--muted, var(--muted))' }}>
                   {user.email}
                 </div>
               </div>
-              <span style={{ color: 'var(--muted, #5a7090)' }} className="text-xs">←</span>
+              <span style={{ color: 'var(--muted, var(--muted))' }} className="text-xs">←</span>
             </Link>
           ) : (
             <div className="flex gap-2">
@@ -283,9 +283,9 @@ export function MobileNavDrawer({ isOpen, onClose }: Props) {
                 onClick={close}
                 className="flex-1 text-center text-sm font-bold px-3 py-2.5 rounded-xl transition-all active:scale-95"
                 style={{
-                  color: 'var(--text, #e8f4ff)',
-                  background: 'var(--surface2, rgba(15,25,41,0.6))',
-                  border: '1px solid var(--border, rgba(26,40,64,0.7))',
+                  color: 'var(--text, var(--text))',
+                  background: 'var(--surface2, rgb(var(--rgb-card) / 0.6))',
+                  border: '1px solid var(--border, rgb(var(--rgb-border) / 0.7))',
                 }}
               >
                 כניסה
@@ -295,9 +295,9 @@ export function MobileNavDrawer({ isOpen, onClose }: Props) {
                 onClick={close}
                 className="flex-1 text-center text-sm font-black px-3 py-2.5 rounded-xl transition-all active:scale-95"
                 style={{
-                  background: 'linear-gradient(135deg, #00e5b0, #00c49a)',
-                  color: '#060b16',
-                  boxShadow: '0 4px 14px rgba(0,229,176,0.3)',
+                  background: 'linear-gradient(135deg, var(--accent), var(--accent2))',
+                  color: 'var(--bg)',
+                  boxShadow: '0 4px 14px rgb(var(--rgb-accent) / 0.3)',
                 }}
               >
                 הצטרף חינם
@@ -315,7 +315,7 @@ export function MobileNavDrawer({ isOpen, onClose }: Props) {
           <div className="px-2 pt-3 pb-1">
             <div
               className="px-3 pb-1.5 text-[10px] font-black tracking-widest uppercase"
-              style={{ color: 'var(--muted, #5a7090)' }}
+              style={{ color: 'var(--muted, var(--muted))' }}
             >
               ראשי
             </div>
@@ -335,11 +335,11 @@ export function MobileNavDrawer({ isOpen, onClose }: Props) {
           {/* Discovery */}
           <div
             className="px-2 pt-3 pb-1 mt-2"
-            style={{ borderTop: '1px solid var(--border2, rgba(26,40,64,0.5))' }}
+            style={{ borderTop: '1px solid var(--border2, rgb(var(--rgb-border) / 0.5))' }}
           >
             <div
               className="px-3 pb-1.5 pt-2 text-[10px] font-black tracking-widest uppercase"
-              style={{ color: 'var(--muted, #5a7090)' }}
+              style={{ color: 'var(--muted, var(--muted))' }}
             >
               גלה שוק
             </div>
@@ -361,11 +361,11 @@ export function MobileNavDrawer({ isOpen, onClose }: Props) {
           {isAdmin && (
             <div
               className="px-2 pt-3 pb-1 mt-2"
-              style={{ borderTop: '1px solid var(--border2, rgba(26,40,64,0.5))' }}
+              style={{ borderTop: '1px solid var(--border2, rgb(var(--rgb-border) / 0.5))' }}
             >
               <div
                 className="px-3 pb-1.5 pt-2 text-[10px] font-black tracking-widest uppercase flex items-center gap-1.5"
-                style={{ color: '#00e5b0' }}
+                style={{ color: 'var(--accent)' }}
               >
                 🛡️ ניהול
               </div>
@@ -385,11 +385,11 @@ export function MobileNavDrawer({ isOpen, onClose }: Props) {
           {user && personalLinks.length > 0 && (
             <div
               className="px-2 pt-3 pb-1 mt-2"
-              style={{ borderTop: '1px solid var(--border2, rgba(26,40,64,0.5))' }}
+              style={{ borderTop: '1px solid var(--border2, rgb(var(--rgb-border) / 0.5))' }}
             >
               <div
                 className="px-3 pb-1.5 pt-2 text-[10px] font-black tracking-widest uppercase"
-                style={{ color: 'var(--muted, #5a7090)' }}
+                style={{ color: 'var(--muted, var(--muted))' }}
               >
                 שלי
               </div>
@@ -410,11 +410,11 @@ export function MobileNavDrawer({ isOpen, onClose }: Props) {
           {/* Tools — theme + settings + logout */}
           <div
             className="px-2 pt-3 pb-2 mt-2"
-            style={{ borderTop: '1px solid var(--border2, rgba(26,40,64,0.5))' }}
+            style={{ borderTop: '1px solid var(--border2, rgb(var(--rgb-border) / 0.5))' }}
           >
             <div
               className="px-3 pb-1.5 pt-2 text-[10px] font-black tracking-widest uppercase"
-              style={{ color: 'var(--muted, #5a7090)' }}
+              style={{ color: 'var(--muted, var(--muted))' }}
             >
               כלים
             </div>
@@ -422,13 +422,13 @@ export function MobileNavDrawer({ isOpen, onClose }: Props) {
             {/* Theme toggle row */}
             <div
               className="flex items-center gap-3 px-3 py-2.5 rounded-xl"
-              style={{ color: 'var(--text, #e8f4ff)' }}
+              style={{ color: 'var(--text, var(--text))' }}
             >
               <div
                 className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
                 style={{
-                  background: 'var(--surface2, rgba(15,25,41,0.5))',
-                  border: '1px solid var(--border, rgba(26,40,64,0.6))',
+                  background: 'var(--surface2, rgb(var(--rgb-card) / 0.5))',
+                  border: '1px solid var(--border, rgb(var(--rgb-border) / 0.6))',
                 }}
               >
                 <span style={{ fontSize: 16 }}>🎨</span>
@@ -454,16 +454,16 @@ export function MobileNavDrawer({ isOpen, onClose }: Props) {
               <button
                 onClick={handleLogout}
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all active:scale-[0.98] text-right"
-                style={{ color: '#ff4d6a' }}
+                style={{ color: 'var(--red)' }}
               >
                 <div
                   className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
                   style={{
-                    background: 'rgba(255,77,106,0.08)',
-                    border: '1px solid rgba(255,77,106,0.18)',
+                    background: 'rgb(var(--rgb-red) / 0.08)',
+                    border: '1px solid rgb(var(--rgb-red) / 0.18)',
                   }}
                 >
-                  <ArrowLeftOnRectangleIcon style={{ color: '#ff4d6a', width: 18, height: 18 }} />
+                  <ArrowLeftOnRectangleIcon style={{ color: 'var(--red)', width: 18, height: 18 }} />
                 </div>
                 <span className="text-sm font-bold flex-1">יציאה</span>
               </button>
@@ -473,13 +473,13 @@ export function MobileNavDrawer({ isOpen, onClose }: Props) {
           {/* Footer */}
           <div
             className="px-4 pt-4 pb-2 mt-2 flex flex-wrap gap-x-3 gap-y-1 justify-center"
-            style={{ borderTop: '1px solid var(--border2, rgba(26,40,64,0.5))' }}
+            style={{ borderTop: '1px solid var(--border2, rgb(var(--rgb-border) / 0.5))' }}
           >
             <Link
               href={`/${locale}/terms`}
               onClick={close}
               className="text-[10px] transition-colors"
-              style={{ color: 'var(--muted, rgba(90,112,144,0.7))', fontFamily: 'monospace' }}
+              style={{ color: 'var(--muted, rgb(var(--rgb-muted) / 0.7))', fontFamily: 'monospace' }}
             >
               תנאי שימוש
             </Link>
@@ -487,14 +487,14 @@ export function MobileNavDrawer({ isOpen, onClose }: Props) {
               href={`/${locale}/privacy`}
               onClick={close}
               className="text-[10px] transition-colors"
-              style={{ color: 'var(--muted, rgba(90,112,144,0.7))', fontFamily: 'monospace' }}
+              style={{ color: 'var(--muted, rgb(var(--rgb-muted) / 0.7))', fontFamily: 'monospace' }}
             >
               פרטיות
             </Link>
             <a
               href="mailto:support@tsua.co"
               className="text-[10px] transition-colors"
-              style={{ color: 'var(--muted, rgba(90,112,144,0.7))', fontFamily: 'monospace' }}
+              style={{ color: 'var(--muted, rgb(var(--rgb-muted) / 0.7))', fontFamily: 'monospace' }}
             >
               צור קשר
             </a>

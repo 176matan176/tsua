@@ -77,7 +77,7 @@ export function SectorDetailClient({ sector, locale }: SectorDetailClientProps) 
               <span
                 dir="ltr"
                 className="text-xs font-mono px-2 py-0.5 rounded-lg"
-                style={{ background: 'rgba(26,40,64,0.5)', color: '#c8d8f0' }}
+                style={{ background: 'rgb(var(--rgb-border) / 0.5)', color: 'var(--text2)' }}
               >
                 {sector.nameEn}
               </span>
@@ -92,8 +92,8 @@ export function SectorDetailClient({ sector, locale }: SectorDetailClientProps) 
             href={`/${locale}/stocks/${sector.etf}`}
             className="rounded-xl px-4 py-3 transition-all hover:scale-[1.02]"
             style={{
-              background: 'rgba(13,20,36,0.9)',
-              border: '1px solid rgba(26,40,64,0.8)',
+              background: 'rgb(var(--rgb-bg2) / 0.9)',
+              border: '1px solid rgb(var(--rgb-border) / 0.8)',
             }}
           >
             <div className="text-[10px] text-tsua-muted uppercase tracking-widest font-bold mb-1">
@@ -102,7 +102,7 @@ export function SectorDetailClient({ sector, locale }: SectorDetailClientProps) 
             <div className="flex items-baseline gap-2" dir="ltr">
               <span className="text-lg font-black font-mono text-tsua-text">{sector.etf}</span>
               {etfQuote && (
-                <span className="text-sm font-bold font-mono" style={{ color: isEtfUp ? '#00e5b0' : '#ff4d6a' }}>
+                <span className="text-sm font-bold font-mono" style={{ color: isEtfUp ? 'var(--accent)' : 'var(--red)' }}>
                   ${etfQuote.price.toFixed(2)}
                 </span>
               )}
@@ -111,7 +111,7 @@ export function SectorDetailClient({ sector, locale }: SectorDetailClientProps) 
               <div
                 dir="ltr"
                 className="text-xs font-bold mt-1 font-mono"
-                style={{ color: isEtfUp ? '#00e5b0' : '#ff4d6a' }}
+                style={{ color: isEtfUp ? 'var(--accent)' : 'var(--red)' }}
               >
                 {isEtfUp ? '▲' : '▼'} {isEtfUp ? '+' : ''}{etfQuote.changePercent.toFixed(2)}%
               </div>
@@ -127,7 +127,7 @@ export function SectorDetailClient({ sector, locale }: SectorDetailClientProps) 
         {loading ? (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {sector.top.map((t) => (
-              <div key={t} className="h-16 rounded-xl animate-pulse" style={{ background: 'rgba(26,40,64,0.5)' }} />
+              <div key={t} className="h-16 rounded-xl animate-pulse" style={{ background: 'rgb(var(--rgb-border) / 0.5)' }} />
             ))}
           </div>
         ) : (
@@ -135,17 +135,17 @@ export function SectorDetailClient({ sector, locale }: SectorDetailClientProps) 
             {sortedTop.map((ticker) => {
               const q = quotes[ticker];
               const up = (q?.changePercent ?? 0) >= 0;
-              const color = q ? (up ? '#00e5b0' : '#ff4d6a') : '#5a7090';
+              const color = q ? (up ? 'var(--accent)' : 'var(--red)') : 'var(--muted)';
               const bg = q
                 ? up
-                  ? 'rgba(0,229,176,0.08)'
-                  : 'rgba(255,77,106,0.08)'
-                : 'rgba(26,40,64,0.4)';
+                  ? 'rgb(var(--rgb-accent) / 0.08)'
+                  : 'rgb(var(--rgb-red) / 0.08)'
+                : 'rgb(var(--rgb-border) / 0.4)';
               const border = q
                 ? up
-                  ? 'rgba(0,229,176,0.25)'
-                  : 'rgba(255,77,106,0.25)'
-                : 'rgba(26,40,64,0.7)';
+                  ? 'rgb(var(--rgb-accent) / 0.25)'
+                  : 'rgb(var(--rgb-red) / 0.25)'
+                : 'rgb(var(--rgb-border) / 0.7)';
 
               return (
                 <Link

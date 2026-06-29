@@ -54,7 +54,7 @@ export function ResetPasswordPage() {
   }
 
   const strength = password.length === 0 ? 0 : password.length < 6 ? 1 : password.length < 10 ? 2 : 3;
-  const strengthColor = ['', '#ff4d6a', '#f5b942', '#00e5b0'][strength];
+  const strengthColor = ['', 'var(--red)', 'var(--gold)', 'var(--accent)'][strength];
   const strengthLabel = ['', 'חלשה', 'בינונית', 'חזקה'][strength];
 
   return (
@@ -65,7 +65,7 @@ export function ResetPasswordPage() {
         <div className="flex flex-col items-center mb-8">
           <div
             className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4"
-            style={{ background: 'linear-gradient(135deg, #00e5b0, #3b82f6)', boxShadow: '0 0 32px rgba(0,229,176,0.4)' }}
+            style={{ background: 'linear-gradient(135deg, var(--accent), var(--blue))', boxShadow: '0 0 32px rgb(var(--rgb-accent) / 0.4)' }}
           >
             <span className="text-white font-black text-2xl">ת</span>
           </div>
@@ -79,13 +79,13 @@ export function ResetPasswordPage() {
 
         <div
           className="rounded-2xl p-6"
-          style={{ background: 'rgba(13,20,36,0.9)', border: '1px solid rgba(26,40,64,0.8)', boxShadow: '0 8px 40px rgba(0,0,0,0.3)' }}
+          style={{ background: 'rgb(var(--rgb-bg2) / 0.9)', border: '1px solid rgb(var(--rgb-border) / 0.8)', boxShadow: '0 8px 40px rgba(0,0,0,0.3)' }}
         >
           {done ? (
             <div className="text-center space-y-4">
               <div
                 className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto"
-                style={{ background: 'rgba(0,229,176,0.1)', border: '1px solid rgba(0,229,176,0.3)' }}
+                style={{ background: 'rgb(var(--rgb-accent) / 0.1)', border: '1px solid rgb(var(--rgb-accent) / 0.3)' }}
               >
                 <span className="text-3xl">🔐</span>
               </div>
@@ -97,10 +97,10 @@ export function ResetPasswordPage() {
                   {'מעביר אותך לאפליקציה...'}
                 </p>
               </div>
-              <div className="w-full h-1 rounded-full overflow-hidden" style={{ background: 'rgba(26,40,64,0.5)' }}>
+              <div className="w-full h-1 rounded-full overflow-hidden" style={{ background: 'rgb(var(--rgb-border) / 0.5)' }}>
                 <div
                   className="h-full rounded-full transition-all duration-[2400ms] ease-linear"
-                  style={{ width: '100%', background: 'linear-gradient(90deg, #00e5b0, #3b82f6)' }}
+                  style={{ width: '100%', background: 'linear-gradient(90deg, var(--accent), var(--blue))' }}
                 />
               </div>
             </div>
@@ -121,16 +121,16 @@ export function ResetPasswordPage() {
                     placeholder="••••••••"
                     className="w-full rounded-xl py-2.5 ps-9 pe-10 text-sm placeholder:text-tsua-muted focus:outline-none transition-all"
                     style={{
-                      background: 'rgba(15,25,41,0.6)',
-                      border: '1px solid rgba(26,40,64,0.8)',
-                      color: '#e8f0ff',
+                      background: 'rgb(var(--rgb-card) / 0.6)',
+                      border: '1px solid rgb(var(--rgb-border) / 0.8)',
+                      color: 'var(--text)',
                     }}
                     onFocus={e => {
-                      e.target.style.border = '1px solid rgba(0,229,176,0.4)';
-                      e.target.style.boxShadow = '0 0 0 3px rgba(0,229,176,0.08)';
+                      e.target.style.border = '1px solid rgb(var(--rgb-accent) / 0.4)';
+                      e.target.style.boxShadow = '0 0 0 3px rgb(var(--rgb-accent) / 0.08)';
                     }}
                     onBlur={e => {
-                      e.target.style.border = '1px solid rgba(26,40,64,0.8)';
+                      e.target.style.border = '1px solid rgb(var(--rgb-border) / 0.8)';
                       e.target.style.boxShadow = 'none';
                     }}
                   />
@@ -151,7 +151,7 @@ export function ResetPasswordPage() {
                         <div
                           key={i}
                           className="h-1 flex-1 rounded-full transition-all duration-300"
-                          style={{ background: i <= strength ? strengthColor : 'rgba(26,40,64,0.5)' }}
+                          style={{ background: i <= strength ? strengthColor : 'rgb(var(--rgb-border) / 0.5)' }}
                         />
                       ))}
                     </div>
@@ -177,26 +177,26 @@ export function ResetPasswordPage() {
                     placeholder="••••••••"
                     className="w-full rounded-xl py-2.5 ps-9 pe-4 text-sm placeholder:text-tsua-muted focus:outline-none transition-all"
                     style={{
-                      background: 'rgba(15,25,41,0.6)',
+                      background: 'rgb(var(--rgb-card) / 0.6)',
                       border: confirm && confirm !== password
-                        ? '1px solid rgba(255,77,106,0.4)'
-                        : '1px solid rgba(26,40,64,0.8)',
-                      color: '#e8f0ff',
+                        ? '1px solid rgb(var(--rgb-red) / 0.4)'
+                        : '1px solid rgb(var(--rgb-border) / 0.8)',
+                      color: 'var(--text)',
                     }}
                     onFocus={e => {
-                      e.target.style.border = '1px solid rgba(0,229,176,0.4)';
-                      e.target.style.boxShadow = '0 0 0 3px rgba(0,229,176,0.08)';
+                      e.target.style.border = '1px solid rgb(var(--rgb-accent) / 0.4)';
+                      e.target.style.boxShadow = '0 0 0 3px rgb(var(--rgb-accent) / 0.08)';
                     }}
                     onBlur={e => {
                       e.target.style.border = confirm && confirm !== password
-                        ? '1px solid rgba(255,77,106,0.4)'
-                        : '1px solid rgba(26,40,64,0.8)';
+                        ? '1px solid rgb(var(--rgb-red) / 0.4)'
+                        : '1px solid rgb(var(--rgb-border) / 0.8)';
                       e.target.style.boxShadow = 'none';
                     }}
                   />
                 </div>
                 {confirm && confirm !== password && (
-                  <p className="text-[10px] mt-1" style={{ color: '#ff4d6a' }}>
+                  <p className="text-[10px] mt-1" style={{ color: 'var(--red)' }}>
                     {'הסיסמאות אינן תואמות'}
                   </p>
                 )}
@@ -205,7 +205,7 @@ export function ResetPasswordPage() {
               {error && (
                 <div
                   className="text-xs px-3 py-2 rounded-xl"
-                  style={{ background: 'rgba(255,77,106,0.08)', border: '1px solid rgba(255,77,106,0.2)', color: '#ff4d6a' }}
+                  style={{ background: 'rgb(var(--rgb-red) / 0.08)', border: '1px solid rgb(var(--rgb-red) / 0.2)', color: 'var(--red)' }}
                 >
                   {error}
                 </div>
@@ -215,7 +215,7 @@ export function ResetPasswordPage() {
                 type="submit"
                 disabled={loading || !password || !confirm}
                 className="w-full py-2.5 rounded-xl text-sm font-black text-tsua-bg transition-all disabled:opacity-50 active:scale-[0.98] flex items-center justify-center gap-2"
-                style={{ background: 'linear-gradient(135deg, #00e5b0, #00c49a)', boxShadow: '0 4px 16px rgba(0,229,176,0.3)' }}
+                style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent2))', boxShadow: '0 4px 16px rgb(var(--rgb-accent) / 0.3)' }}
               >
                 {loading ? (
                   <>

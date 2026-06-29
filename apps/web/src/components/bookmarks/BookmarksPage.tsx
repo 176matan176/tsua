@@ -11,13 +11,13 @@ import type { Post } from '@/types/shared';
 
 function BookmarkSkeleton() {
   return (
-    <div className="rounded-2xl p-4 animate-pulse" style={{ background: 'rgba(15,25,41,0.6)', border: '1px solid rgba(26,40,64,0.8)' }}>
+    <div className="rounded-2xl p-4 animate-pulse" style={{ background: 'rgb(var(--rgb-card) / 0.6)', border: '1px solid rgb(var(--rgb-border) / 0.8)' }}>
       <div className="flex gap-3">
-        <div className="w-10 h-10 rounded-full shrink-0" style={{ background: 'rgba(26,40,64,0.8)' }} />
+        <div className="w-10 h-10 rounded-full shrink-0" style={{ background: 'rgb(var(--rgb-border) / 0.8)' }} />
         <div className="flex-1 space-y-2">
-          <div className="h-3 rounded-full w-1/3" style={{ background: 'rgba(26,40,64,0.8)' }} />
-          <div className="h-3 rounded-full w-full" style={{ background: 'rgba(26,40,64,0.6)' }} />
-          <div className="h-3 rounded-full w-2/3" style={{ background: 'rgba(26,40,64,0.6)' }} />
+          <div className="h-3 rounded-full w-1/3" style={{ background: 'rgb(var(--rgb-border) / 0.8)' }} />
+          <div className="h-3 rounded-full w-full" style={{ background: 'rgb(var(--rgb-border) / 0.6)' }} />
+          <div className="h-3 rounded-full w-2/3" style={{ background: 'rgb(var(--rgb-border) / 0.6)' }} />
         </div>
       </div>
     </div>
@@ -54,7 +54,7 @@ export function BookmarksPage() {
       <div className="flex flex-col items-center justify-center py-20 text-center" dir="rtl">
         <div
           className="w-20 h-20 rounded-3xl flex items-center justify-center mb-5 text-3xl"
-          style={{ background: 'rgba(0,229,176,0.08)', border: '1px solid rgba(0,229,176,0.15)' }}
+          style={{ background: 'rgb(var(--rgb-accent) / 0.08)', border: '1px solid rgb(var(--rgb-accent) / 0.15)' }}
         >
           🔖
         </div>
@@ -67,7 +67,7 @@ export function BookmarksPage() {
         <Link
           href={`/${locale}/login`}
           className="font-bold px-6 py-2.5 rounded-xl text-tsua-bg text-sm"
-          style={{ background: 'linear-gradient(135deg, #00e5b0, #00c49a)' }}
+          style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent2))' }}
         >
           כניסה
         </Link>
@@ -80,13 +80,13 @@ export function BookmarksPage() {
       {/* Header */}
       <div
         className="rounded-2xl p-4 flex items-center gap-3"
-        style={{ background: 'rgba(13,20,36,0.8)', border: '1px solid rgba(26,40,64,0.7)' }}
+        style={{ background: 'rgb(var(--rgb-bg2) / 0.8)', border: '1px solid rgb(var(--rgb-border) / 0.7)' }}
       >
         <div
           className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-          style={{ background: 'rgba(0,229,176,0.1)', border: '1px solid rgba(0,229,176,0.2)' }}
+          style={{ background: 'rgb(var(--rgb-accent) / 0.1)', border: '1px solid rgb(var(--rgb-accent) / 0.2)' }}
         >
-          <BookmarkSolid className="w-5 h-5" style={{ color: '#00e5b0' }} />
+          <BookmarkSolid className="w-5 h-5" style={{ color: 'var(--accent)' }} />
         </div>
         <div>
           <h1 className="text-lg font-black text-tsua-text">
@@ -104,7 +104,7 @@ export function BookmarksPage() {
 
       {/* Error */}
       {error && (
-        <div className="text-center py-6 text-sm font-medium" style={{ color: '#ff4d6a' }}>
+        <div className="text-center py-6 text-sm font-medium" style={{ color: 'var(--red)' }}>
           {error}
         </div>
       )}
@@ -130,7 +130,7 @@ export function BookmarksPage() {
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <div
             className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
-            style={{ background: 'rgba(26,40,64,0.4)', border: '1px dashed rgba(26,40,64,0.8)' }}
+            style={{ background: 'rgb(var(--rgb-border) / 0.4)', border: '1px dashed rgb(var(--rgb-border) / 0.8)' }}
           >
             <BookmarkIcon className="w-7 h-7 text-tsua-muted" />
           </div>
@@ -143,7 +143,7 @@ export function BookmarksPage() {
           <Link
             href={`/${locale}`}
             className="mt-4 text-sm font-bold px-4 py-2 rounded-xl transition-all hover:opacity-90"
-            style={{ background: 'rgba(0,229,176,0.1)', color: '#00e5b0', border: '1px solid rgba(0,229,176,0.2)' }}
+            style={{ background: 'rgb(var(--rgb-accent) / 0.1)', color: 'var(--accent)', border: '1px solid rgb(var(--rgb-accent) / 0.2)' }}
           >
             לפיד הראשי
           </Link>

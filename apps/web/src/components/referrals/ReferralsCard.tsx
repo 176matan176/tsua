@@ -50,7 +50,7 @@ export function ReferralsCard() {
   if (loading) {
     return (
       <div className="rounded-2xl p-6 animate-pulse"
-        style={{ background: 'rgba(13,20,36,0.5)', border: '1px solid var(--border)', minHeight: 180 }} />
+        style={{ background: 'rgb(var(--rgb-bg2) / 0.5)', border: '1px solid var(--border)', minHeight: 180 }} />
     );
   }
 
@@ -60,15 +60,15 @@ export function ReferralsCard() {
     <div
       className="rounded-2xl p-6 space-y-5"
       style={{
-        background: 'linear-gradient(135deg, rgba(0,229,176,0.05), rgba(10,20,36,0.7))',
-        border: '1px solid rgba(0,229,176,0.22)',
+        background: 'linear-gradient(135deg, rgb(var(--rgb-accent) / 0.05), rgba(10,20,36,0.7))',
+        border: '1px solid rgb(var(--rgb-accent) / 0.22)',
         boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
       }}
     >
       <div className="flex items-center gap-3">
         <div
           className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
-          style={{ background: 'linear-gradient(135deg, #00e5b0, #00a884)', color: '#060b16' }}
+          style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent2))', color: 'var(--bg)' }}
         >
           <UserPlusIcon className="w-6 h-6" strokeWidth={2.5} />
         </div>
@@ -83,13 +83,13 @@ export function ReferralsCard() {
       {/* Stats */}
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-xl p-3 text-center"
-          style={{ background: 'rgba(0,229,176,0.05)', border: '1px solid rgba(0,229,176,0.15)' }}>
-          <div className="text-3xl font-black font-mono" style={{ color: '#00e5b0' }}>{data.invites}</div>
+          style={{ background: 'rgb(var(--rgb-accent) / 0.05)', border: '1px solid rgb(var(--rgb-accent) / 0.15)' }}>
+          <div className="text-3xl font-black font-mono" style={{ color: 'var(--accent)' }}>{data.invites}</div>
           <div className="text-[10px] text-tsua-muted uppercase tracking-widest mt-1">הזמנות שהצליחו</div>
         </div>
         <div className="rounded-xl p-3 text-center"
-          style={{ background: 'rgba(0,229,176,0.05)', border: '1px solid rgba(0,229,176,0.15)' }}>
-          <div className="text-3xl font-black font-mono" style={{ color: '#00e5b0' }}>{data.credits}</div>
+          style={{ background: 'rgb(var(--rgb-accent) / 0.05)', border: '1px solid rgb(var(--rgb-accent) / 0.15)' }}>
+          <div className="text-3xl font-black font-mono" style={{ color: 'var(--accent)' }}>{data.credits}</div>
           <div className="text-[10px] text-tsua-muted uppercase tracking-widest mt-1">נקודות זיכוי</div>
         </div>
       </div>
@@ -104,9 +104,9 @@ export function ReferralsCard() {
             dir="ltr"
             className="flex-1 rounded-xl px-3 py-2.5 text-[12px] font-mono truncate"
             style={{
-              background: 'rgba(6,11,22,0.6)',
-              border: '1px solid rgba(26,40,64,0.8)',
-              color: '#b3c2d6',
+              background: 'rgb(var(--rgb-bg) / 0.6)',
+              border: '1px solid rgb(var(--rgb-border) / 0.8)',
+              color: 'var(--text2)',
             }}
           >
             {data.link}
@@ -115,9 +115,9 @@ export function ReferralsCard() {
             onClick={copy}
             className="px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1 transition-all hover:brightness-110 active:scale-95"
             style={{
-              background: copied ? 'rgba(0,229,176,0.18)' : 'rgba(0,229,176,0.1)',
-              border: '1px solid rgba(0,229,176,0.3)',
-              color: '#00e5b0',
+              background: copied ? 'rgb(var(--rgb-accent) / 0.18)' : 'rgb(var(--rgb-accent) / 0.1)',
+              border: '1px solid rgb(var(--rgb-accent) / 0.3)',
+              color: 'var(--accent)',
               minWidth: 84,
             }}
           >
@@ -132,9 +132,9 @@ export function ReferralsCard() {
         onClick={share}
         className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-black transition-all hover:brightness-110 active:scale-95"
         style={{
-          background: 'linear-gradient(135deg, #00e5b0, #00a884)',
-          color: '#060b16',
-          boxShadow: '0 4px 16px rgba(0,229,176,0.25)',
+          background: 'linear-gradient(135deg, var(--accent), var(--accent2))',
+          color: 'var(--bg)',
+          boxShadow: '0 4px 16px rgb(var(--rgb-accent) / 0.25)',
         }}
       >
         <ShareIcon className="w-4 h-4" strokeWidth={2.5} />

@@ -25,10 +25,10 @@ interface Trader {
 }
 
 const BADGE_CONFIG = {
-  legend: { emoji: '👑', labelHe: 'אגדה', labelEn: 'Legend', color: '#f5b942', bg: 'rgba(245,185,66,0.12)', border: 'rgba(245,185,66,0.3)' },
-  expert:  { emoji: '⭐', labelHe: 'מומחה', labelEn: 'Expert',  color: '#3b82f6', bg: 'rgba(59,130,246,0.12)', border: 'rgba(59,130,246,0.3)' },
-  rising:  { emoji: '🚀', labelHe: 'עולה', labelEn: 'Rising',  color: '#00e5b0', bg: 'rgba(0,229,176,0.12)', border: 'rgba(0,229,176,0.3)' },
-  rookie:  { emoji: '🌱', labelHe: 'מתחיל', labelEn: 'Rookie', color: '#a8bcd4', bg: 'rgba(168,188,212,0.1)', border: 'rgba(168,188,212,0.2)' },
+  legend: { emoji: '👑', labelHe: 'אגדה', labelEn: 'Legend', color: 'var(--gold)', bg: 'rgb(var(--rgb-gold) / 0.12)', border: 'rgb(var(--rgb-gold) / 0.3)' },
+  expert:  { emoji: '⭐', labelHe: 'מומחה', labelEn: 'Expert',  color: 'var(--blue)', bg: 'rgb(var(--rgb-blue) / 0.12)', border: 'rgb(var(--rgb-blue) / 0.3)' },
+  rising:  { emoji: '🚀', labelHe: 'עולה', labelEn: 'Rising',  color: 'var(--accent)', bg: 'rgb(var(--rgb-accent) / 0.12)', border: 'rgb(var(--rgb-accent) / 0.3)' },
+  rookie:  { emoji: '🌱', labelHe: 'מתחיל', labelEn: 'Rookie', color: 'var(--text2)', bg: 'rgb(var(--rgb-text2) / 0.1)', border: 'rgb(var(--rgb-text2) / 0.2)' },
 };
 
 function RankMedal({ rank }: { rank: number }) {
@@ -39,10 +39,10 @@ function RankMedal({ rank }: { rank: number }) {
 }
 
 function AccuracyBar({ accuracy }: { accuracy: number }) {
-  const color = accuracy >= 70 ? '#00e5b0' : accuracy >= 40 ? '#f5b942' : '#ff4d6a';
+  const color = accuracy >= 70 ? 'var(--accent)' : accuracy >= 40 ? 'var(--gold)' : 'var(--red)';
   return (
     <div className="flex items-center gap-1.5">
-      <div className="flex-1 h-1.5 rounded-full" style={{ background: 'rgba(26,40,64,0.6)' }}>
+      <div className="flex-1 h-1.5 rounded-full" style={{ background: 'rgb(var(--rgb-border) / 0.6)' }}>
         <div
           className="h-full rounded-full transition-all"
           style={{ width: `${Math.min(accuracy, 100)}%`, background: color, boxShadow: `0 0 6px ${color}40` }}
@@ -57,18 +57,18 @@ function SkeletonCard() {
   return (
     <div
       className="flex items-center gap-3 p-3 rounded-2xl animate-pulse"
-      style={{ background: 'rgba(15,25,41,0.6)', border: '1px solid rgba(26,40,64,0.8)' }}
+      style={{ background: 'rgb(var(--rgb-card) / 0.6)', border: '1px solid rgb(var(--rgb-border) / 0.8)' }}
     >
-      <div className="w-8 h-5 rounded" style={{ background: 'rgba(26,40,64,0.8)' }} />
-      <div className="w-10 h-10 rounded-full" style={{ background: 'rgba(26,40,64,0.8)' }} />
+      <div className="w-8 h-5 rounded" style={{ background: 'rgb(var(--rgb-border) / 0.8)' }} />
+      <div className="w-10 h-10 rounded-full" style={{ background: 'rgb(var(--rgb-border) / 0.8)' }} />
       <div className="flex-1 space-y-2">
-        <div className="h-3 w-28 rounded" style={{ background: 'rgba(26,40,64,0.8)' }} />
-        <div className="h-2 w-full rounded" style={{ background: 'rgba(26,40,64,0.8)' }} />
-        <div className="h-2 w-20 rounded" style={{ background: 'rgba(26,40,64,0.8)' }} />
+        <div className="h-3 w-28 rounded" style={{ background: 'rgb(var(--rgb-border) / 0.8)' }} />
+        <div className="h-2 w-full rounded" style={{ background: 'rgb(var(--rgb-border) / 0.8)' }} />
+        <div className="h-2 w-20 rounded" style={{ background: 'rgb(var(--rgb-border) / 0.8)' }} />
       </div>
       <div className="w-12 space-y-1">
-        <div className="h-4 rounded" style={{ background: 'rgba(26,40,64,0.8)' }} />
-        <div className="h-3 rounded" style={{ background: 'rgba(26,40,64,0.8)' }} />
+        <div className="h-4 rounded" style={{ background: 'rgb(var(--rgb-border) / 0.8)' }} />
+        <div className="h-3 rounded" style={{ background: 'rgb(var(--rgb-border) / 0.8)' }} />
       </div>
     </div>
   );
@@ -77,8 +77,8 @@ function SkeletonCard() {
 function AvatarCircle({ trader, size = 'md', isFirst = false }: { trader: Trader; size?: 'sm' | 'md'; isFirst?: boolean }) {
   const sizeClass = size === 'md' ? 'w-10 h-10 text-sm' : 'w-12 h-12';
   const bg = isFirst
-    ? 'linear-gradient(135deg, #f5b942, #e8a020)'
-    : 'linear-gradient(135deg, #00e5b0, #3b82f6)';
+    ? 'linear-gradient(135deg, var(--gold), #e8a020)'
+    : 'linear-gradient(135deg, var(--accent), var(--blue))';
 
   if (trader.avatarUrl) {
     return (
@@ -151,25 +151,25 @@ export function LeaderboardPage() {
 
       {/* Filters */}
       <div className="flex gap-2 flex-wrap">
-        <div className="flex gap-1 p-1 rounded-xl flex-1" style={{ background: 'rgba(15,25,41,0.6)', border: '1px solid rgba(26,40,64,0.8)' }}>
+        <div className="flex gap-1 p-1 rounded-xl flex-1" style={{ background: 'rgb(var(--rgb-card) / 0.6)', border: '1px solid rgb(var(--rgb-border) / 0.8)' }}>
           {(['7d', '30d', 'alltime'] as Period[]).map((p) => (
             <button
               key={p}
               onClick={() => setPeriod(p)}
               className="flex-1 text-xs font-semibold py-1.5 rounded-lg transition-all"
-              style={period === p ? { background: 'linear-gradient(135deg, #00e5b0, #00c49a)', color: '#080d1a' } : { color: '#5a7090' }}
+              style={period === p ? { background: 'linear-gradient(135deg, var(--accent), var(--accent2))', color: '#080d1a' } : { color: 'var(--muted)' }}
             >
               {p === '7d' ? '7 ימים' : p === '30d' ? '30 ימים' : 'הכל'}
             </button>
           ))}
         </div>
-        <div className="flex gap-1 p-1 rounded-xl" style={{ background: 'rgba(15,25,41,0.6)', border: '1px solid rgba(26,40,64,0.8)' }}>
+        <div className="flex gap-1 p-1 rounded-xl" style={{ background: 'rgb(var(--rgb-card) / 0.6)', border: '1px solid rgb(var(--rgb-border) / 0.8)' }}>
           {(['all', 'tase', 'us'] as Category[]).map((c) => (
             <button
               key={c}
               onClick={() => setCategory(c)}
               className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-all"
-              style={category === c ? { background: 'rgba(0,229,176,0.15)', color: '#00e5b0', border: '1px solid rgba(0,229,176,0.3)' } : { color: '#5a7090' }}
+              style={category === c ? { background: 'rgb(var(--rgb-accent) / 0.15)', color: 'var(--accent)', border: '1px solid rgb(var(--rgb-accent) / 0.3)' } : { color: 'var(--muted)' }}
             >
               {c === 'all' ? 'הכל' : c === 'tase' ? '🇮🇱 ת"א' : '🇺🇸 US'}
             </button>
@@ -181,7 +181,7 @@ export function LeaderboardPage() {
       {error && (
         <div
           className="rounded-2xl p-4 text-center text-sm"
-          style={{ background: 'rgba(255,77,106,0.08)', border: '1px solid rgba(255,77,106,0.2)', color: '#ff4d6a' }}
+          style={{ background: 'rgb(var(--rgb-red) / 0.08)', border: '1px solid rgb(var(--rgb-red) / 0.2)', color: 'var(--red)' }}
         >
           {error}
         </div>
@@ -195,12 +195,12 @@ export function LeaderboardPage() {
               <div
                 key={i}
                 className={`rounded-2xl p-3 animate-pulse ${i === 1 ? 'py-5' : 'mt-4'}`}
-                style={{ background: 'rgba(15,25,41,0.6)', border: '1px solid rgba(26,40,64,0.8)' }}
+                style={{ background: 'rgb(var(--rgb-card) / 0.6)', border: '1px solid rgb(var(--rgb-border) / 0.8)' }}
               >
-                <div className="w-8 h-8 rounded-full mx-auto mb-2" style={{ background: 'rgba(26,40,64,0.8)' }} />
-                <div className="w-12 h-12 rounded-full mx-auto mb-2" style={{ background: 'rgba(26,40,64,0.8)' }} />
-                <div className="h-3 w-16 rounded mx-auto mb-1" style={{ background: 'rgba(26,40,64,0.8)' }} />
-                <div className="h-3 w-10 rounded mx-auto" style={{ background: 'rgba(26,40,64,0.8)' }} />
+                <div className="w-8 h-8 rounded-full mx-auto mb-2" style={{ background: 'rgb(var(--rgb-border) / 0.8)' }} />
+                <div className="w-12 h-12 rounded-full mx-auto mb-2" style={{ background: 'rgb(var(--rgb-border) / 0.8)' }} />
+                <div className="h-3 w-16 rounded mx-auto mb-1" style={{ background: 'rgb(var(--rgb-border) / 0.8)' }} />
+                <div className="h-3 w-10 rounded mx-auto" style={{ background: 'rgb(var(--rgb-border) / 0.8)' }} />
               </div>
             ))}
           </div>
@@ -214,7 +214,7 @@ export function LeaderboardPage() {
       {!loading && !error && traders.length === 0 && (
         <div
           className="rounded-2xl p-8 text-center"
-          style={{ background: 'rgba(15,25,41,0.6)', border: '1px solid rgba(26,40,64,0.8)' }}
+          style={{ background: 'rgb(var(--rgb-card) / 0.6)', border: '1px solid rgb(var(--rgb-border) / 0.8)' }}
         >
           <div className="text-4xl mb-3">📭</div>
           <p className="text-tsua-muted text-sm">{'אין נתונים לתקופה הנבחרת עדיין'}</p>
@@ -234,9 +234,9 @@ export function LeaderboardPage() {
                 <div
                   className={`relative text-center rounded-2xl p-3 cursor-pointer transition-all hover:scale-105 ${isFirst ? 'py-5' : 'mt-4'}`}
                   style={{
-                    background: isFirst ? 'rgba(245,185,66,0.08)' : 'rgba(15,25,41,0.7)',
-                    border: isFirst ? '1px solid rgba(245,185,66,0.3)' : '1px solid rgba(26,40,64,0.8)',
-                    boxShadow: isFirst ? '0 0 20px rgba(245,185,66,0.1)' : 'none',
+                    background: isFirst ? 'rgb(var(--rgb-gold) / 0.08)' : 'rgb(var(--rgb-card) / 0.7)',
+                    border: isFirst ? '1px solid rgb(var(--rgb-gold) / 0.3)' : '1px solid rgb(var(--rgb-border) / 0.8)',
+                    boxShadow: isFirst ? '0 0 20px rgb(var(--rgb-gold) / 0.1)' : 'none',
                   }}
                 >
                   <div className="text-2xl mb-1">
@@ -247,10 +247,10 @@ export function LeaderboardPage() {
                   </div>
                   <div className="text-xs font-bold text-tsua-text truncate">{trader.displayName}</div>
                   <div className="text-[10px] text-tsua-muted">@{trader.username}</div>
-                  <div className="mt-1.5 text-sm font-black" style={{ color: isFirst ? '#f5b942' : '#00e5b0' }}>
+                  <div className="mt-1.5 text-sm font-black" style={{ color: isFirst ? 'var(--gold)' : 'var(--accent)' }}>
                     {Math.round(trader.score).toLocaleString()}
                   </div>
-                  <div className="text-[10px]" style={{ color: '#00e5b0' }}>{trader.postCount} {'פוסטים'}</div>
+                  <div className="text-[10px]" style={{ color: 'var(--accent)' }}>{trader.postCount} {'פוסטים'}</div>
                   {badge && (
                     <div className="mt-1">
                       <span
@@ -278,14 +278,14 @@ export function LeaderboardPage() {
               <Link key={trader.username} href={`/${locale}/profile/${trader.username}`}>
                 <div
                   className="flex items-center gap-3 p-3 rounded-2xl cursor-pointer transition-all"
-                  style={{ background: 'rgba(15,25,41,0.6)', border: '1px solid rgba(26,40,64,0.8)' }}
+                  style={{ background: 'rgb(var(--rgb-card) / 0.6)', border: '1px solid rgb(var(--rgb-border) / 0.8)' }}
                   onMouseEnter={e => {
-                    (e.currentTarget as HTMLElement).style.borderColor = 'rgba(0,229,176,0.2)';
-                    (e.currentTarget as HTMLElement).style.background = 'rgba(15,25,41,0.9)';
+                    (e.currentTarget as HTMLElement).style.borderColor = 'rgb(var(--rgb-accent) / 0.2)';
+                    (e.currentTarget as HTMLElement).style.background = 'rgb(var(--rgb-card) / 0.9)';
                   }}
                   onMouseLeave={e => {
-                    (e.currentTarget as HTMLElement).style.borderColor = 'rgba(26,40,64,0.8)';
-                    (e.currentTarget as HTMLElement).style.background = 'rgba(15,25,41,0.6)';
+                    (e.currentTarget as HTMLElement).style.borderColor = 'rgb(var(--rgb-border) / 0.8)';
+                    (e.currentTarget as HTMLElement).style.background = 'rgb(var(--rgb-card) / 0.6)';
                   }}
                 >
                   {/* Rank */}
@@ -303,7 +303,7 @@ export function LeaderboardPage() {
                       {trader.isVerified && (
                         <span
                           className="w-3.5 h-3.5 rounded-full inline-flex items-center justify-center text-[8px] font-black text-tsua-bg shrink-0"
-                          style={{ background: 'linear-gradient(135deg, #00e5b0, #3b82f6)' }}
+                          style={{ background: 'linear-gradient(135deg, var(--accent), var(--blue))' }}
                         >
                           ✓
                         </span>
@@ -322,16 +322,16 @@ export function LeaderboardPage() {
                     </div>
                     <div className="mt-0.5 text-[10px] text-tsua-muted">
                       {trader.postCount} {'פוסטים'} ·{' '}
-                      <span style={{ color: '#3b82f6' }}>{'שור:'} {trader.bullishCount}</span>
+                      <span style={{ color: 'var(--blue)' }}>{'שור:'} {trader.bullishCount}</span>
                       {' / '}
-                      <span style={{ color: '#ff4d6a' }}>{'דוב:'} {trader.bearishCount}</span>
+                      <span style={{ color: 'var(--red)' }}>{'דוב:'} {trader.bearishCount}</span>
                     </div>
                   </div>
 
                   {/* Score */}
                   <div className="text-right shrink-0">
                     <div className="text-base font-black text-tsua-text">{Math.round(trader.score).toLocaleString()}</div>
-                    <div className="text-[11px] font-bold" style={{ color: '#00e5b0' }}>
+                    <div className="text-[11px] font-bold" style={{ color: 'var(--accent)' }}>
                       ♥ {trader.totalLikes}
                     </div>
                   </div>
@@ -345,7 +345,7 @@ export function LeaderboardPage() {
       {/* How it works */}
       <div
         className="rounded-2xl p-4"
-        style={{ background: 'rgba(0,229,176,0.04)', border: '1px solid rgba(0,229,176,0.1)' }}
+        style={{ background: 'rgb(var(--rgb-accent) / 0.04)', border: '1px solid rgb(var(--rgb-accent) / 0.1)' }}
       >
         <h3 className="text-sm font-bold text-tsua-text mb-3">
           {'❓ איך עובד הדירוג?'}

@@ -21,11 +21,11 @@ const LABELS: Record<string, string> = {
 };
 
 function getColor(v: number) {
-  if (v <= 25) return '#ff4d6a';
+  if (v <= 25) return 'var(--red)';
   if (v <= 45) return '#ff8c42';
-  if (v <= 55) return '#ffd166';
+  if (v <= 55) return 'var(--gold)';
   if (v <= 75) return '#06d6a0';
-  return '#00e5b0';
+  return 'var(--accent)';
 }
 
 function getEmoji(v: number) {
@@ -114,13 +114,13 @@ export function FearGreedWidget() {
   const isStale = updatedAt !== null && (Date.now() - updatedAt) > 26 * 60 * 60 * 1000;
 
   return (
-    <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(15,25,41,0.7)', border: '1px solid rgba(26,40,64,0.8)' }}>
-      <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(26,40,64,0.6)' }}>
+    <div className="rounded-2xl overflow-hidden" style={{ background: 'rgb(var(--rgb-card) / 0.7)', border: '1px solid rgb(var(--rgb-border) / 0.8)' }}>
+      <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid rgb(var(--rgb-border) / 0.6)' }}>
         <h3 className="text-sm font-bold text-tsua-text">🧠 מדד פחד וחמדנות</h3>
         {updatedAt && (
           <span
             className="text-[10px] tabular-nums flex items-center gap-1"
-            style={{ color: isStale ? '#ffd166' : 'var(--muted)' }}
+            style={{ color: isStale ? 'var(--gold)' : 'var(--muted)' }}
             title={`CNN updated: ${new Date(updatedAt).toLocaleString('he-IL')}`}
           >
             {isStale && <span>⚠️</span>}
@@ -132,8 +132,8 @@ export function FearGreedWidget() {
       <div className="px-4 py-4" dir="rtl">
         {state.status === 'loading' && (
           <div className="space-y-3 animate-pulse">
-            <div className="h-8 rounded w-24 mx-auto" style={{ background: 'rgba(26,40,64,0.6)' }} />
-            <div className="h-3 rounded" style={{ background: 'rgba(26,40,64,0.4)' }} />
+            <div className="h-8 rounded w-24 mx-auto" style={{ background: 'rgb(var(--rgb-border) / 0.6)' }} />
+            <div className="h-3 rounded" style={{ background: 'rgb(var(--rgb-border) / 0.4)' }} />
           </div>
         )}
 
@@ -174,7 +174,7 @@ export function FearGreedWidget() {
                     RIGHT  = start of reading = פחד קיצוני (red)
                     LEFT   = end of reading   = חמדנות קיצונית (green) */}
               <div className="relative w-full h-2.5 rounded-full overflow-hidden mt-2"
-                style={{ background: 'linear-gradient(to left, #ff4d6a, #ff8c42, #ffd166, #06d6a0, #00e5b0)' }}>
+                style={{ background: 'linear-gradient(to left, var(--red), #ff8c42, var(--gold), #06d6a0, var(--accent))' }}>
                 <div
                   className="absolute top-1/2 w-3 h-3 rounded-full border-2 border-white"
                   style={{
@@ -192,7 +192,7 @@ export function FearGreedWidget() {
               </div>
 
               {trends.length > 0 && (
-                <div className="grid grid-cols-3 gap-2 mt-3 pt-3" style={{ borderTop: '1px solid rgba(26,40,64,0.4)' }}>
+                <div className="grid grid-cols-3 gap-2 mt-3 pt-3" style={{ borderTop: '1px solid rgb(var(--rgb-border) / 0.4)' }}>
                   {trends.map((t) => {
                     const tColor = getColor(t.v);
                     return (

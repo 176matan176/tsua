@@ -38,14 +38,14 @@ export default function HomePage() {
         <div
           className="rounded-2xl overflow-hidden"
           style={{
-            background: 'rgba(13,20,36,0.6)',
-            border: '1px solid rgba(26,40,64,0.6)',
+            background: 'rgb(var(--rgb-bg2) / 0.6)',
+            border: '1px solid rgb(var(--rgb-border) / 0.6)',
           }}
         >
           {/* Topic tabs */}
           <div
             className="flex gap-1 px-3 py-2.5 overflow-x-auto scrollbar-none"
-            style={{ borderBottom: '1px solid rgba(26,40,64,0.5)' }}
+            style={{ borderBottom: '1px solid rgb(var(--rgb-border) / 0.5)' }}
           >
             {STREAM_TOPICS.map((t, i) => (
               <button
@@ -53,8 +53,8 @@ export default function HomePage() {
                 onClick={() => setStreamTopic(i)}
                 className="text-[11px] px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all duration-200 shrink-0"
                 style={streamTopic === i
-                  ? { background: 'rgba(0,229,176,0.15)', color: '#00e5b0', border: '1px solid rgba(0,229,176,0.25)' }
-                  : { background: 'rgba(15,25,41,0.6)', color: '#5a7090', border: '1px solid rgba(26,40,64,0.6)' }
+                  ? { background: 'rgb(var(--rgb-accent) / 0.15)', color: 'var(--accent)', border: '1px solid rgb(var(--rgb-accent) / 0.25)' }
+                  : { background: 'rgb(var(--rgb-card) / 0.6)', color: 'var(--muted)', border: '1px solid rgb(var(--rgb-border) / 0.6)' }
                 }
               >
                 {t.topicHe}

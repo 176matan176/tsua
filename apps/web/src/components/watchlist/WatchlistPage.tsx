@@ -54,7 +54,7 @@ function WatchlistRow({
   return (
     <div
       className="flex items-center gap-3 px-4 py-3.5 transition-all hover:bg-white/2 group"
-      style={{ borderBottom: '1px solid rgba(26,40,64,0.4)' }}
+      style={{ borderBottom: '1px solid rgb(var(--rgb-border) / 0.4)' }}
     >
       {/* Logo / Icon */}
       {item.logo ? (
@@ -62,7 +62,7 @@ function WatchlistRow({
       ) : (
         <div
           className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-xs shrink-0"
-          style={{ background: 'rgba(0,229,176,0.1)', color: '#00e5b0', border: '1px solid rgba(0,229,176,0.2)' }}
+          style={{ background: 'rgb(var(--rgb-accent) / 0.1)', color: 'var(--accent)', border: '1px solid rgb(var(--rgb-accent) / 0.2)' }}
         >
           {item.ticker.slice(0, 3)}
         </div>
@@ -91,22 +91,22 @@ function WatchlistRow({
             <div
               dir="ltr"
               className="font-bold font-mono text-sm transition-colors duration-300"
-              style={{ color: live.flash === 'up' ? '#00e5b0' : live.flash === 'down' ? '#ff4d6a' : '#e8f0ff' }}
+              style={{ color: live.flash === 'up' ? 'var(--accent)' : live.flash === 'down' ? 'var(--red)' : 'var(--text)' }}
             >
               {currencySymbol}{live.price.toFixed(2)}
             </div>
             <div
               dir="ltr"
               className="text-xs font-semibold"
-              style={{ color: isUp ? '#00e5b0' : '#ff4d6a' }}
+              style={{ color: isUp ? 'var(--accent)' : 'var(--red)' }}
             >
               {isUp ? '▲' : '▼'} {Math.abs(live.changePercent ?? 0).toFixed(2)}%
             </div>
           </>
         ) : (
           <div className="space-y-1 animate-pulse">
-            <div className="h-3 w-16 rounded" style={{ background: 'rgba(26,40,64,0.6)' }} />
-            <div className="h-2.5 w-12 rounded ms-auto" style={{ background: 'rgba(26,40,64,0.4)' }} />
+            <div className="h-3 w-16 rounded" style={{ background: 'rgb(var(--rgb-border) / 0.6)' }} />
+            <div className="h-2.5 w-12 rounded ms-auto" style={{ background: 'rgb(var(--rgb-border) / 0.4)' }} />
           </div>
         )}
       </div>
@@ -116,7 +116,7 @@ function WatchlistRow({
         {removeError && (
           <span
             className="text-[10px]"
-            style={{ color: '#ff4d6a' }}
+            style={{ color: 'var(--red)' }}
             title="הסרה נכשלה — נסה שוב"
           >
             ⚠️
@@ -142,9 +142,9 @@ function EmptyState() {
     <div className="flex flex-col items-center justify-center py-20 text-center px-4">
       <div
         className="w-16 h-16 rounded-2xl flex items-center justify-center mb-5"
-        style={{ background: 'rgba(0,229,176,0.08)', border: '1px solid rgba(0,229,176,0.2)' }}
+        style={{ background: 'rgb(var(--rgb-accent) / 0.08)', border: '1px solid rgb(var(--rgb-accent) / 0.2)' }}
       >
-        <BookmarkIcon className="w-8 h-8" style={{ color: '#00e5b0' }} />
+        <BookmarkIcon className="w-8 h-8" style={{ color: 'var(--accent)' }} />
       </div>
       <h2 className="text-lg font-black text-tsua-text mb-2">
         {'רשימת המעקב ריקה'}
@@ -155,7 +155,7 @@ function EmptyState() {
       <Link
         href={`/${locale}/markets`}
         className="text-sm font-bold px-6 py-2.5 rounded-xl text-tsua-bg transition-all hover:opacity-90 active:scale-95"
-        style={{ background: 'linear-gradient(135deg, #00e5b0, #00c49a)', boxShadow: '0 4px 16px rgba(0,229,176,0.25)' }}
+        style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent2))', boxShadow: '0 4px 16px rgb(var(--rgb-accent) / 0.25)' }}
       >
         {'גלה מניות →'}
       </Link>
@@ -217,7 +217,7 @@ export function WatchlistPage() {
         <Link
           href={`/${locale}/login`}
           className="text-sm font-bold px-6 py-2.5 rounded-xl text-tsua-bg"
-          style={{ background: 'linear-gradient(135deg, #00e5b0, #00c49a)' }}
+          style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent2))' }}
         >
           {'כניסה'}
         </Link>
@@ -245,13 +245,13 @@ export function WatchlistPage() {
       {/* Card */}
       <div
         className="rounded-2xl overflow-hidden"
-        style={{ background: 'rgba(13,20,36,0.8)', border: '1px solid rgba(26,40,64,0.8)' }}
+        style={{ background: 'rgb(var(--rgb-bg2) / 0.8)', border: '1px solid rgb(var(--rgb-border) / 0.8)' }}
       >
         {/* Column headers */}
         {!loading && items.length > 0 && (
           <div
             className="flex items-center gap-3 px-4 py-2.5 text-[10px] font-bold tracking-widest uppercase text-tsua-muted"
-            style={{ borderBottom: '1px solid rgba(26,40,64,0.6)' }}
+            style={{ borderBottom: '1px solid rgb(var(--rgb-border) / 0.6)' }}
           >
             <div className="w-10 shrink-0" />
             <div className="flex-1">{'מניה'}</div>
@@ -264,14 +264,14 @@ export function WatchlistPage() {
           <div className="divide-y divide-white/4 animate-pulse">
             {[1, 2, 3, 4].map(i => (
               <div key={i} className="flex items-center gap-3 px-4 py-4">
-                <div className="w-10 h-10 rounded-xl shrink-0" style={{ background: 'rgba(26,40,64,0.5)' }} />
+                <div className="w-10 h-10 rounded-xl shrink-0" style={{ background: 'rgb(var(--rgb-border) / 0.5)' }} />
                 <div className="flex-1 space-y-1.5">
-                  <div className="h-3 w-20 rounded" style={{ background: 'rgba(26,40,64,0.5)' }} />
-                  <div className="h-2.5 w-32 rounded" style={{ background: 'rgba(26,40,64,0.35)' }} />
+                  <div className="h-3 w-20 rounded" style={{ background: 'rgb(var(--rgb-border) / 0.5)' }} />
+                  <div className="h-2.5 w-32 rounded" style={{ background: 'rgb(var(--rgb-border) / 0.35)' }} />
                 </div>
                 <div className="space-y-1.5 text-end">
-                  <div className="h-3 w-16 rounded ms-auto" style={{ background: 'rgba(26,40,64,0.5)' }} />
-                  <div className="h-2.5 w-12 rounded ms-auto" style={{ background: 'rgba(26,40,64,0.35)' }} />
+                  <div className="h-3 w-16 rounded ms-auto" style={{ background: 'rgb(var(--rgb-border) / 0.5)' }} />
+                  <div className="h-2.5 w-12 rounded ms-auto" style={{ background: 'rgb(var(--rgb-border) / 0.35)' }} />
                 </div>
               </div>
             ))}
@@ -294,7 +294,7 @@ export function WatchlistPage() {
             <button
               onClick={() => setRetry(r => r + 1)}
               className="mt-4 text-xs font-semibold px-4 py-2 rounded-lg text-tsua-text hover:text-tsua-accent transition-colors"
-              style={{ background: 'rgba(15,25,41,0.6)', border: '1px solid rgba(26,40,64,0.7)' }}
+              style={{ background: 'rgb(var(--rgb-card) / 0.6)', border: '1px solid rgb(var(--rgb-border) / 0.7)' }}
             >
               🔄 נסה שוב
             </button>

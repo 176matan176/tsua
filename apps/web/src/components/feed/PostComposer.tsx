@@ -213,7 +213,7 @@ export function PostComposer({ onPost }: { onPost?: () => void }) {
       >
         {/* Decorative grid lines */}
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
-          style={{ backgroundImage: 'linear-gradient(rgba(0,229,176,1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,176,1) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+          style={{ backgroundImage: 'linear-gradient(rgb(var(--rgb-accent) / 1) 1px, transparent 1px), linear-gradient(90deg, rgb(var(--rgb-accent) / 1) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
         <div className="relative flex items-center gap-4" dir="rtl">
           <div
             className="w-11 h-11 rounded-xl flex items-center justify-center text-xl shrink-0"
@@ -240,7 +240,7 @@ export function PostComposer({ onPost }: { onPost?: () => void }) {
             <Link
               href={`/${locale}/signup`}
               className="text-[12px] font-black px-4 py-2 rounded-lg transition-all hover:brightness-110 active:scale-95"
-              style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent2))', color: '#030d09', boxShadow: '0 4px 12px rgba(0,229,176,0.2)' }}
+              style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent2))', color: '#030d09', boxShadow: '0 4px 12px rgb(var(--rgb-accent) / 0.2)' }}
             >
               הצטרף →
             </Link>
@@ -258,8 +258,8 @@ export function PostComposer({ onPost }: { onPost?: () => void }) {
       className="rounded-xl overflow-visible transition-all duration-200 relative"
       style={{
         background: 'var(--card)',
-        border: focused ? '1px solid rgba(0,229,176,0.4)' : '1px solid var(--border)',
-        boxShadow: focused ? '0 0 0 3px rgba(0,229,176,0.06), 0 4px 24px rgba(0,0,0,0.15)' : '0 2px 12px rgba(0,0,0,0.08)',
+        border: focused ? '1px solid rgb(var(--rgb-accent) / 0.4)' : '1px solid var(--border)',
+        boxShadow: focused ? '0 0 0 3px rgb(var(--rgb-accent) / 0.06), 0 4px 24px rgba(0,0,0,0.15)' : '0 2px 12px rgba(0,0,0,0.08)',
       }}
     >
       {/* Terminal header strip */}
@@ -270,7 +270,7 @@ export function PostComposer({ onPost }: { onPost?: () => void }) {
       >
         <span
           className="w-1.5 h-1.5 rounded-full"
-          style={{ background: focused ? 'var(--accent)' : 'var(--muted2)', boxShadow: focused ? '0 0 6px rgba(0,229,176,0.6)' : 'none', transition: 'all 0.2s' }}
+          style={{ background: focused ? 'var(--accent)' : 'var(--muted2)', boxShadow: focused ? '0 0 6px rgb(var(--rgb-accent) / 0.6)' : 'none', transition: 'all 0.2s' }}
         />
         <span className="text-[10px] font-mono font-bold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>
           {focused ? 'כותב...' : 'פרסם ניתוח · שתף תחזית · $TAG מניה'}
@@ -279,9 +279,9 @@ export function PostComposer({ onPost }: { onPost?: () => void }) {
           <span
             className="ms-auto text-[10px] font-black px-2 py-0.5 rounded-md"
             style={{
-              background: sentiment === 'bullish' ? 'rgba(0,229,176,0.12)' : 'rgba(255,77,106,0.12)',
+              background: sentiment === 'bullish' ? 'rgb(var(--rgb-accent) / 0.12)' : 'rgb(var(--rgb-red) / 0.12)',
               color: sentiment === 'bullish' ? 'var(--accent)' : 'var(--red)',
-              border: `1px solid ${sentiment === 'bullish' ? 'rgba(0,229,176,0.25)' : 'rgba(255,77,106,0.25)'}`,
+              border: `1px solid ${sentiment === 'bullish' ? 'rgb(var(--rgb-accent) / 0.25)' : 'rgb(var(--rgb-red) / 0.25)'}`,
             }}
           >
             {sentiment === 'bullish' ? '▲ שורי' : '▼ דובי'}
@@ -295,10 +295,10 @@ export function PostComposer({ onPost }: { onPost?: () => void }) {
           <div
             className="w-9 h-9 rounded-lg flex items-center justify-center font-black text-[13px] shrink-0 mt-0.5"
             style={{
-              background: 'linear-gradient(135deg, #003d2e, #00e5b0)',
-              color: '#00e5b0',
-              border: '1px solid rgba(0,229,176,0.2)',
-              boxShadow: '0 0 12px rgba(0,229,176,0.15)',
+              background: 'linear-gradient(135deg, #003d2e, var(--accent))',
+              color: 'var(--accent)',
+              border: '1px solid rgb(var(--rgb-accent) / 0.2)',
+              boxShadow: '0 0 12px rgb(var(--rgb-accent) / 0.15)',
             }}
           >
             {initial}
@@ -326,9 +326,9 @@ export function PostComposer({ onPost }: { onPost?: () => void }) {
                 ref={dropdownRef}
                 className="absolute left-0 right-0 top-full mt-1 rounded-xl overflow-hidden z-50"
                 style={{
-                  background: 'rgba(8,13,26,0.97)',
-                  border: '1px solid rgba(0,229,176,0.25)',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,229,176,0.05)',
+                  background: 'rgb(var(--rgb-bg) / 0.97)',
+                  border: '1px solid rgb(var(--rgb-accent) / 0.25)',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgb(var(--rgb-accent) / 0.05)',
                   backdropFilter: 'blur(16px)',
                 }}
               >
@@ -345,13 +345,13 @@ export function PostComposer({ onPost }: { onPost?: () => void }) {
                     onMouseEnter={() => setSelectedIdx(idx)}
                     className="w-full flex items-center gap-2.5 px-3 py-2 text-start transition-all"
                     style={{
-                      background: idx === selectedIdx ? 'rgba(0,229,176,0.08)' : 'transparent',
-                      borderBottom: idx < suggestions.length - 1 ? '1px solid rgba(26,40,64,0.5)' : 'none',
+                      background: idx === selectedIdx ? 'rgb(var(--rgb-accent) / 0.08)' : 'transparent',
+                      borderBottom: idx < suggestions.length - 1 ? '1px solid rgb(var(--rgb-border) / 0.5)' : 'none',
                     }}
                   >
                     <span
                       className="font-black text-xs px-2 py-0.5 rounded-md shrink-0 font-mono"
-                      style={{ background: 'rgba(0,229,176,0.1)', color: '#00e5b0', border: '1px solid rgba(0,229,176,0.2)', minWidth: '52px', textAlign: 'center' }}
+                      style={{ background: 'rgb(var(--rgb-accent) / 0.1)', color: 'var(--accent)', border: '1px solid rgb(var(--rgb-accent) / 0.2)', minWidth: '52px', textAlign: 'center' }}
                     >
                       ${s.ticker}
                     </span>
@@ -359,7 +359,7 @@ export function PostComposer({ onPost }: { onPost?: () => void }) {
                     <span className="text-[10px] text-tsua-muted shrink-0">{s.exchange?.replace('NASDAQ NMS - GLOBAL MARKET', 'NASDAQ').replace('NEW YORK STOCK EXCHANGE', 'NYSE').slice(0, 6)}</span>
                   </button>
                 ))}
-                <div className="px-3 py-1.5" style={{ borderTop: '1px solid rgba(26,40,64,0.5)' }}>
+                <div className="px-3 py-1.5" style={{ borderTop: '1px solid rgb(var(--rgb-border) / 0.5)' }}>
                   <span className="text-[10px] text-tsua-muted">
                     ↑↓ לניווט · Enter להוספה · Esc לסגירה
                   </span>
@@ -378,7 +378,7 @@ export function PostComposer({ onPost }: { onPost?: () => void }) {
             {tickers.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-2 mb-1">
                 {tickers.map(t => (
-                  <span key={t} className="text-[11px] font-bold px-2 py-0.5 rounded-lg" style={{ background: 'rgba(0,229,176,0.1)', color: '#00e5b0', border: '1px solid rgba(0,229,176,0.2)' }}>
+                  <span key={t} className="text-[11px] font-bold px-2 py-0.5 rounded-lg" style={{ background: 'rgb(var(--rgb-accent) / 0.1)', color: 'var(--accent)', border: '1px solid rgb(var(--rgb-accent) / 0.2)' }}>
                     ${t}
                   </span>
                 ))}
@@ -390,13 +390,13 @@ export function PostComposer({ onPost }: { onPost?: () => void }) {
 
       {/* Image preview */}
       {imageUrl && (
-        <div className="relative mx-4 mb-2 rounded-xl overflow-hidden" style={{ maxHeight: '200px', border: '1px solid rgba(26,40,64,0.6)' }}>
+        <div className="relative mx-4 mb-2 rounded-xl overflow-hidden" style={{ maxHeight: '200px', border: '1px solid rgb(var(--rgb-border) / 0.6)' }}>
           <img src={imageUrl} alt="תצוגה מקדימה" className="w-full object-cover" style={{ maxHeight: '200px' }} />
           <button
             type="button"
             onClick={() => setImageUrl(null)}
             className="absolute top-2 end-2 w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-110"
-            style={{ background: 'rgba(6,11,22,0.8)', border: '1px solid rgba(255,255,255,0.15)' }}
+            style={{ background: 'rgb(var(--rgb-bg) / 0.8)', border: '1px solid rgba(255,255,255,0.15)' }}
           >
             <XMarkIcon className="w-3.5 h-3.5 text-tsua-muted" />
           </button>
@@ -414,7 +414,7 @@ export function PostComposer({ onPost }: { onPost?: () => void }) {
           onClick={() => setSentiment(sentiment === 'bullish' ? null : 'bullish')}
           className="flex items-center gap-1 text-[11px] font-black px-2.5 py-1.5 rounded-lg transition-all duration-150 hover:scale-105 active:scale-95"
           style={sentiment === 'bullish'
-            ? { background: 'rgba(0,229,176,0.15)', color: 'var(--accent)', border: '1px solid rgba(0,229,176,0.3)' }
+            ? { background: 'rgb(var(--rgb-accent) / 0.15)', color: 'var(--accent)', border: '1px solid rgb(var(--rgb-accent) / 0.3)' }
             : { background: 'var(--surface2)', color: 'var(--muted)', border: '1px solid var(--border)' }}
         >
           ▲ שורי
@@ -423,7 +423,7 @@ export function PostComposer({ onPost }: { onPost?: () => void }) {
           onClick={() => setSentiment(sentiment === 'bearish' ? null : 'bearish')}
           className="flex items-center gap-1 text-[11px] font-black px-2.5 py-1.5 rounded-lg transition-all duration-150 hover:scale-105 active:scale-95"
           style={sentiment === 'bearish'
-            ? { background: 'rgba(255,77,106,0.15)', color: 'var(--red)', border: '1px solid rgba(255,77,106,0.3)' }
+            ? { background: 'rgb(var(--rgb-red) / 0.15)', color: 'var(--red)', border: '1px solid rgb(var(--rgb-red) / 0.3)' }
             : { background: 'var(--surface2)', color: 'var(--muted)', border: '1px solid var(--border)' }}
         >
           ▼ דובי
@@ -458,7 +458,7 @@ export function PostComposer({ onPost }: { onPost?: () => void }) {
               </span>
             )}
             <svg width="22" height="22" className="shrink-0 -rotate-90">
-              <circle cx="11" cy="11" r="9" fill="none" stroke="rgba(26,40,64,0.5)" strokeWidth="2" />
+              <circle cx="11" cy="11" r="9" fill="none" stroke="rgb(var(--rgb-border) / 0.5)" strokeWidth="2" />
               <circle cx="11" cy="11" r="9" fill="none"
                 stroke={pct > 0.9 ? 'var(--red)' : pct > 0.75 ? 'var(--gold)' : 'var(--accent)'}
                 strokeWidth="2"
@@ -480,7 +480,7 @@ export function PostComposer({ onPost }: { onPost?: () => void }) {
             background: body.trim() ? 'linear-gradient(135deg, var(--accent), var(--accent2))' : 'var(--surface2)',
             color: body.trim() ? '#030d09' : 'var(--muted)',
             border: `1px solid ${body.trim() ? 'transparent' : 'var(--border)'}`,
-            boxShadow: body.trim() ? '0 4px 14px rgba(0,229,176,0.2)' : 'none',
+            boxShadow: body.trim() ? '0 4px 14px rgb(var(--rgb-accent) / 0.2)' : 'none',
             letterSpacing: '-0.01em',
           }}
         >

@@ -24,7 +24,7 @@ const TickerItem = memo(function TickerItem({ symbol, label, flag }: { symbol: s
     <div className="flex items-center gap-2 px-4 shrink-0" dir="ltr">
       <span className="text-xs shrink-0">{flag}</span>
       <span className="text-xs font-bold text-tsua-muted font-mono">{label}</span>
-      <div className="w-14 h-3 rounded animate-pulse" style={{ background: 'rgba(26,40,64,0.6)' }} />
+      <div className="w-14 h-3 rounded animate-pulse" style={{ background: 'rgb(var(--rgb-border) / 0.6)' }} />
     </div>
   );
 
@@ -36,23 +36,23 @@ const TickerItem = memo(function TickerItem({ symbol, label, flag }: { symbol: s
       dir="ltr"
       className="flex items-center gap-2 px-4 shrink-0 transition-all duration-200 hover:bg-white/5 rounded-lg group"
       style={
-        live.flash === 'up'   ? { background: 'rgba(0,229,176,0.1)' } :
-        live.flash === 'down' ? { background: 'rgba(255,77,106,0.1)' } : {}
+        live.flash === 'up'   ? { background: 'rgb(var(--rgb-accent) / 0.1)' } :
+        live.flash === 'down' ? { background: 'rgb(var(--rgb-red) / 0.1)' } : {}
       }
     >
       <span className="text-xs shrink-0">{flag}</span>
       <span className="text-xs font-bold text-tsua-muted font-mono group-hover:text-tsua-text transition-colors">{label}</span>
       <span
         className="text-xs font-black font-mono transition-colors duration-300 tabular-nums"
-        style={{ color: live.flash === 'up' ? '#00e5b0' : live.flash === 'down' ? '#ff4d6a' : '#c8d8f0' }}
+        style={{ color: live.flash === 'up' ? 'var(--accent)' : live.flash === 'down' ? 'var(--red)' : 'var(--text2)' }}
       >
         {live.price >= 1000 ? live.price.toLocaleString('en', { maximumFractionDigits: 0 }) : live.price.toFixed(2)}
       </span>
       <span
         className="text-[11px] font-bold tabular-nums px-1.5 py-0.5 rounded-md"
         style={{
-          background: isUp ? 'rgba(0,229,176,0.1)' : 'rgba(255,77,106,0.1)',
-          color: isUp ? '#00e5b0' : '#ff4d6a',
+          background: isUp ? 'rgb(var(--rgb-accent) / 0.1)' : 'rgb(var(--rgb-red) / 0.1)',
+          color: isUp ? 'var(--accent)' : 'var(--red)',
         }}
       >
         {isUp ? '+' : ''}{live.changePercent.toFixed(2)}%
@@ -62,7 +62,7 @@ const TickerItem = memo(function TickerItem({ symbol, label, flag }: { symbol: s
 });
 
 const Divider = () => (
-  <span className="w-px h-4 shrink-0 mx-1" style={{ background: 'rgba(26,40,64,0.7)' }} />
+  <span className="w-px h-4 shrink-0 mx-1" style={{ background: 'rgb(var(--rgb-border) / 0.7)' }} />
 );
 
 export function LiveMarketBar() {
@@ -73,8 +73,8 @@ export function LiveMarketBar() {
     <div
       className="overflow-hidden relative market-bar-wrap"
       style={{
-        background: 'rgba(6,11,22,0.9)',
-        borderBottom: '1px solid rgba(26,40,64,0.5)',
+        background: 'rgb(var(--rgb-bg) / 0.9)',
+        borderBottom: '1px solid rgb(var(--rgb-border) / 0.5)',
       }}
     >
       {/* Fade left */}
@@ -89,13 +89,13 @@ export function LiveMarketBar() {
       {/* Fixed "שוק" label */}
       <div
         className="absolute start-0 top-0 bottom-0 z-20 flex items-center px-3"
-        style={{ background: 'rgba(6,11,22,0.95)', borderRight: '1px solid rgba(26,40,64,0.4)' }}
+        style={{ background: 'rgb(var(--rgb-bg) / 0.95)', borderRight: '1px solid rgb(var(--rgb-border) / 0.4)' }}
       >
         <span
           className="w-1.5 h-1.5 rounded-full animate-pulse shrink-0 me-1.5"
-          style={{ background: '#00e5b0', boxShadow: '0 0 6px rgba(0,229,176,0.8)' }}
+          style={{ background: 'var(--accent)', boxShadow: '0 0 6px rgb(var(--rgb-accent) / 0.8)' }}
         />
-        <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#00e5b0' }}>שוק</span>
+        <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--accent)' }}>שוק</span>
       </div>
 
       {/* Scrolling strip — always LTR so translateX(-33.33%) works correctly.

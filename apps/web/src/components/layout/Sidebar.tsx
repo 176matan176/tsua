@@ -85,8 +85,8 @@ export function Sidebar() {
             className="relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 group"
             style={isActive
               ? {
-                  background: 'rgba(0,229,176,0.08)',
-                  border: '1px solid rgba(0,229,176,0.15)',
+                  background: 'rgb(var(--rgb-accent) / 0.08)',
+                  border: '1px solid rgb(var(--rgb-accent) / 0.15)',
                 }
               : {
                   border: '1px solid transparent',
@@ -97,17 +97,17 @@ export function Sidebar() {
             {isActive && (
               <span
                 className="absolute start-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-e-full"
-                style={{ background: '#00e5b0', boxShadow: '2px 0 10px rgba(0,229,176,0.6)' }}
+                style={{ background: 'var(--accent)', boxShadow: '2px 0 10px rgb(var(--rgb-accent) / 0.6)' }}
               />
             )}
 
             {/* Icon */}
             <span className={`transition-all duration-150 ${isActive ? '' : 'group-hover:translate-x-0.5'}`}
-              style={{ color: isActive ? '#00e5b0' : undefined }}>
+              style={{ color: isActive ? 'var(--accent)' : undefined }}>
               {isActive
                 ? <IconActive
                     className="w-[18px] h-[18px] shrink-0"
-                    style={{ color: '#00e5b0', filter: 'drop-shadow(0 0 5px rgba(0,229,176,0.5))' }}
+                    style={{ color: 'var(--accent)', filter: 'drop-shadow(0 0 5px rgb(var(--rgb-accent) / 0.5))' }}
                   />
                 : <Icon
                     className="w-[18px] h-[18px] shrink-0 transition-colors"
@@ -132,7 +132,7 @@ export function Sidebar() {
             {key === 'alerts' && (
               <span
                 className="ms-auto w-1.5 h-1.5 rounded-full shrink-0 animate-pulse"
-                style={{ background: '#00e5b0', boxShadow: '0 0 6px rgba(0,229,176,0.8)' }}
+                style={{ background: 'var(--accent)', boxShadow: '0 0 6px rgb(var(--rgb-accent) / 0.8)' }}
               />
             )}
           </Link>
@@ -149,22 +149,22 @@ export function Sidebar() {
             href={adminHref}
             className="relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 group"
             style={adminActive
-              ? { background: 'rgba(0,229,176,0.12)', border: '1px solid rgba(0,229,176,0.3)' }
-              : { border: '1px solid rgba(0,229,176,0.08)' }}
+              ? { background: 'rgb(var(--rgb-accent) / 0.12)', border: '1px solid rgb(var(--rgb-accent) / 0.3)' }
+              : { border: '1px solid rgb(var(--rgb-accent) / 0.08)' }}
           >
             <AdminIcon
               className="w-[18px] h-[18px] shrink-0"
-              style={{ color: '#00e5b0', filter: 'drop-shadow(0 0 5px rgba(0,229,176,0.5))' }}
+              style={{ color: 'var(--accent)', filter: 'drop-shadow(0 0 5px rgb(var(--rgb-accent) / 0.5))' }}
             />
             <span
               className="text-[13px]"
-              style={{ color: '#00e5b0', fontWeight: 800, letterSpacing: '-0.01em' }}
+              style={{ color: 'var(--accent)', fontWeight: 800, letterSpacing: '-0.01em' }}
             >
               חדר בקרה
             </span>
             <span
               className="ms-auto text-[9px] font-black px-1.5 py-0.5 rounded"
-              style={{ background: 'rgba(0,229,176,0.15)', color: '#00e5b0', border: '1px solid rgba(0,229,176,0.3)' }}
+              style={{ background: 'rgb(var(--rgb-accent) / 0.15)', color: 'var(--accent)', border: '1px solid rgb(var(--rgb-accent) / 0.3)' }}
             >
               ADMIN
             </span>
@@ -191,9 +191,9 @@ export function Sidebar() {
           <div
             className="w-8 h-8 rounded-lg flex items-center justify-center font-black text-[12px] shrink-0 transition-transform group-hover:scale-105"
             style={{
-              background: 'linear-gradient(135deg, #003d2e 0%, #00e5b0 150%)',
-              border: '1px solid rgba(0,229,176,0.25)',
-              color: '#00e5b0',
+              background: 'linear-gradient(135deg, #003d2e 0%, var(--accent) 150%)',
+              border: '1px solid rgb(var(--rgb-accent) / 0.25)',
+              color: 'var(--accent)',
             }}
           >
             {initial}
@@ -205,7 +205,7 @@ export function Sidebar() {
             >
               {displayName}
             </div>
-            <div className="text-[10px] font-mono" style={{ color: 'rgba(90,112,144,0.7)' }}>
+            <div className="text-[10px] font-mono" style={{ color: 'rgb(var(--rgb-muted) / 0.7)' }}>
               הפרופיל שלי →
             </div>
           </div>
@@ -214,14 +214,14 @@ export function Sidebar() {
         <div
           className="rounded-xl p-4 space-y-3"
           style={{
-            background: 'linear-gradient(135deg, rgba(0,229,176,0.04) 0%, rgba(10,16,30,0.6) 100%)',
-            border: '1px solid rgba(0,229,176,0.12)',
+            background: 'linear-gradient(135deg, rgb(var(--rgb-accent) / 0.04) 0%, rgb(var(--rgb-card) / 0.6) 100%)',
+            border: '1px solid rgb(var(--rgb-accent) / 0.12)',
           }}
         >
           <div className="text-center space-y-1">
             <div
               className="text-xs font-black uppercase tracking-widest"
-              style={{ color: 'rgba(0,229,176,0.7)' }}
+              style={{ color: 'rgb(var(--rgb-accent) / 0.7)' }}
             >
               הצטרף עכשיו
             </div>
@@ -233,10 +233,10 @@ export function Sidebar() {
             href={`/${locale}/signup`}
             className="block text-center text-[12px] font-black py-2 rounded-lg transition-all hover:brightness-110 active:scale-95"
             style={{
-              background: 'linear-gradient(135deg, #00e5b0, #00a884)',
-              color: '#060b16',
+              background: 'linear-gradient(135deg, var(--accent), var(--accent2))',
+              color: 'var(--bg)',
               letterSpacing: '-0.01em',
-              boxShadow: '0 4px 16px rgba(0,229,176,0.2)',
+              boxShadow: '0 4px 16px rgb(var(--rgb-accent) / 0.2)',
             }}
           >
             הצטרף חינם
@@ -244,7 +244,7 @@ export function Sidebar() {
           <Link
             href={`/${locale}/login`}
             className="block text-center text-[11px] font-semibold py-1.5 transition-colors"
-            style={{ color: 'rgba(90,112,144,0.7)' }}
+            style={{ color: 'rgb(var(--rgb-muted) / 0.7)' }}
           >
             כבר יש לי חשבון
           </Link>

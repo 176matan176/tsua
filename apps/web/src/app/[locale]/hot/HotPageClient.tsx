@@ -26,7 +26,7 @@ function Sparkline({ stock }: { stock: StockScore }) {
   const isUp = (stock.changePercent ?? 0) >= 0;
   return (
     <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} className="shrink-0 hidden md:block">
-      <path d={d} fill="none" stroke={isUp ? '#00e5b0' : '#ff4d6a'} strokeWidth="1.5"
+      <path d={d} fill="none" stroke={isUp ? 'var(--accent)' : 'var(--red)'} strokeWidth="1.5"
         strokeLinecap="round" strokeLinejoin="round" opacity="0.85" />
     </svg>
   );
@@ -37,8 +37,8 @@ function SentimentBar({ s }: { s: StockScore['sentiment'] }) {
   return (
     <div className="flex flex-col gap-0.5 items-center">
       <div className="flex h-1.5 rounded-full overflow-hidden w-16" style={{ background: 'var(--border)' }}>
-        <div style={{ width: `${s.bullish}%`, background: '#00e5b0' }} />
-        <div style={{ width: `${s.bearish}%`, background: '#ff4d6a' }} />
+        <div style={{ width: `${s.bullish}%`, background: 'var(--accent)' }} />
+        <div style={{ width: `${s.bearish}%`, background: 'var(--red)' }} />
       </div>
       <span className="text-[9px] font-mono" style={{ color: 'var(--muted)' }}>{s.bullish}% שורי</span>
     </div>
@@ -79,9 +79,9 @@ function MobileCard({ stock, locale }: { stock: StockScore; locale: string }) {
       <div
         className="w-8 h-8 rounded-xl flex items-center justify-center text-[10px] font-black shrink-0"
         style={{
-          background: isUp ? 'rgba(0,229,176,0.1)' : 'rgba(255,77,106,0.1)',
-          border: `1px solid ${isUp ? 'rgba(0,229,176,0.2)' : 'rgba(255,77,106,0.2)'}`,
-          color: isUp ? '#00e5b0' : '#ff4d6a',
+          background: isUp ? 'rgb(var(--rgb-accent) / 0.1)' : 'rgb(var(--rgb-red) / 0.1)',
+          border: `1px solid ${isUp ? 'rgb(var(--rgb-accent) / 0.2)' : 'rgb(var(--rgb-red) / 0.2)'}`,
+          color: isUp ? 'var(--accent)' : 'var(--red)',
         }}
       >
         {stock.ticker.slice(0, 2)}
@@ -105,7 +105,7 @@ function MobileCard({ stock, locale }: { stock: StockScore; locale: string }) {
         <div className="text-sm font-black font-mono tabular-nums" style={{ color: 'var(--text)' }} dir="ltr">
           {stock.price != null ? stock.price.toFixed(2) : '—'}
         </div>
-        <div className="text-[11px] font-bold tabular-nums" style={{ color: isUp ? '#00e5b0' : '#ff4d6a' }} dir="ltr">
+        <div className="text-[11px] font-bold tabular-nums" style={{ color: isUp ? 'var(--accent)' : 'var(--red)' }} dir="ltr">
           {stock.changePercent != null ? `${isUp ? '+' : ''}${stock.changePercent.toFixed(2)}%` : '—'}
         </div>
       </div>
@@ -127,9 +127,9 @@ function TableRow({ stock, locale }: { stock: StockScore; locale: string }) {
       <div
         className="w-8 h-8 rounded-xl flex items-center justify-center text-[10px] font-black shrink-0"
         style={{
-          background: isUp ? 'rgba(0,229,176,0.1)' : 'rgba(255,77,106,0.1)',
-          border: `1px solid ${isUp ? 'rgba(0,229,176,0.2)' : 'rgba(255,77,106,0.2)'}`,
-          color: isUp ? '#00e5b0' : '#ff4d6a',
+          background: isUp ? 'rgb(var(--rgb-accent) / 0.1)' : 'rgb(var(--rgb-red) / 0.1)',
+          border: `1px solid ${isUp ? 'rgb(var(--rgb-accent) / 0.2)' : 'rgb(var(--rgb-red) / 0.2)'}`,
+          color: isUp ? 'var(--accent)' : 'var(--red)',
         }}
       >
         {stock.ticker.slice(0, 2)}
@@ -144,7 +144,7 @@ function TableRow({ stock, locale }: { stock: StockScore; locale: string }) {
         </div>
       </div>
       <div className="w-16 text-end shrink-0">
-        <span className="text-xs font-bold tabular-nums" style={{ color: isUp ? '#00e5b0' : '#ff4d6a' }} dir="ltr">
+        <span className="text-xs font-bold tabular-nums" style={{ color: isUp ? 'var(--accent)' : 'var(--red)' }} dir="ltr">
           {stock.changePercent != null ? `${isUp ? '+' : ''}${stock.changePercent.toFixed(2)}%` : '—'}
         </span>
       </div>
@@ -255,7 +255,7 @@ export function HotPageClient() {
               onClick={() => setMarket(m)}
               className="text-xs font-bold px-3 py-1.5 rounded-xl transition-all"
               style={market === m
-                ? { background: 'rgba(0,229,176,0.15)', color: '#00e5b0', border: '1px solid rgba(0,229,176,0.3)' }
+                ? { background: 'rgb(var(--rgb-accent) / 0.15)', color: 'var(--accent)', border: '1px solid rgb(var(--rgb-accent) / 0.3)' }
                 : { background: 'var(--surface2)', color: 'var(--muted)', border: '1px solid var(--border)' }
               }
             >

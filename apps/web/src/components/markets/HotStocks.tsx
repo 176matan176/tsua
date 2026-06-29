@@ -52,15 +52,15 @@ function HotRow({ symbol, nameHe, flag, tag }: typeof HOT[0]) {
     <Link
       href={`/${locale}/stocks/${symbol}`}
       className="flex items-center gap-3 px-4 py-2.5 hover:bg-white/3 transition-colors group"
-      style={{ borderBottom: '1px solid rgba(26,40,64,0.3)' }}
+      style={{ borderBottom: '1px solid rgb(var(--rgb-border) / 0.3)' }}
     >
       {/* Symbol badge */}
       <div
         className="w-9 h-9 rounded-xl flex items-center justify-center font-black text-[10px] shrink-0"
         style={{
-          background: 'rgba(0,229,176,0.08)',
-          border: '1px solid rgba(0,229,176,0.15)',
-          color: '#00e5b0',
+          background: 'rgb(var(--rgb-accent) / 0.08)',
+          border: '1px solid rgb(var(--rgb-accent) / 0.15)',
+          color: 'var(--accent)',
         }}
       >
         {symbol.slice(0, 4)}
@@ -76,7 +76,7 @@ function HotRow({ symbol, nameHe, flag, tag }: typeof HOT[0]) {
         </div>
         <span
           className="text-[9px] font-semibold px-1.5 py-0.5 rounded-md mt-0.5 inline-block"
-          style={{ background: 'rgba(0,229,176,0.07)', color: 'rgba(0,229,176,0.7)' }}
+          style={{ background: 'rgb(var(--rgb-accent) / 0.07)', color: 'rgb(var(--rgb-accent) / 0.7)' }}
         >
           {tag}
         </span>
@@ -88,7 +88,7 @@ function HotRow({ symbol, nameHe, flag, tag }: typeof HOT[0]) {
           <>
             <div
               className="text-sm font-black font-mono tabular-nums"
-              style={{ color: live.flash === 'up' ? '#00e5b0' : live.flash === 'down' ? '#ff4d6a' : '#c8d8f0' }}
+              style={{ color: live.flash === 'up' ? 'var(--accent)' : live.flash === 'down' ? 'var(--red)' : 'var(--text2)' }}
               dir="ltr"
             >
               ${live.price >= 1000
@@ -98,7 +98,7 @@ function HotRow({ symbol, nameHe, flag, tag }: typeof HOT[0]) {
             <div
               className="text-[11px] font-bold tabular-nums"
               dir="ltr"
-              style={{ color: live.changePercent >= 0 ? '#00e5b0' : '#ff4d6a' }}
+              style={{ color: live.changePercent >= 0 ? 'var(--accent)' : 'var(--red)' }}
             >
               {live.changePercent >= 0 ? '+' : ''}{live.changePercent.toFixed(2)}%
             </div>
@@ -113,7 +113,7 @@ function HotRow({ symbol, nameHe, flag, tag }: typeof HOT[0]) {
             <span>—</span>
           </div>
         ) : (
-          <div className="w-14 h-4 rounded animate-pulse" style={{ background: 'rgba(26,40,64,0.5)' }} />
+          <div className="w-14 h-4 rounded animate-pulse" style={{ background: 'rgb(var(--rgb-border) / 0.5)' }} />
         )}
       </div>
     </Link>
@@ -129,12 +129,12 @@ export function HotStocks() {
   // honest per-row signal — header staying green a bit longer is fine.
   const [liveYet, setLiveYet] = useState(false);
   return (
-    <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(15,25,41,0.7)', border: '1px solid rgba(26,40,64,0.8)' }}>
-      <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(26,40,64,0.6)' }}>
+    <div className="rounded-2xl overflow-hidden" style={{ background: 'rgb(var(--rgb-card) / 0.7)', border: '1px solid rgb(var(--rgb-border) / 0.8)' }}>
+      <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid rgb(var(--rgb-border) / 0.6)' }}>
         <h3 className="text-sm font-bold text-tsua-text">🔥 מניות רותחות</h3>
         {liveYet && (
           <span className="flex items-center gap-1.5 text-[10px] text-tsua-muted">
-            <span className="inline-block w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#00e5b0' }} />
+            <span className="inline-block w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'var(--accent)' }} />
             LIVE
           </span>
         )}
@@ -145,7 +145,7 @@ export function HotStocks() {
         {HOT.map(s => <HotRow key={s.symbol} {...s} />)}
       </div>
 
-      <div className="px-4 py-2" style={{ borderTop: '1px solid rgba(26,40,64,0.4)' }}>
+      <div className="px-4 py-2" style={{ borderTop: '1px solid rgb(var(--rgb-border) / 0.4)' }}>
         <p className="text-[9px] text-tsua-muted text-center">
           מחירים בזמן אמת · לחץ להצגת פרטים
         </p>

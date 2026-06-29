@@ -68,7 +68,7 @@ export function CryptoGrid() {
     return (
       <div className="rounded-2xl overflow-hidden" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
         {Array.from({ length: 10 }).map((_, i) => (
-          <div key={i} className="h-16 animate-pulse" style={{ background: i % 2 ? 'rgba(26,40,64,0.2)' : 'transparent' }} />
+          <div key={i} className="h-16 animate-pulse" style={{ background: i % 2 ? 'rgb(var(--rgb-border) / 0.2)' : 'transparent' }} />
         ))}
       </div>
     );
@@ -106,8 +106,8 @@ export function CryptoGrid() {
       {coins.map((coin, i) => {
         const isUp = (coin.changePercent24h ?? 0) >= 0;
         const changeColor = coin.changePercent24h == null
-          ? '#5a7090'
-          : isUp ? '#00e5b0' : '#ff4d6a';
+          ? 'var(--muted)'
+          : isUp ? 'var(--accent)' : 'var(--red)';
 
         return (
           <Link
@@ -131,7 +131,7 @@ export function CryptoGrid() {
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <span className="text-sm font-bold text-tsua-text">{coin.nameHe}</span>
                   <span dir="ltr" className="text-[10px] font-mono font-bold text-tsua-muted px-1.5 py-0.5 rounded"
-                    style={{ background: 'rgba(26,40,64,0.5)' }}
+                    style={{ background: 'rgb(var(--rgb-border) / 0.5)' }}
                   >
                     {coin.symbol}
                   </span>

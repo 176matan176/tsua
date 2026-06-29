@@ -27,11 +27,11 @@ interface LiveStreamProps {
 }
 
 const AVATAR_GRADIENTS = [
-  'linear-gradient(135deg,#3b82f6,#8b5cf6)',
+  'linear-gradient(135deg,var(--blue),#8b5cf6)',
   'linear-gradient(135deg,#f59e0b,#ef4444)',
-  'linear-gradient(135deg,#10b981,#3b82f6)',
+  'linear-gradient(135deg,#10b981,var(--blue))',
   'linear-gradient(135deg,#ec4899,#8b5cf6)',
-  'linear-gradient(135deg,#06b6d4,#3b82f6)',
+  'linear-gradient(135deg,#06b6d4,var(--blue))',
   'linear-gradient(135deg,#f97316,#ec4899)',
 ];
 
@@ -137,7 +137,7 @@ export function LiveStream({ topic, topicHe, topicEn }: LiveStreamProps) {
       id: Date.now().toString(),
       author: 'אתה',
       avatarLetter: 'א',
-      avatarGradient: 'linear-gradient(135deg,#00e5b0,#3b82f6)',
+      avatarGradient: 'linear-gradient(135deg,var(--accent),var(--blue))',
       body: body.trim(),
       sentiment,
       likeCount: 0,
@@ -161,20 +161,20 @@ export function LiveStream({ topic, topicHe, topicEn }: LiveStreamProps) {
       className="rounded-2xl flex flex-col overflow-hidden"
       style={{
         height: '500px',
-        background: 'rgba(13,20,36,0.7)',
-        border: '1px solid rgba(26,40,64,0.7)',
+        background: 'rgb(var(--rgb-bg2) / 0.7)',
+        border: '1px solid rgb(var(--rgb-border) / 0.7)',
         backdropFilter: 'blur(12px)',
       }}
     >
       {/* Header */}
       <div
         className="flex items-center justify-between px-4 py-3 shrink-0"
-        style={{ borderBottom: '1px solid rgba(26,40,64,0.5)' }}
+        style={{ borderBottom: '1px solid rgb(var(--rgb-border) / 0.5)' }}
       >
         <div className="flex items-center gap-2">
           <span
             className="w-2 h-2 rounded-full animate-pulse shrink-0"
-            style={{ background: '#00e5b0', boxShadow: '0 0 8px rgba(0,229,176,0.8)' }}
+            style={{ background: 'var(--accent)', boxShadow: '0 0 8px rgb(var(--rgb-accent) / 0.8)' }}
           />
           <span className="text-sm font-bold text-tsua-text">
             {`דיון חי · ${topicHe}`}
@@ -182,7 +182,7 @@ export function LiveStream({ topic, topicHe, topicEn }: LiveStreamProps) {
         </div>
         <span
           className="text-[10px] font-bold px-2 py-0.5 rounded-full tabular-nums"
-          style={{ background: 'rgba(26,40,64,0.6)', color: '#5a7090', border: '1px solid rgba(26,40,64,0.6)' }}
+          style={{ background: 'rgb(var(--rgb-border) / 0.6)', color: 'var(--muted)', border: '1px solid rgb(var(--rgb-border) / 0.6)' }}
         >
           {posts.length}
         </span>
@@ -193,7 +193,7 @@ export function LiveStream({ topic, topicHe, topicEn }: LiveStreamProps) {
         ref={containerRef}
         onScroll={handleScroll}
         className="flex-1 overflow-y-auto p-3 space-y-1"
-        style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(26,40,64,0.8) transparent' }}
+        style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgb(var(--rgb-border) / 0.8) transparent' }}
       >
         {posts.map(post => (
           <StreamPostCard
@@ -211,9 +211,9 @@ export function LiveStream({ topic, topicHe, topicEn }: LiveStreamProps) {
           onClick={scrollToBottom}
           className="mx-3 mb-1 py-1.5 text-xs font-bold rounded-xl text-center shrink-0 transition-all hover:opacity-90 active:scale-95"
           style={{
-            background: 'rgba(0,229,176,0.15)',
-            border: '1px solid rgba(0,229,176,0.3)',
-            color: '#00e5b0',
+            background: 'rgb(var(--rgb-accent) / 0.15)',
+            border: '1px solid rgb(var(--rgb-accent) / 0.3)',
+            color: 'var(--accent)',
           }}
         >
           ↓ {newCount} {'הודעות חדשות'}
@@ -223,7 +223,7 @@ export function LiveStream({ topic, topicHe, topicEn }: LiveStreamProps) {
       {/* Composer */}
       <div
         className="shrink-0 px-3 py-3 space-y-2"
-        style={{ borderTop: '1px solid rgba(26,40,64,0.5)', background: 'rgba(6,11,22,0.4)' }}
+        style={{ borderTop: '1px solid rgb(var(--rgb-border) / 0.5)', background: 'rgb(var(--rgb-bg) / 0.4)' }}
       >
         {/* Sentiment */}
         <div className="flex gap-1">
@@ -234,11 +234,11 @@ export function LiveStream({ topic, topicHe, topicEn }: LiveStreamProps) {
               className="text-[10px] px-2 py-1 rounded-lg font-bold transition-all duration-150"
               style={sentiment === s
                 ? s === 'bullish'
-                  ? { background: 'rgba(0,229,176,0.15)', color: '#00e5b0', border: '1px solid rgba(0,229,176,0.3)' }
+                  ? { background: 'rgb(var(--rgb-accent) / 0.15)', color: 'var(--accent)', border: '1px solid rgb(var(--rgb-accent) / 0.3)' }
                   : s === 'bearish'
-                  ? { background: 'rgba(255,77,106,0.15)', color: '#ff4d6a', border: '1px solid rgba(255,77,106,0.3)' }
-                  : { background: 'rgba(90,112,144,0.2)', color: '#8aaccf', border: '1px solid rgba(90,112,144,0.3)' }
-                : { background: 'rgba(15,25,41,0.6)', color: '#5a7090', border: '1px solid rgba(26,40,64,0.6)' }
+                  ? { background: 'rgb(var(--rgb-red) / 0.15)', color: 'var(--red)', border: '1px solid rgb(var(--rgb-red) / 0.3)' }
+                  : { background: 'rgb(var(--rgb-muted) / 0.2)', color: '#8aaccf', border: '1px solid rgb(var(--rgb-muted) / 0.3)' }
+                : { background: 'rgb(var(--rgb-card) / 0.6)', color: 'var(--muted)', border: '1px solid rgb(var(--rgb-border) / 0.6)' }
               }
             >
               {s === 'bullish' ? '▲' : s === 'bearish' ? '▼' : '●'}{' '}
@@ -259,10 +259,10 @@ export function LiveStream({ topic, topicHe, topicEn }: LiveStreamProps) {
             rows={2}
             className="flex-1 rounded-xl px-3 py-2 text-sm placeholder:text-tsua-muted focus:outline-none resize-none transition-all duration-200"
             style={{
-              background: 'rgba(8,13,26,0.8)',
-              border: inputFocused ? '1px solid rgba(0,229,176,0.35)' : '1px solid rgba(26,40,64,0.7)',
+              background: 'rgb(var(--rgb-bg) / 0.8)',
+              border: inputFocused ? '1px solid rgb(var(--rgb-accent) / 0.35)' : '1px solid rgb(var(--rgb-border) / 0.7)',
               color: '#d4e4ff',
-              boxShadow: inputFocused ? '0 0 0 3px rgba(0,229,176,0.06)' : 'none',
+              boxShadow: inputFocused ? '0 0 0 3px rgb(var(--rgb-accent) / 0.06)' : 'none',
             }}
           />
           <button
@@ -270,9 +270,9 @@ export function LiveStream({ topic, topicHe, topicEn }: LiveStreamProps) {
             disabled={!body.trim()}
             className="px-3 rounded-xl font-black text-sm transition-all hover:opacity-90 active:scale-95 disabled:opacity-30"
             style={{
-              background: 'linear-gradient(135deg, #00e5b0, #00c49a)',
-              color: '#060b16',
-              boxShadow: body.trim() ? '0 4px 12px rgba(0,229,176,0.25)' : 'none',
+              background: 'linear-gradient(135deg, var(--accent), var(--accent2))',
+              color: 'var(--bg)',
+              boxShadow: body.trim() ? '0 4px 12px rgb(var(--rgb-accent) / 0.25)' : 'none',
             }}
           >
             {'←'}
@@ -287,15 +287,15 @@ function StreamPostCard({ post, onLike }: { post: StreamPost; onLike: () => void
   const timeAgo = formatDistanceToNow(post.createdAt, { addSuffix: false, locale: he });
 
   const sentimentStyle = post.sentiment === 'bullish'
-    ? { bg: 'rgba(0,229,176,0.1)', color: '#00e5b0', border: 'rgba(0,229,176,0.2)', label: '▲ שורי' }
+    ? { bg: 'rgb(var(--rgb-accent) / 0.1)', color: 'var(--accent)', border: 'rgb(var(--rgb-accent) / 0.2)', label: '▲ שורי' }
     : post.sentiment === 'bearish'
-    ? { bg: 'rgba(255,77,106,0.1)', color: '#ff4d6a', border: 'rgba(255,77,106,0.2)', label: '▼ דובי' }
+    ? { bg: 'rgb(var(--rgb-red) / 0.1)', color: 'var(--red)', border: 'rgb(var(--rgb-red) / 0.2)', label: '▼ דובי' }
     : null;
 
   return (
     <div
       className={`flex gap-2.5 px-2 py-2 rounded-xl transition-all duration-200 group ${post.isNew ? 'animate-fade-in' : ''}`}
-      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(26,40,64,0.3)'; }}
+      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgb(var(--rgb-border) / 0.3)'; }}
       onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
     >
       {/* Avatar */}
@@ -319,7 +319,7 @@ function StreamPostCard({ post, onLike }: { post: StreamPost; onLike: () => void
             </span>
           )}
           {post.ticker && (
-            <span className="text-[10px] font-black" style={{ color: '#00e5b0' }}>${post.ticker}</span>
+            <span className="text-[10px] font-black" style={{ color: 'var(--accent)' }}>${post.ticker}</span>
           )}
           <span className="text-[9px] text-tsua-muted ms-auto">{timeAgo}</span>
         </div>
@@ -335,10 +335,10 @@ function StreamPostCard({ post, onLike }: { post: StreamPost; onLike: () => void
           className={`flex items-center gap-1 mt-1.5 text-[10px] font-semibold transition-all duration-200 ${
             post.isLiked ? 'opacity-100' : 'opacity-0 group-hover:opacity-60'
           }`}
-          style={{ color: post.isLiked ? '#ff4d6a' : '#5a7090' }}
+          style={{ color: post.isLiked ? 'var(--red)' : 'var(--muted)' }}
         >
           {post.isLiked
-            ? <HeartSolid className="w-3 h-3" style={{ filter: 'drop-shadow(0 0 4px rgba(255,77,106,0.5))' }} />
+            ? <HeartSolid className="w-3 h-3" style={{ filter: 'drop-shadow(0 0 4px rgb(var(--rgb-red) / 0.5))' }} />
             : <HeartIcon className="w-3 h-3" />
           }
           {post.likeCount > 0 && post.likeCount}

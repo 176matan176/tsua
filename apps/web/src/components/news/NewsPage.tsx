@@ -77,7 +77,7 @@ function classifySource(source: string | null): SourceMeta {
     return { key: 'bitcoin', nameHe: source ?? 'קריפטו', color: '#f7931a' };
   }
   // Long-tail: keep the original name, neutral color.
-  return { key: 'other', nameHe: source ?? 'מקור לא ידוע', color: '#5a7090' };
+  return { key: 'other', nameHe: source ?? 'מקור לא ידוע', color: 'var(--muted)' };
 }
 
 function sourceToIcon(source: string | null): string {
@@ -222,8 +222,8 @@ export function NewsPage() {
             מאוגד מ-TheMarker, כלכליסט, גלובס, ביזפורטל, Ynet ועוד
           </p>
         </div>
-        <span className="text-[11px] text-tsua-muted flex items-center gap-1.5" style={{ background: 'rgba(0,229,176,0.06)', border: '1px solid rgba(0,229,176,0.18)', padding: '4px 10px', borderRadius: '999px' }}>
-          <span className="inline-block w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#00e5b0' }} />
+        <span className="text-[11px] text-tsua-muted flex items-center gap-1.5" style={{ background: 'rgb(var(--rgb-accent) / 0.06)', border: '1px solid rgb(var(--rgb-accent) / 0.18)', padding: '4px 10px', borderRadius: '999px' }}>
+          <span className="inline-block w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'var(--accent)' }} />
           חי
         </span>
       </div>
@@ -240,9 +240,9 @@ export function NewsPage() {
               style={{
                 padding: '7px 14px',
                 borderRadius: '999px',
-                background: active ? '#00e5b0' : 'rgba(15,25,41,0.6)',
+                background: active ? 'var(--accent)' : 'rgb(var(--rgb-card) / 0.6)',
                 color: active ? '#080d1a' : '#9ab1cc',
-                border: active ? '1px solid transparent' : '1px solid rgba(26,40,64,0.7)',
+                border: active ? '1px solid transparent' : '1px solid rgb(var(--rgb-border) / 0.7)',
               }}
             >
               {labelHe}
@@ -256,7 +256,7 @@ export function NewsPage() {
           + breathing room so the two rows don't read as one cluttered strip. */}
       <div
         className="flex gap-1.5 flex-wrap items-center"
-        style={{ paddingTop: '12px', borderTop: '1px solid rgba(26,40,64,0.5)' }}
+        style={{ paddingTop: '12px', borderTop: '1px solid rgb(var(--rgb-border) / 0.5)' }}
       >
         <span className="text-[10px] text-tsua-muted">מקור:</span>
         {SOURCE_FILTERS.map(({ key, label }) => {
@@ -270,9 +270,9 @@ export function NewsPage() {
               style={{
                 padding: '4px 10px',
                 borderRadius: '999px',
-                background: active && meta ? `${meta.color}22` : (active ? 'rgba(0,229,176,0.12)' : 'transparent'),
-                color: active && meta ? meta.color : (active ? '#00e5b0' : '#5a7090'),
-                border: `1px solid ${active && meta ? `${meta.color}55` : (active ? 'rgba(0,229,176,0.3)' : 'rgba(26,40,64,0.6)')}`,
+                background: active && meta ? `${meta.color}22` : (active ? 'rgb(var(--rgb-accent) / 0.12)' : 'transparent'),
+                color: active && meta ? meta.color : (active ? 'var(--accent)' : 'var(--muted)'),
+                border: `1px solid ${active && meta ? `${meta.color}55` : (active ? 'rgb(var(--rgb-accent) / 0.3)' : 'rgb(var(--rgb-border) / 0.6)')}`,
               }}
             >
               {label}
@@ -392,8 +392,8 @@ function NewsCard({ article }: { article: NewsArticle }) {
       rel="noopener noreferrer"
       className="block group transition-all hover:translate-x-[-2px]"
       style={{
-        background: 'rgba(15,25,41,0.7)',
-        border: '1px solid rgba(26,40,64,0.7)',
+        background: 'rgb(var(--rgb-card) / 0.7)',
+        border: '1px solid rgb(var(--rgb-border) / 0.7)',
         borderInlineStartWidth: '3px',
         borderInlineStartColor: meta.color,
         borderRadius: '14px',
@@ -417,7 +417,7 @@ function NewsCard({ article }: { article: NewsArticle }) {
           </span>
           <span
             className="text-[10px] flex items-center gap-1"
-            style={{ color: isStale ? '#ffd166' : 'rgba(154,177,204,0.7)' }}
+            style={{ color: isStale ? 'var(--gold)' : 'rgba(154,177,204,0.7)' }}
             title={isStale ? `הכתבה מ-${article.publishedAt.toLocaleString('he-IL')}` : undefined}
           >
             {isStale && <span>⚠️</span>}
@@ -434,7 +434,7 @@ function NewsCard({ article }: { article: NewsArticle }) {
             {article.ticker && (
               <span
                 className="text-[11px] mx-1.5 px-1.5 py-0.5 rounded font-mono align-middle"
-                style={{ background: 'rgba(0,229,176,0.1)', color: '#00e5b0' }}
+                style={{ background: 'rgb(var(--rgb-accent) / 0.1)', color: 'var(--accent)' }}
                 dir="ltr"
               >
                 ${article.ticker}

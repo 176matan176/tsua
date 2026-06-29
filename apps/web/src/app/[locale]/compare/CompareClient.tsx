@@ -220,8 +220,8 @@ export function CompareClient() {
             disabled={tickers.length >= 4 || !input.trim()}
             className="px-4 py-2.5 rounded-xl text-sm font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed"
             style={{
-              background: 'linear-gradient(135deg, #00e5b0, #00c49a)',
-              color: '#060b16',
+              background: 'linear-gradient(135deg, var(--accent), var(--accent2))',
+              color: 'var(--bg)',
             }}
           >
             הוסף
@@ -238,9 +238,9 @@ export function CompareClient() {
                 onClick={() => addTicker(p.ticker)}
                 className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-md transition-colors hover:opacity-80"
                 style={{
-                  background: 'rgba(0,229,176,0.08)',
-                  color: '#00e5b0',
-                  border: '1px solid rgba(0,229,176,0.2)',
+                  background: 'rgb(var(--rgb-accent) / 0.08)',
+                  color: 'var(--accent)',
+                  border: '1px solid rgb(var(--rgb-accent) / 0.2)',
                 }}
               >
                 {p.ticker}
@@ -255,7 +255,7 @@ export function CompareClient() {
               <span
                 key={t}
                 className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-mono font-bold"
-                style={{ background: 'rgba(0,229,176,0.1)', border: '1px solid rgba(0,229,176,0.25)', color: '#00e5b0' }}
+                style={{ background: 'rgb(var(--rgb-accent) / 0.1)', border: '1px solid rgb(var(--rgb-accent) / 0.25)', color: 'var(--accent)' }}
                 dir="ltr"
               >
                 {t}
@@ -307,7 +307,7 @@ export function CompareClient() {
             ))}
             {/* Fill empty columns if fewer than 4 */}
             {Array.from({ length: Math.max(0, Math.min(4, tickers.length) - stockList.length) }).map((_, i) => (
-              <div key={`skeleton-${i}`} className="h-8 rounded animate-pulse" style={{ background: 'rgba(26,40,64,0.4)' }} />
+              <div key={`skeleton-${i}`} className="h-8 rounded animate-pulse" style={{ background: 'rgb(var(--rgb-border) / 0.4)' }} />
             ))}
           </div>
 
@@ -327,7 +327,7 @@ export function CompareClient() {
                       className="grid gap-3 px-4 py-2 hover:bg-white/3 transition-colors"
                       style={{
                         gridTemplateColumns: `180px repeat(${stockList.length}, 1fr)`,
-                        borderBottom: '1px solid rgba(26,40,64,0.3)',
+                        borderBottom: '1px solid rgb(var(--rgb-border) / 0.3)',
                       }}
                     >
                       <div className="text-xs text-tsua-muted flex items-center font-semibold">
@@ -341,7 +341,7 @@ export function CompareClient() {
                           <div
                             key={s.ticker}
                             className="text-xs font-mono font-bold flex items-center"
-                            style={{ color: isBest ? '#00e5b0' : (v ? '#c8d8f0' : '#5a7090') }}
+                            style={{ color: isBest ? 'var(--accent)' : (v ? 'var(--text2)' : 'var(--muted)') }}
                             dir="ltr"
                           >
                             {isBest && <span className="me-1">🏆</span>}

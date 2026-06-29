@@ -95,13 +95,13 @@ export function CurrencyRates() {
   const coldFail = refreshFailed && !updated;
 
   return (
-    <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(15,25,41,0.7)', border: '1px solid rgba(26,40,64,0.8)' }}>
-      <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(26,40,64,0.6)' }}>
+    <div className="rounded-2xl overflow-hidden" style={{ background: 'rgb(var(--rgb-card) / 0.7)', border: '1px solid rgb(var(--rgb-border) / 0.8)' }}>
+      <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid rgb(var(--rgb-border) / 0.6)' }}>
         <h3 className="text-sm font-bold text-tsua-text">💱 שערי חליפין</h3>
         {updated && (
           <span
             className="flex items-center gap-1.5 text-[10px]"
-            style={{ color: showWarning ? '#ffd166' : undefined }}
+            style={{ color: showWarning ? 'var(--gold)' : undefined }}
             title={
               refreshFailed
                 ? `הרענון האחרון נכשל. מהזמן ${updated.toLocaleString('he-IL')}`
@@ -112,17 +112,17 @@ export function CurrencyRates() {
           >
             {showWarning
               ? <span>⚠️</span>
-              : <span className="inline-block w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#00e5b0' }} />
+              : <span className="inline-block w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'var(--accent)' }} />
             }
             <span className={showWarning ? '' : 'text-tsua-muted'}>עודכן {fmtTime(updated)}</span>
           </span>
         )}
         {coldFail && (
-          <span className="text-[10px]" style={{ color: '#ff4d6a' }}>שגיאת טעינה</span>
+          <span className="text-[10px]" style={{ color: 'var(--red)' }}>שגיאת טעינה</span>
         )}
       </div>
 
-      <div className="divide-y" style={{ borderColor: 'rgba(26,40,64,0.35)' }}>
+      <div className="divide-y" style={{ borderColor: 'rgb(var(--rgb-border) / 0.35)' }}>
         {rates.map(r => {
           const isUp = (r.changePercent ?? 0) >= 0;
           return (
@@ -140,16 +140,16 @@ export function CurrencyRates() {
                       - cold-failed → "—" so the row doesn't spin forever
                       - has rate → render */}
                 {r.rate === null && loading ? (
-                  <div className="w-16 h-4 rounded animate-pulse" style={{ background: 'rgba(26,40,64,0.6)' }} />
+                  <div className="w-16 h-4 rounded animate-pulse" style={{ background: 'rgb(var(--rgb-border) / 0.6)' }} />
                 ) : r.rate === null ? (
                   <span className="text-sm font-black font-mono text-tsua-muted" dir="ltr">—</span>
                 ) : (
                   <div>
-                    <span className="text-sm font-black font-mono" style={{ color: '#c8d8f0' }} dir="ltr">
+                    <span className="text-sm font-black font-mono" style={{ color: 'var(--text2)' }} dir="ltr">
                       ₪{r.rate.toFixed(r.rate < 1 ? 4 : 3)}
                     </span>
                     {r.changePercent != null && (
-                      <div className="text-[11px] font-semibold text-end" style={{ color: isUp ? '#00e5b0' : '#ff4d6a' }} dir="ltr">
+                      <div className="text-[11px] font-semibold text-end" style={{ color: isUp ? 'var(--accent)' : 'var(--red)' }} dir="ltr">
                         {isUp ? '▲' : '▼'} {Math.abs(r.changePercent).toFixed(2)}%
                       </div>
                     )}
@@ -161,12 +161,12 @@ export function CurrencyRates() {
         })}
       </div>
 
-      <div className="px-4 py-2" style={{ borderTop: '1px solid rgba(26,40,64,0.4)' }}>
+      <div className="px-4 py-2" style={{ borderTop: '1px solid rgb(var(--rgb-border) / 0.4)' }}>
         {/* When the server fell through to Frankfurter (ECB EOD rates), tell
             the user — otherwise they'll think the rates are live intraday
             when they're actually yesterday's 4pm Frankfurt close. */}
         {source && source !== 'yahoo' ? (
-          <p className="text-[10px] text-center" style={{ color: '#ffd166' }}>
+          <p className="text-[10px] text-center" style={{ color: 'var(--gold)' }}>
             ⚠️ שערים סופי יום (ECB) — Yahoo לא זמין
           </p>
         ) : (

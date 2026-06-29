@@ -9,7 +9,7 @@ export default function PrivacyPage() {
     <div className="max-w-2xl mx-auto py-8 px-4" dir="rtl">
       <div
         className="rounded-2xl p-8 space-y-6"
-        style={{ background: 'rgba(13,20,36,0.7)', border: '1px solid rgba(26,40,64,0.6)' }}
+        style={{ background: 'rgb(var(--rgb-bg2) / 0.7)', border: '1px solid rgb(var(--rgb-border) / 0.6)' }}
       >
         <h1 className="text-2xl font-black text-tsua-text">מדיניות פרטיות</h1>
         <p className="text-tsua-muted text-sm">עדכון אחרון: אפריל 2026</p>

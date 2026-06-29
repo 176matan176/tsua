@@ -11,14 +11,14 @@ function PostSkeleton() {
   return (
     <div
       className="rounded-2xl p-5 animate-pulse"
-      style={{ background: 'rgba(13,20,36,0.7)', border: '1px solid rgba(26,40,64,0.7)', minHeight: '160px' }}
+      style={{ background: 'rgb(var(--rgb-bg2) / 0.7)', border: '1px solid rgb(var(--rgb-border) / 0.7)', minHeight: '160px' }}
     >
       <div className="flex gap-3">
-        <div className="w-11 h-11 rounded-xl shrink-0" style={{ background: 'rgba(26,40,64,0.8)' }} />
+        <div className="w-11 h-11 rounded-xl shrink-0" style={{ background: 'rgb(var(--rgb-border) / 0.8)' }} />
         <div className="flex-1 space-y-2 pt-1">
-          <div className="h-3 w-32 rounded" style={{ background: 'rgba(26,40,64,0.8)' }} />
-          <div className="h-3 w-full rounded" style={{ background: 'rgba(26,40,64,0.6)' }} />
-          <div className="h-3 w-3/4 rounded" style={{ background: 'rgba(26,40,64,0.5)' }} />
+          <div className="h-3 w-32 rounded" style={{ background: 'rgb(var(--rgb-border) / 0.8)' }} />
+          <div className="h-3 w-full rounded" style={{ background: 'rgb(var(--rgb-border) / 0.6)' }} />
+          <div className="h-3 w-3/4 rounded" style={{ background: 'rgb(var(--rgb-border) / 0.5)' }} />
         </div>
       </div>
     </div>
@@ -92,7 +92,7 @@ export function PostDetailPage({ postId }: { postId: string }) {
       <div className="flex flex-col items-center justify-center py-20 text-center" dir="rtl">
         <div
           className="w-20 h-20 rounded-3xl flex items-center justify-center mb-5 text-4xl"
-          style={{ background: 'rgba(26,40,64,0.4)', border: '1px dashed rgba(26,40,64,0.8)' }}
+          style={{ background: 'rgb(var(--rgb-border) / 0.4)', border: '1px dashed rgb(var(--rgb-border) / 0.8)' }}
         >
           📭
         </div>
@@ -103,7 +103,7 @@ export function PostDetailPage({ postId }: { postId: string }) {
         <Link
           href={`/${locale}`}
           className="font-bold px-6 py-2.5 rounded-xl text-tsua-bg text-sm"
-          style={{ background: 'linear-gradient(135deg, #00e5b0, #00c49a)' }}
+          style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent2))' }}
         >
           חזרה לפיד
         </Link>
@@ -117,9 +117,9 @@ export function PostDetailPage({ postId }: { postId: string }) {
       <Link
         href={`/${locale}`}
         className="inline-flex items-center gap-1.5 text-[12px] font-semibold transition-colors"
-        style={{ color: '#5a7090' }}
-        onMouseEnter={e => (e.currentTarget.style.color = '#e8f0ff')}
-        onMouseLeave={e => (e.currentTarget.style.color = '#5a7090')}
+        style={{ color: 'var(--muted)' }}
+        onMouseEnter={e => (e.currentTarget.style.color = 'var(--text)')}
+        onMouseLeave={e => (e.currentTarget.style.color = 'var(--muted)')}
       >
         <ArrowRightIcon className="w-3.5 h-3.5" />
         חזרה לפיד
@@ -128,14 +128,14 @@ export function PostDetailPage({ postId }: { postId: string }) {
       {/* Parent context (if this is a reply) */}
       {parent && (
         <div className="space-y-1.5">
-          <div className="flex items-center gap-1.5 text-[11px] font-bold px-1" style={{ color: '#5a7090' }}>
+          <div className="flex items-center gap-1.5 text-[11px] font-bold px-1" style={{ color: 'var(--muted)' }}>
             <ChatBubbleOvalLeftIcon className="w-3.5 h-3.5" />
             בתגובה ל־
           </div>
           <PostCard post={parent} />
           <div
             className="mx-auto w-px h-4"
-            style={{ background: 'linear-gradient(180deg, rgba(26,40,64,0.8), transparent)' }}
+            style={{ background: 'linear-gradient(180deg, rgb(var(--rgb-border) / 0.8), transparent)' }}
           />
         </div>
       )}
@@ -148,7 +148,7 @@ export function PostDetailPage({ postId }: { postId: string }) {
         <>
           <div
             className="flex items-center gap-2 px-1 pt-2 text-[11px] font-bold uppercase tracking-wider"
-            style={{ color: '#5a7090' }}
+            style={{ color: 'var(--muted)' }}
           >
             <ChatBubbleOvalLeftIcon className="w-3.5 h-3.5" />
             <span>{replies.length} {replies.length === 1 ? 'תגובה' : 'תגובות'}</span>
@@ -165,7 +165,7 @@ export function PostDetailPage({ postId }: { postId: string }) {
       {replies.length === 0 && (
         <div
           className="text-center py-8 rounded-2xl"
-          style={{ background: 'rgba(13,20,36,0.5)', border: '1px solid rgba(26,40,64,0.5)' }}
+          style={{ background: 'rgb(var(--rgb-bg2) / 0.5)', border: '1px solid rgb(var(--rgb-border) / 0.5)' }}
         >
           <div className="text-2xl mb-1.5">💬</div>
           <div className="text-tsua-muted text-xs font-medium">

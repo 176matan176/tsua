@@ -53,13 +53,13 @@ function NewsCard({ article }: { article: NewsArticle }) {
         <div className="flex items-center gap-2 mb-1">
           <span
             className="text-[10px] font-bold px-1.5 py-0.5 rounded-md uppercase"
-            style={{ background: 'rgba(0,229,176,0.08)', color: '#00e5b0', border: '1px solid rgba(0,229,176,0.15)' }}
+            style={{ background: 'rgb(var(--rgb-accent) / 0.08)', color: 'var(--accent)', border: '1px solid rgb(var(--rgb-accent) / 0.15)' }}
           >
             {article.source}
           </span>
           <span
             className="text-[10px] flex items-center gap-1"
-            style={{ color: isStale ? '#ffd166' : 'var(--muted)' }}
+            style={{ color: isStale ? 'var(--gold)' : 'var(--muted)' }}
             title={isStale ? `הכתבה מ-${new Date(article.datetime).toLocaleString('he-IL')}` : undefined}
           >
             {isStale && <span>⚠️</span>}
@@ -171,7 +171,7 @@ export function StockNews({ ticker }: { ticker: string }) {
             <button
               onClick={() => setRetry(r => r + 1)}
               className="mt-3 text-[11px] font-semibold px-3 py-1.5 rounded-lg text-tsua-text hover:text-tsua-accent transition-colors"
-              style={{ background: 'rgba(15,25,41,0.6)', border: '1px solid rgba(26,40,64,0.7)' }}
+              style={{ background: 'rgb(var(--rgb-card) / 0.6)', border: '1px solid rgb(var(--rgb-border) / 0.7)' }}
             >
               🔄 נסה שוב
             </button>

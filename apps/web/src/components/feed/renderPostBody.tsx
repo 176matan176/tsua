@@ -80,7 +80,7 @@ export function renderPostBody(text: string, opts: RenderOptions): ReactNode {
           onClick={(e) => e.stopPropagation()}
           className="font-bold transition-colors"
           style={{
-            color: '#00e5b0',
+            color: 'var(--accent)',
             textDecoration: 'none',
           }}
           onMouseEnter={(e) => {

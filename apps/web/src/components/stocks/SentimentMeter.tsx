@@ -140,9 +140,9 @@ export function SentimentMeter({ ticker }: SentimentMeterProps) {
     'פסימי מאוד';
 
   const sentimentColor =
-    data.bullish >= 60 ? '#00e5b0' :
-    data.bullish >= 48 ? '#f5b942' :
-    '#ff4d6a';
+    data.bullish >= 60 ? 'var(--accent)' :
+    data.bullish >= 48 ? 'var(--gold)' :
+    'var(--red)';
 
   const change24hPositive = data.change24h >= 0;
 
@@ -164,8 +164,8 @@ export function SentimentMeter({ ticker }: SentimentMeterProps) {
             <span
               className="text-[11px] font-bold px-2 py-0.5 rounded-full"
               style={change24hPositive
-                ? { background: 'rgba(0,229,176,0.12)', color: '#00e5b0' }
-                : { background: 'rgba(255,77,106,0.12)', color: '#ff4d6a' }
+                ? { background: 'rgb(var(--rgb-accent) / 0.12)', color: 'var(--accent)' }
+                : { background: 'rgb(var(--rgb-red) / 0.12)', color: 'var(--red)' }
               }
             >
               {change24hPositive ? '▲' : '▼'} {Math.abs(data.change24h)}% מאתמול
@@ -189,14 +189,14 @@ export function SentimentMeter({ ticker }: SentimentMeterProps) {
 
       {/* Progress bar */}
       <div className="space-y-1.5">
-        <div className="relative h-3 rounded-full overflow-hidden" style={{ background: 'rgba(255,77,106,0.2)' }}>
-          <div className="absolute inset-0 rounded-full" style={{ background: 'rgba(255,77,106,0.3)' }} />
+        <div className="relative h-3 rounded-full overflow-hidden" style={{ background: 'rgb(var(--rgb-red) / 0.2)' }}>
+          <div className="absolute inset-0 rounded-full" style={{ background: 'rgb(var(--rgb-red) / 0.3)' }} />
           <div
             className="absolute top-0 start-0 h-full rounded-full transition-all duration-700 ease-out"
             style={{
               width: animated ? `${data.bullish}%` : '0%',
-              background: 'linear-gradient(90deg, #00e5b0, #00c49a)',
-              boxShadow: '0 0 8px rgba(0,229,176,0.4)',
+              background: 'linear-gradient(90deg, var(--accent), var(--accent2))',
+              boxShadow: '0 0 8px rgb(var(--rgb-accent) / 0.4)',
             }}
           />
           <div
@@ -204,23 +204,23 @@ export function SentimentMeter({ ticker }: SentimentMeterProps) {
             style={{
               right: `${data.bearish}%`,
               width: `${data.neutral}%`,
-              background: 'rgba(245,185,66,0.25)',
+              background: 'rgb(var(--rgb-gold) / 0.25)',
             }}
           />
         </div>
         <div className="flex items-center justify-between text-[11px] font-semibold">
-          <span style={{ color: '#00e5b0' }}>▲ שוריים {data.bullish}%</span>
-          <span style={{ color: '#f5b942' }}>ניטרלי {data.neutral}%</span>
-          <span style={{ color: '#ff4d6a' }}>{data.bearish}% דוביים ▼</span>
+          <span style={{ color: 'var(--accent)' }}>▲ שוריים {data.bullish}%</span>
+          <span style={{ color: 'var(--gold)' }}>ניטרלי {data.neutral}%</span>
+          <span style={{ color: 'var(--red)' }}>{data.bearish}% דוביים ▼</span>
         </div>
       </div>
 
       {/* Breakdown pills */}
       <div className="grid grid-cols-3 gap-2 pt-1">
         {[
-          { label: '🐂 שוריים', value: data.bullish, color: '#00e5b0', bg: 'rgba(0,229,176,0.08)',  border: 'rgba(0,229,176,0.2)'  },
-          { label: '➡️ ניטרלי', value: data.neutral, color: '#f5b942', bg: 'rgba(245,185,66,0.08)', border: 'rgba(245,185,66,0.2)' },
-          { label: '🐻 דוביים', value: data.bearish, color: '#ff4d6a', bg: 'rgba(255,77,106,0.08)', border: 'rgba(255,77,106,0.2)' },
+          { label: '🐂 שוריים', value: data.bullish, color: 'var(--accent)', bg: 'rgb(var(--rgb-accent) / 0.08)',  border: 'rgb(var(--rgb-accent) / 0.2)'  },
+          { label: '➡️ ניטרלי', value: data.neutral, color: 'var(--gold)', bg: 'rgb(var(--rgb-gold) / 0.08)', border: 'rgb(var(--rgb-gold) / 0.2)' },
+          { label: '🐻 דוביים', value: data.bearish, color: 'var(--red)', bg: 'rgb(var(--rgb-red) / 0.08)', border: 'rgb(var(--rgb-red) / 0.2)' },
         ].map(item => (
           <div
             key={item.label}

@@ -41,8 +41,8 @@ function hourLabel(h: EarningEntry['hour']): { text: string; icon: string; color
   switch (h) {
     case 'bmo': return { text: 'לפני פתיחה', icon: '🌅', color: '#ffa94d' };
     case 'amc': return { text: 'אחרי סגירה', icon: '🌙', color: '#8b8cf7' };
-    case 'dmh': return { text: 'במהלך מסחר', icon: '☀️', color: '#00e5b0' };
-    default:    return { text: 'שעה לא ידועה', icon: '⏱', color: '#5a7090' };
+    case 'dmh': return { text: 'במהלך מסחר', icon: '☀️', color: 'var(--accent)' };
+    default:    return { text: 'שעה לא ידועה', icon: '⏱', color: 'var(--muted)' };
   }
 }
 
@@ -64,8 +64,8 @@ function relativeDate(dateStr: string): string {
 function beatBadge(actual: number | null, estimate: number | null): { label: string; color: string } | null {
   if (actual == null || estimate == null || estimate === 0) return null;
   const diffPct = ((actual - estimate) / Math.abs(estimate)) * 100;
-  if (diffPct > 2)  return { label: `✓ ${diffPct.toFixed(1)}%`, color: '#00e5b0' };
-  if (diffPct < -2) return { label: `✗ ${diffPct.toFixed(1)}%`, color: '#ff4d6a' };
+  if (diffPct > 2)  return { label: `✓ ${diffPct.toFixed(1)}%`, color: 'var(--accent)' };
+  if (diffPct < -2) return { label: `✗ ${diffPct.toFixed(1)}%`, color: 'var(--red)' };
   return { label: `= ${diffPct.toFixed(1)}%`, color: '#ffa94d' };
 }
 
@@ -114,8 +114,8 @@ export function EarningsCalendar() {
               onClick={() => setRange(r)}
               className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
               style={range === r ? {
-                background: 'linear-gradient(135deg, #00e5b0, #00c49a)',
-                color: '#060b16',
+                background: 'linear-gradient(135deg, var(--accent), var(--accent2))',
+                color: 'var(--bg)',
               } : {
                 background: 'var(--surface2)',
                 color: 'var(--muted)',
@@ -133,9 +133,9 @@ export function EarningsCalendar() {
               onClick={() => setFilter(f)}
               className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
               style={filter === f ? {
-                background: 'rgba(0,229,176,0.12)',
-                color: '#00e5b0',
-                border: '1px solid rgba(0,229,176,0.3)',
+                background: 'rgb(var(--rgb-accent) / 0.12)',
+                color: 'var(--accent)',
+                border: '1px solid rgb(var(--rgb-accent) / 0.3)',
               } : {
                 background: 'var(--surface2)',
                 color: 'var(--muted)',
@@ -152,7 +152,7 @@ export function EarningsCalendar() {
       {loading && !data ? (
         <div className="space-y-3">
           {[0, 1, 2].map(i => (
-            <div key={i} className="h-32 rounded-2xl animate-pulse" style={{ background: 'rgba(26,40,64,0.4)' }} />
+            <div key={i} className="h-32 rounded-2xl animate-pulse" style={{ background: 'rgb(var(--rgb-border) / 0.4)' }} />
           ))}
         </div>
       ) : !data || data.entries.length === 0 ? (
@@ -174,16 +174,16 @@ export function EarningsCalendar() {
                 className="rounded-2xl overflow-hidden"
                 style={{
                   background: 'var(--card)',
-                  border: isToday ? '1px solid rgba(0,229,176,0.3)' : '1px solid var(--border)',
-                  boxShadow: isToday ? '0 0 30px rgba(0,229,176,0.1)' : undefined,
+                  border: isToday ? '1px solid rgb(var(--rgb-accent) / 0.3)' : '1px solid var(--border)',
+                  boxShadow: isToday ? '0 0 30px rgb(var(--rgb-accent) / 0.1)' : undefined,
                 }}
               >
                 <header
                   className="flex items-center justify-between px-4 py-3"
                   style={{
                     background: isToday
-                      ? 'linear-gradient(135deg, rgba(0,229,176,0.12), rgba(0,229,176,0.04))'
-                      : 'rgba(26,40,64,0.4)',
+                      ? 'linear-gradient(135deg, rgb(var(--rgb-accent) / 0.12), rgb(var(--rgb-accent) / 0.04))'
+                      : 'rgb(var(--rgb-border) / 0.4)',
                     borderBottom: '1px solid var(--border2)',
                   }}
                 >
@@ -194,7 +194,7 @@ export function EarningsCalendar() {
                     </span>
                   </div>
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                    style={{ background: 'rgba(0,229,176,0.1)', color: '#00e5b0' }}
+                    style={{ background: 'rgb(var(--rgb-accent) / 0.1)', color: 'var(--accent)' }}
                   >
                     {entries.length} דוחות
                   </span>
@@ -208,7 +208,7 @@ export function EarningsCalendar() {
                     return (
                       <div key={`${e.symbol}-${i}`}
                         className="flex items-center gap-3 px-4 py-3 hover:bg-white/3 transition-colors"
-                        style={{ borderTop: i > 0 ? '1px solid rgba(26,40,64,0.3)' : undefined }}
+                        style={{ borderTop: i > 0 ? '1px solid rgb(var(--rgb-border) / 0.3)' : undefined }}
                       >
                         {/* Ticker + name */}
                         <Link href={`/${locale}/stocks/${e.symbol}`} className="min-w-0 flex-1 group">
@@ -218,7 +218,7 @@ export function EarningsCalendar() {
                             </span>
                             {e.isIsraeli && (
                               <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md"
-                                style={{ background: 'rgba(0,229,176,0.1)', color: '#00e5b0' }}
+                                style={{ background: 'rgb(var(--rgb-accent) / 0.1)', color: 'var(--accent)' }}
                               >
                                 🇮🇱
                               </span>

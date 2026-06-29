@@ -44,7 +44,7 @@ function NavItem({ navKey, icon: Icon, iconActive: IconActive, href, locale, pat
       {isActive && (
         <span
           className="absolute inset-0 rounded-2xl"
-          style={{ background: 'radial-gradient(ellipse at center, rgba(0,229,176,0.12) 0%, transparent 70%)' }}
+          style={{ background: 'radial-gradient(ellipse at center, rgb(var(--rgb-accent) / 0.12) 0%, transparent 70%)' }}
         />
       )}
       {isActive && (
@@ -56,7 +56,7 @@ function NavItem({ navKey, icon: Icon, iconActive: IconActive, href, locale, pat
       {isActive
         ? <IconActive
             className="w-6 h-6 relative"
-            style={{ color: 'var(--accent)', filter: 'drop-shadow(0 0 8px rgba(0,229,176,0.6))' }}
+            style={{ color: 'var(--accent)', filter: 'drop-shadow(0 0 8px rgb(var(--rgb-accent) / 0.6))' }}
           />
         : <Icon
             className="w-6 h-6 relative transition-colors"
@@ -123,8 +123,8 @@ export function BottomNav() {
               className="w-[56px] h-[56px] rounded-2xl flex items-center justify-center"
               style={{
                 background: 'linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%)',
-                boxShadow: '0 0 28px rgba(0,229,176,0.5), 0 8px 20px rgba(0,0,0,0.45)',
-                border: '1.5px solid rgba(0,229,176,0.4)',
+                boxShadow: '0 0 28px rgb(var(--rgb-accent) / 0.5), 0 8px 20px rgba(0,0,0,0.45)',
+                border: '1.5px solid rgb(var(--rgb-accent) / 0.4)',
               }}
             >
               <PlusIcon className="w-7 h-7" style={{ color: 'var(--accent-contrast)', strokeWidth: 3 }} />

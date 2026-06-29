@@ -37,20 +37,20 @@ function DiscussionRow({ row, rank }: { row: TrendingTicker; rank: number }) {
       href={`/${locale}/stocks/${row.ticker}`}
       className="group block px-3 py-2.5 rounded-xl transition-all duration-200"
       style={{ background: 'transparent' }}
-      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(26,40,64,0.4)'; }}
+      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgb(var(--rgb-border) / 0.4)'; }}
       onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
     >
       <div className="flex items-center gap-2.5 mb-1.5">
         {/* Rank */}
         <span
           className="text-[10px] font-black w-4 text-center font-mono"
-          style={{ color: rank <= 3 ? '#00e5b0' : '#5a7090' }}
+          style={{ color: rank <= 3 ? 'var(--accent)' : 'var(--muted)' }}
         >
           {rank}
         </span>
 
         {/* Ticker */}
-        <span className="text-[13px] font-black font-mono" style={{ color: '#e8f0ff' }}>
+        <span className="text-[13px] font-black font-mono" style={{ color: 'var(--text)' }}>
           ${row.ticker}
         </span>
 
@@ -58,7 +58,7 @@ function DiscussionRow({ row, rank }: { row: TrendingTicker; rank: number }) {
         {live && (
           <span
             className="text-[10px] font-bold font-mono ms-auto tabular-nums"
-            style={{ color: isUp ? '#00e5b0' : '#ff4d6a' }}
+            style={{ color: isUp ? 'var(--accent)' : 'var(--red)' }}
           >
             {isUp ? '+' : ''}{live.changePercent.toFixed(2)}%
           </span>
@@ -74,16 +74,16 @@ function DiscussionRow({ row, rank }: { row: TrendingTicker; rank: number }) {
       {/* Sentiment bar */}
       <div
         className="h-1 rounded-full overflow-hidden flex"
-        style={{ background: 'rgba(26,40,64,0.6)' }}
+        style={{ background: 'rgb(var(--rgb-border) / 0.6)' }}
       >
         {bullPct > 0 && (
-          <span style={{ width: `${bullPct}%`, background: '#00e5b0' }} />
+          <span style={{ width: `${bullPct}%`, background: 'var(--accent)' }} />
         )}
         {neutPct > 0 && (
           <span style={{ width: `${neutPct}%`, background: 'rgba(122,140,165,0.5)' }} />
         )}
         {bearPct > 0 && (
-          <span style={{ width: `${bearPct}%`, background: '#ff4d6a' }} />
+          <span style={{ width: `${bearPct}%`, background: 'var(--red)' }} />
         )}
       </div>
     </Link>
@@ -94,11 +94,11 @@ function SkeletonRow() {
   return (
     <div className="px-3 py-2.5 animate-pulse">
       <div className="flex items-center gap-2.5 mb-2">
-        <div className="h-3 w-3 rounded" style={{ background: 'rgba(26,40,64,0.6)' }} />
-        <div className="h-3 w-16 rounded" style={{ background: 'rgba(26,40,64,0.6)' }} />
-        <div className="h-3 w-10 rounded ms-auto" style={{ background: 'rgba(26,40,64,0.4)' }} />
+        <div className="h-3 w-3 rounded" style={{ background: 'rgb(var(--rgb-border) / 0.6)' }} />
+        <div className="h-3 w-16 rounded" style={{ background: 'rgb(var(--rgb-border) / 0.6)' }} />
+        <div className="h-3 w-10 rounded ms-auto" style={{ background: 'rgb(var(--rgb-border) / 0.4)' }} />
       </div>
-      <div className="h-1 rounded-full w-full" style={{ background: 'rgba(26,40,64,0.4)' }} />
+      <div className="h-1 rounded-full w-full" style={{ background: 'rgb(var(--rgb-border) / 0.4)' }} />
     </div>
   );
 }
@@ -130,18 +130,18 @@ export function TrendingDiscussions() {
     <div
       className="rounded-2xl overflow-hidden"
       style={{
-        background: 'rgba(13,20,36,0.6)',
-        border: '1px solid rgba(26,40,64,0.6)',
+        background: 'rgb(var(--rgb-bg2) / 0.6)',
+        border: '1px solid rgb(var(--rgb-border) / 0.6)',
       }}
     >
       {/* Header */}
       <div
         className="flex items-center justify-between px-4 py-3"
-        style={{ borderBottom: '1px solid rgba(26,40,64,0.5)' }}
+        style={{ borderBottom: '1px solid rgb(var(--rgb-border) / 0.5)' }}
       >
         <div className="flex items-center gap-2">
           <span className="text-base">🔥</span>
-          <span className="text-[13px] font-black" style={{ color: '#e8f0ff' }}>
+          <span className="text-[13px] font-black" style={{ color: 'var(--text)' }}>
             מדוברים
           </span>
         </div>
@@ -155,8 +155,8 @@ export function TrendingDiscussions() {
               className="text-[10px] font-bold px-2 py-1 rounded-md transition-all"
               style={
                 windowOpt === w
-                  ? { background: 'rgba(0,229,176,0.12)', color: '#00e5b0', border: '1px solid rgba(0,229,176,0.25)' }
-                  : { background: 'transparent', color: '#5a7090', border: '1px solid transparent' }
+                  ? { background: 'rgb(var(--rgb-accent) / 0.12)', color: 'var(--accent)', border: '1px solid rgb(var(--rgb-accent) / 0.25)' }
+                  : { background: 'transparent', color: 'var(--muted)', border: '1px solid transparent' }
               }
             >
               {WINDOW_LABEL[w]}

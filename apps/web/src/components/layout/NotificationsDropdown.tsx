@@ -156,13 +156,13 @@ export function NotificationsDropdown({ userId }: { userId: string }) {
         className="relative p-2 rounded-xl text-tsua-muted hover:text-tsua-text transition-all duration-200 hover:bg-tsua-card"
       >
         {unreadCount > 0
-          ? <BellSolid className="w-5 h-5" style={{ color: '#00e5b0' }} />
+          ? <BellSolid className="w-5 h-5" style={{ color: 'var(--accent)' }} />
           : <BellIcon className="w-5 h-5" />
         }
         {unreadCount > 0 && (
           <span
             className="absolute -top-0.5 -end-0.5 min-w-[16px] h-4 px-1 rounded-full text-[9px] font-black flex items-center justify-center"
-            style={{ background: '#ff4d6a', color: '#fff', boxShadow: '0 0 8px rgba(255,77,106,0.6)' }}
+            style={{ background: 'var(--red)', color: '#fff', boxShadow: '0 0 8px rgb(var(--rgb-red) / 0.6)' }}
           >
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
@@ -174,15 +174,15 @@ export function NotificationsDropdown({ userId }: { userId: string }) {
         <div
           className="absolute end-0 top-full mt-2 w-80 rounded-2xl overflow-hidden z-50"
           style={{
-            background: 'rgba(8,14,26,0.99)',
-            border: '1px solid rgba(26,40,64,0.8)',
+            background: 'rgb(var(--rgb-bg) / 0.99)',
+            border: '1px solid rgb(var(--rgb-border) / 0.8)',
             boxShadow: '0 16px 48px rgba(0,0,0,0.7)',
           }}
         >
           {/* Header */}
           <div
             className="flex items-center justify-between px-4 py-3"
-            style={{ borderBottom: '1px solid rgba(26,40,64,0.6)' }}
+            style={{ borderBottom: '1px solid rgb(var(--rgb-border) / 0.6)' }}
           >
             <span className="text-sm font-black text-tsua-text">
               🔔 התראות
@@ -203,11 +203,11 @@ export function NotificationsDropdown({ userId }: { userId: string }) {
             {loading && (
               <div className="space-y-0 animate-pulse">
                 {[1, 2, 3].map(i => (
-                  <div key={i} className="flex items-start gap-3 px-4 py-3.5" style={{ borderBottom: '1px solid rgba(26,40,64,0.3)' }}>
-                    <div className="w-9 h-9 rounded-full shrink-0" style={{ background: 'rgba(26,40,64,0.5)' }} />
+                  <div key={i} className="flex items-start gap-3 px-4 py-3.5" style={{ borderBottom: '1px solid rgb(var(--rgb-border) / 0.3)' }}>
+                    <div className="w-9 h-9 rounded-full shrink-0" style={{ background: 'rgb(var(--rgb-border) / 0.5)' }} />
                     <div className="flex-1 space-y-1.5">
-                      <div className="h-3 w-3/4 rounded" style={{ background: 'rgba(26,40,64,0.5)' }} />
-                      <div className="h-2.5 w-1/2 rounded" style={{ background: 'rgba(26,40,64,0.35)' }} />
+                      <div className="h-3 w-3/4 rounded" style={{ background: 'rgb(var(--rgb-border) / 0.5)' }} />
+                      <div className="h-2.5 w-1/2 rounded" style={{ background: 'rgb(var(--rgb-border) / 0.35)' }} />
                     </div>
                   </div>
                 ))}
@@ -231,8 +231,8 @@ export function NotificationsDropdown({ userId }: { userId: string }) {
                 <div
                   className="flex items-start gap-3 px-4 py-3 transition-colors hover:bg-white/3 cursor-pointer"
                   style={{
-                    borderBottom: '1px solid rgba(26,40,64,0.3)',
-                    background: n.isRead ? 'transparent' : 'rgba(0,229,176,0.02)',
+                    borderBottom: '1px solid rgb(var(--rgb-border) / 0.3)',
+                    background: n.isRead ? 'transparent' : 'rgb(var(--rgb-accent) / 0.02)',
                   }}
                 >
                   {/* Actor avatar */}
@@ -242,7 +242,7 @@ export function NotificationsDropdown({ userId }: { userId: string }) {
                     ) : (
                       <div
                         className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm text-tsua-bg"
-                        style={{ background: 'linear-gradient(135deg, #00e5b0, #3b82f6)' }}
+                        style={{ background: 'linear-gradient(135deg, var(--accent), var(--blue))' }}
                       >
                         {n.actor ? initial : TYPE_ICON[n.type] ?? '🔔'}
                       </div>
@@ -250,7 +250,7 @@ export function NotificationsDropdown({ userId }: { userId: string }) {
                     {/* Type icon badge */}
                     <span
                       className="absolute -bottom-0.5 -end-0.5 w-4 h-4 rounded-full flex items-center justify-center text-[9px]"
-                      style={{ background: 'rgba(8,14,26,1)', border: '1px solid rgba(26,40,64,0.6)' }}
+                      style={{ background: 'rgb(var(--rgb-bg) / 1)', border: '1px solid rgb(var(--rgb-border) / 0.6)' }}
                     >
                       {TYPE_ICON[n.type] ?? '🔔'}
                     </span>
@@ -260,7 +260,7 @@ export function NotificationsDropdown({ userId }: { userId: string }) {
                     <div className="flex items-start justify-between gap-2">
                       <p className="text-xs font-semibold text-tsua-text leading-snug">{n.title}</p>
                       {!n.isRead && (
-                        <div className="w-2 h-2 rounded-full shrink-0 mt-0.5" style={{ background: '#00e5b0' }} />
+                        <div className="w-2 h-2 rounded-full shrink-0 mt-0.5" style={{ background: 'var(--accent)' }} />
                       )}
                     </div>
                     {n.body && (
@@ -285,7 +285,7 @@ export function NotificationsDropdown({ userId }: { userId: string }) {
           {notifications.length > 0 && (
             <div
               className="px-4 py-2.5 text-center"
-              style={{ borderTop: '1px solid rgba(26,40,64,0.5)' }}
+              style={{ borderTop: '1px solid rgb(var(--rgb-border) / 0.5)' }}
             >
               <button
                 onClick={() => { fetchNotifications(); }}

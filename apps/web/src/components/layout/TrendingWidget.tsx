@@ -35,13 +35,13 @@ function TrendingRow({ item }: { item: TrendingItem }) {
       <div className="flex items-center gap-2 px-3 py-1.5 animate-pulse">
         <div className="text-xs font-bold font-mono text-tsua-muted w-12">{item.ticker}</div>
         <div className="flex-1" />
-        <div className="h-3 w-14 rounded-full" style={{ background: 'rgba(26,40,64,0.6)' }} />
+        <div className="h-3 w-14 rounded-full" style={{ background: 'rgb(var(--rgb-border) / 0.6)' }} />
       </div>
     );
   }
 
   const up = price.changePercent >= 0;
-  const color = up ? '#00e5b0' : '#ff4d6a';
+  const color = up ? 'var(--accent)' : 'var(--red)';
 
   return (
     <Link
@@ -51,8 +51,8 @@ function TrendingRow({ item }: { item: TrendingItem }) {
       <span
         className="text-xs font-black font-mono w-12 truncate transition-colors"
         style={{
-          color: price.flash ? (price.flash === 'up' ? '#00e5b0' : '#ff4d6a') : '#d4e4ff',
-          textShadow: price.flash ? `0 0 8px ${price.flash === 'up' ? 'rgba(0,229,176,0.6)' : 'rgba(255,77,106,0.6)'}` : 'none',
+          color: price.flash ? (price.flash === 'up' ? 'var(--accent)' : 'var(--red)') : '#d4e4ff',
+          textShadow: price.flash ? `0 0 8px ${price.flash === 'up' ? 'rgb(var(--rgb-accent) / 0.6)' : 'rgb(var(--rgb-red) / 0.6)'}` : 'none',
         }}
       >
         {item.ticker}
@@ -61,9 +61,9 @@ function TrendingRow({ item }: { item: TrendingItem }) {
       <div className="flex-1 min-w-0">
         {/* Sentiment bar (bullish vs bearish from post votes) */}
         {totalVotes > 0 ? (
-          <div className="h-0.5 rounded-full flex overflow-hidden" style={{ background: 'rgba(26,40,64,0.8)' }}>
-            <div className="h-full" style={{ width: `${bullishPct}%`, background: '#00e5b0' }} />
-            <div className="h-full flex-1" style={{ background: '#ff4d6a' }} />
+          <div className="h-0.5 rounded-full flex overflow-hidden" style={{ background: 'rgb(var(--rgb-border) / 0.8)' }}>
+            <div className="h-full" style={{ width: `${bullishPct}%`, background: 'var(--accent)' }} />
+            <div className="h-full flex-1" style={{ background: 'var(--red)' }} />
           </div>
         ) : (
           <div className="h-0.5 rounded-full" style={{ background: `${color}30` }}>
@@ -130,25 +130,25 @@ export function TrendingWidget() {
   return (
     <div
       className="rounded-2xl overflow-hidden mt-2"
-      style={{ background: 'rgba(13,20,36,0.7)', border: '1px solid rgba(26,40,64,0.6)' }}
+      style={{ background: 'rgb(var(--rgb-bg2) / 0.7)', border: '1px solid rgb(var(--rgb-border) / 0.6)' }}
     >
       <div
         className="px-3 py-2.5 flex items-center gap-2"
-        style={{ borderBottom: '1px solid rgba(26,40,64,0.5)' }}
+        style={{ borderBottom: '1px solid rgb(var(--rgb-border) / 0.5)' }}
       >
         <span className="text-[11px] font-black tracking-widest uppercase text-tsua-muted">
           🔥 מניות חמות
         </span>
         <div className="flex-1" />
-        <div className="flex items-center rounded-lg overflow-hidden" style={{ background: 'rgba(26,40,64,0.5)' }}>
+        <div className="flex items-center rounded-lg overflow-hidden" style={{ background: 'rgb(var(--rgb-border) / 0.5)' }}>
           {(['24h', '7d'] as const).map(w => (
             <button
               key={w}
               onClick={() => setWindowKey(w)}
               className="px-1.5 py-0.5 text-[9px] font-bold transition-colors"
               style={{
-                background: windowKey === w ? 'rgba(0,229,176,0.18)' : 'transparent',
-                color: windowKey === w ? '#00e5b0' : '#9ab1cc',
+                background: windowKey === w ? 'rgb(var(--rgb-accent) / 0.18)' : 'transparent',
+                color: windowKey === w ? 'var(--accent)' : '#9ab1cc',
               }}
             >
               {w === '24h' ? '24ש\'' : '7ימ\''}
@@ -157,7 +157,7 @@ export function TrendingWidget() {
         </div>
         <span
           className="w-1.5 h-1.5 rounded-full animate-pulse"
-          style={{ background: loading ? '#ffd700' : '#00e5b0' }}
+          style={{ background: loading ? '#ffd700' : 'var(--accent)' }}
         />
       </div>
 

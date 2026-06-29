@@ -30,6 +30,23 @@ overrides (verified: home page chrome + cards render light fine). So the
 remaining work targets the genuinely-uncovered components (e.g. modals)
 rather than blindly rewriting everything. Prioritize by visible breakage.
 
+╔═══════════════════════════════════════════════════════════════════════╗
+║ CHECKPOINT 3 — BULK MIGRATION (scripted) — DONE & DEPLOYED            ║
+║ Ran dark-mode-fix/migrate-colors.mjs: 60 files, 1576 replacements of  ║
+║ dark-palette literals -> rgb(var(--rgb-*) / a) and var(--token),      ║
+║ alpha preserved. EXCLUDED intentional-fixed files (charts, data-viz,  ║
+║ og/* + embed routes, layout boot script, ThemeToggle, lib/sectors).   ║
+║ User opted for scripted pass w/ compile+grep verify (not per-element).║
+║ Verified: tsc --noEmit OK; home feed compiles/renders no error        ║
+║ overlay; light = cream surfaces+dark text, dark = dark+light text;    ║
+║ 0 dark-palette literals left in migrated files. So all Tier 1-5 files ║
+║ below are migrated (boxes left unticked since not hand-verified each).║
+║ REMAINING (left intentionally): black scrims rgba(0,0,0), white       ║
+║ highlights rgba(255,255,255), and the excluded files. Named tailwind  ║
+║ palette classes (text-white etc.) were NOT scripted — many are        ║
+║ intentional on colored buttons; revisit case-by-case if any look off. ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
 ─── TIER 1 — GLOBAL CHROME ────────────────────────────────────────────
  [ ] MobileNavDrawer.tsx
  [ ] Navbar.tsx

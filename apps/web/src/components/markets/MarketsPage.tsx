@@ -71,8 +71,8 @@ function IndexCard({ idx }: { idx: IndexData }) {
       <div
         className="rounded-2xl p-4"
         style={{
-          background: 'rgba(13,20,36,0.6)',
-          border: '1px solid rgba(26,40,64,0.7)',
+          background: 'rgb(var(--rgb-bg2) / 0.6)',
+          border: '1px solid rgb(var(--rgb-border) / 0.7)',
         }}
       >
         <div className="flex items-start justify-between mb-3">
@@ -83,7 +83,7 @@ function IndexCard({ idx }: { idx: IndexData }) {
             </div>
             <div className="font-bold text-tsua-text text-sm mt-0.5">{idx.nameHe}</div>
           </div>
-          <span className="text-[10px] font-black px-2 py-1 rounded-lg text-tsua-muted" style={{ background: 'rgba(26,40,64,0.5)' }}>
+          <span className="text-[10px] font-black px-2 py-1 rounded-lg text-tsua-muted" style={{ background: 'rgb(var(--rgb-border) / 0.5)' }}>
             ⚠️ N/A
           </span>
         </div>
@@ -99,15 +99,15 @@ function IndexCard({ idx }: { idx: IndexData }) {
   // for 1.5s after each price change. Pure inline transition — when `flash`
   // flips back to null, the background fades back through CSS.
   const flashBg = flash === 'up'
-    ? 'rgba(0,229,176,0.18)'
-    : flash === 'down' ? 'rgba(255,77,106,0.18)' : 'rgba(13,20,36,0.8)';
+    ? 'rgb(var(--rgb-accent) / 0.18)'
+    : flash === 'down' ? 'rgb(var(--rgb-red) / 0.18)' : 'rgb(var(--rgb-bg2) / 0.8)';
   return (
     <div
       className="rounded-2xl p-4 hover:scale-[1.02]"
       style={{
         background: flashBg,
-        border: `1px solid ${isUp ? 'rgba(0,229,176,0.2)' : 'rgba(255,77,106,0.2)'}`,
-        boxShadow: isUp ? '0 4px 20px rgba(0,229,176,0.05)' : '0 4px 20px rgba(255,77,106,0.05)',
+        border: `1px solid ${isUp ? 'rgb(var(--rgb-accent) / 0.2)' : 'rgb(var(--rgb-red) / 0.2)'}`,
+        boxShadow: isUp ? '0 4px 20px rgb(var(--rgb-accent) / 0.05)' : '0 4px 20px rgb(var(--rgb-red) / 0.05)',
         transition: 'background 1.5s ease-out, transform 0.15s ease-out',
       }}
     >
@@ -124,8 +124,8 @@ function IndexCard({ idx }: { idx: IndexData }) {
         <span
           className="text-[10px] font-black px-2 py-1 rounded-lg"
           style={isUp
-            ? { background: 'rgba(0,229,176,0.1)', color: '#00e5b0' }
-            : { background: 'rgba(255,77,106,0.1)', color: '#ff4d6a' }
+            ? { background: 'rgb(var(--rgb-accent) / 0.1)', color: 'var(--accent)' }
+            : { background: 'rgb(var(--rgb-red) / 0.1)', color: 'var(--red)' }
           }
         >
           {isUp ? '▲' : '▼'} {Math.abs(changePct).toFixed(2)}%
@@ -134,14 +134,14 @@ function IndexCard({ idx }: { idx: IndexData }) {
       <div
         className="text-2xl font-black font-mono"
         style={{
-          color: flash === 'up' ? '#00e5b0' : flash === 'down' ? '#ff4d6a' : (isUp ? '#00e5b0' : '#ff4d6a'),
+          color: flash === 'up' ? 'var(--accent)' : flash === 'down' ? 'var(--red)' : (isUp ? 'var(--accent)' : 'var(--red)'),
           transition: 'color 0.3s ease-out',
         }}
         dir="ltr"
       >
         {idx.currency === 'ILS' ? '₪' : '$'}{effectivePrice!.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
       </div>
-      <div className="text-xs font-semibold mt-1" style={{ color: isUp ? '#00e5b0' : '#ff4d6a' }} dir="ltr">
+      <div className="text-xs font-semibold mt-1" style={{ color: isUp ? 'var(--accent)' : 'var(--red)' }} dir="ltr">
         {isUp ? '+' : ''}{(effectiveChange ?? 0).toFixed(2)}
       </div>
     </div>
@@ -163,15 +163,15 @@ function StockTableRow({ row, isLast, rank }: { row: StockRow; isLast: boolean; 
   const flash = live?.flash ?? null;
   const isUp = pct >= 0;
   const rowBg = flash === 'up'
-    ? 'rgba(0,229,176,0.10)'
-    : flash === 'down' ? 'rgba(255,77,106,0.10)' : 'transparent';
+    ? 'rgb(var(--rgb-accent) / 0.10)'
+    : flash === 'down' ? 'rgb(var(--rgb-red) / 0.10)' : 'transparent';
 
   return (
     <Link
       href={`/he/stocks/${row.symbol}`}
       className="flex items-center gap-3 px-4 py-3 hover:bg-white/3 group"
       style={{
-        borderBottom: isLast ? 'none' : '1px solid rgba(26,40,64,0.35)',
+        borderBottom: isLast ? 'none' : '1px solid rgb(var(--rgb-border) / 0.35)',
         background: rowBg,
         transition: 'background 1.5s ease-out',
       }}
@@ -179,7 +179,7 @@ function StockTableRow({ row, isLast, rank }: { row: StockRow; isLast: boolean; 
       <span className="text-xs text-tsua-muted w-4 shrink-0">{rank}</span>
       <div
         className="w-9 h-9 rounded-xl flex items-center justify-center font-black text-xs shrink-0"
-        style={{ background: isUp ? 'rgba(0,229,176,0.08)' : 'rgba(255,77,106,0.08)', color: isUp ? '#00e5b0' : '#ff4d6a', border: `1px solid ${isUp ? 'rgba(0,229,176,0.2)' : 'rgba(255,77,106,0.2)'}` }}
+        style={{ background: isUp ? 'rgb(var(--rgb-accent) / 0.08)' : 'rgb(var(--rgb-red) / 0.08)', color: isUp ? 'var(--accent)' : 'var(--red)', border: `1px solid ${isUp ? 'rgb(var(--rgb-accent) / 0.2)' : 'rgb(var(--rgb-red) / 0.2)'}` }}
       >
         {row.symbol.slice(0, 3)}
       </div>
@@ -196,7 +196,7 @@ function StockTableRow({ row, isLast, rank }: { row: StockRow; isLast: boolean; 
           className="text-sm font-bold font-mono"
           dir="ltr"
           style={{
-            color: flash === 'up' ? '#00e5b0' : flash === 'down' ? '#ff4d6a' : '#e8f0ff',
+            color: flash === 'up' ? 'var(--accent)' : flash === 'down' ? 'var(--red)' : 'var(--text)',
             transition: 'color 0.3s ease-out',
           }}
         >
@@ -205,7 +205,7 @@ function StockTableRow({ row, isLast, rank }: { row: StockRow; isLast: boolean; 
         <div
           className="text-xs font-bold"
           dir="ltr"
-          style={{ color: isUp ? '#00e5b0' : '#ff4d6a' }}
+          style={{ color: isUp ? 'var(--accent)' : 'var(--red)' }}
         >
           {isUp ? '▲' : '▼'} {Math.abs(pct).toFixed(2)}%
         </div>
@@ -219,11 +219,11 @@ function StockTable({ stocks, type }: { stocks: StockRow[]; type: 'gainers' | 'l
   return (
     <div
       className="rounded-2xl overflow-hidden"
-      style={{ background: 'rgba(13,20,36,0.8)', border: '1px solid rgba(26,40,64,0.8)' }}
+      style={{ background: 'rgb(var(--rgb-bg2) / 0.8)', border: '1px solid rgb(var(--rgb-border) / 0.8)' }}
     >
       <div
         className="flex items-center gap-2 px-4 py-3"
-        style={{ borderBottom: '1px solid rgba(26,40,64,0.6)' }}
+        style={{ borderBottom: '1px solid rgb(var(--rgb-border) / 0.6)' }}
       >
         <span className="text-lg">{isGainer ? '🚀' : '📉'}</span>
         <h3 className="text-sm font-black text-tsua-text">
@@ -248,11 +248,11 @@ function SectorHeatmapCard({ locale }: { locale: string }) {
   return (
     <div
       className="rounded-2xl overflow-hidden"
-      style={{ background: 'rgba(13,20,36,0.8)', border: '1px solid rgba(26,40,64,0.8)' }}
+      style={{ background: 'rgb(var(--rgb-bg2) / 0.8)', border: '1px solid rgb(var(--rgb-border) / 0.8)' }}
     >
       <div
         className="px-4 py-3 flex items-center justify-between"
-        style={{ borderBottom: '1px solid rgba(26,40,64,0.6)' }}
+        style={{ borderBottom: '1px solid rgb(var(--rgb-border) / 0.6)' }}
       >
         <h3 className="text-sm font-black text-tsua-text">🗺️ מפת מגזרים</h3>
         <Link
@@ -273,9 +273,9 @@ function ForexCard({ rates }: { rates: ForexRate[] }) {
   return (
     <div
       className="rounded-2xl overflow-hidden"
-      style={{ background: 'rgba(13,20,36,0.8)', border: '1px solid rgba(26,40,64,0.8)' }}
+      style={{ background: 'rgb(var(--rgb-bg2) / 0.8)', border: '1px solid rgb(var(--rgb-border) / 0.8)' }}
     >
-      <div className="px-4 py-3" style={{ borderBottom: '1px solid rgba(26,40,64,0.6)' }}>
+      <div className="px-4 py-3" style={{ borderBottom: '1px solid rgb(var(--rgb-border) / 0.6)' }}>
         <h3 className="text-sm font-black text-tsua-text">
           💱 שערי חליפין
         </h3>
@@ -287,7 +287,7 @@ function ForexCard({ rates }: { rates: ForexRate[] }) {
             <div
               key={r.pair}
               className="flex items-center justify-between px-4 py-3"
-              style={{ borderBottom: i < rates.length - 1 ? '1px solid rgba(26,40,64,0.35)' : 'none' }}
+              style={{ borderBottom: i < rates.length - 1 ? '1px solid rgb(var(--rgb-border) / 0.35)' : 'none' }}
             >
               <div className="flex items-center gap-2">
                 <span>{r.base}{r.quote}</span>
@@ -298,7 +298,7 @@ function ForexCard({ rates }: { rates: ForexRate[] }) {
                   {r.rate > 100 ? r.rate.toLocaleString(undefined, { maximumFractionDigits: 0 }) : r.rate.toFixed(4)}
                 </div>
                 {r.changePercent != null && (
-                  <div className="text-xs font-semibold" style={{ color: isUp ? '#00e5b0' : '#ff4d6a' }} dir="ltr">
+                  <div className="text-xs font-semibold" style={{ color: isUp ? 'var(--accent)' : 'var(--red)' }} dir="ltr">
                     {isUp ? '▲' : '▼'} {Math.abs(r.changePercent).toFixed(2)}%
                   </div>
                 )}
@@ -313,11 +313,11 @@ function ForexCard({ rates }: { rates: ForexRate[] }) {
 
 function SkeletonCard() {
   return (
-    <div className="rounded-2xl p-4 animate-pulse" style={{ background: 'rgba(13,20,36,0.8)', border: '1px solid rgba(26,40,64,0.6)' }}>
+    <div className="rounded-2xl p-4 animate-pulse" style={{ background: 'rgb(var(--rgb-bg2) / 0.8)', border: '1px solid rgb(var(--rgb-border) / 0.6)' }}>
       <div className="space-y-2">
-        <div className="h-3 w-20 rounded" style={{ background: 'rgba(26,40,64,0.6)' }} />
-        <div className="h-7 w-28 rounded" style={{ background: 'rgba(26,40,64,0.5)' }} />
-        <div className="h-3 w-16 rounded" style={{ background: 'rgba(26,40,64,0.4)' }} />
+        <div className="h-3 w-20 rounded" style={{ background: 'rgb(var(--rgb-border) / 0.6)' }} />
+        <div className="h-7 w-28 rounded" style={{ background: 'rgb(var(--rgb-border) / 0.5)' }} />
+        <div className="h-3 w-16 rounded" style={{ background: 'rgb(var(--rgb-border) / 0.4)' }} />
       </div>
     </div>
   );
@@ -422,7 +422,7 @@ export function MarketsPage() {
           {lastUpdated && (
             <p
               className="text-xs mt-0.5 flex items-center gap-1"
-              style={{ color: showWarning ? '#ffd166' : undefined }}
+              style={{ color: showWarning ? 'var(--gold)' : undefined }}
               title={
                 refreshFailed
                   ? `הרענון האחרון נכשל. הנתונים מהזמן ${lastUpdated.toLocaleString('he-IL')}`
@@ -438,7 +438,7 @@ export function MarketsPage() {
             </p>
           )}
           {!lastUpdated && refreshFailed && !loading && (
-            <p className="text-xs mt-0.5" style={{ color: '#ff4d6a' }}>
+            <p className="text-xs mt-0.5" style={{ color: 'var(--red)' }}>
               ⚠️ לא ניתן לטעון נתונים
             </p>
           )}
@@ -448,7 +448,7 @@ export function MarketsPage() {
           disabled={refreshing}
           aria-label="רענן את נתוני השווקים"
           className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl text-tsua-muted hover:text-tsua-text transition-all disabled:opacity-50"
-          style={{ background: 'rgba(15,25,41,0.6)', border: '1px solid rgba(26,40,64,0.7)' }}
+          style={{ background: 'rgb(var(--rgb-card) / 0.6)', border: '1px solid rgb(var(--rgb-border) / 0.7)' }}
         >
           <ArrowPathIcon className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} aria-hidden="true" />
           רענן
@@ -469,8 +469,8 @@ export function MarketsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {loading ? (
           <>
-            <div className="rounded-2xl h-64 animate-pulse" style={{ background: 'rgba(13,20,36,0.8)', border: '1px solid rgba(26,40,64,0.6)' }} />
-            <div className="rounded-2xl h-64 animate-pulse" style={{ background: 'rgba(13,20,36,0.8)', border: '1px solid rgba(26,40,64,0.6)' }} />
+            <div className="rounded-2xl h-64 animate-pulse" style={{ background: 'rgb(var(--rgb-bg2) / 0.8)', border: '1px solid rgb(var(--rgb-border) / 0.6)' }} />
+            <div className="rounded-2xl h-64 animate-pulse" style={{ background: 'rgb(var(--rgb-bg2) / 0.8)', border: '1px solid rgb(var(--rgb-border) / 0.6)' }} />
           </>
         ) : (
           <>

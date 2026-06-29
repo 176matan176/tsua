@@ -108,12 +108,12 @@ export function PushToggle() {
       <div
         className="flex items-center gap-3 px-3 py-2.5 rounded-xl"
         style={{
-          background: 'var(--surface2, rgba(15,25,41,0.5))',
-          border: '1px solid var(--border, rgba(26,40,64,0.6))',
+          background: 'var(--surface2, rgb(var(--rgb-card) / 0.5))',
+          border: '1px solid var(--border, rgb(var(--rgb-border) / 0.6))',
         }}
       >
-        <div className="w-8 h-8 rounded-lg animate-pulse shrink-0" style={{ background: 'rgba(26,40,64,0.6)' }} />
-        <div className="flex-1 h-3 rounded animate-pulse" style={{ background: 'rgba(26,40,64,0.6)' }} />
+        <div className="w-8 h-8 rounded-lg animate-pulse shrink-0" style={{ background: 'rgb(var(--rgb-border) / 0.6)' }} />
+        <div className="flex-1 h-3 rounded animate-pulse" style={{ background: 'rgb(var(--rgb-border) / 0.6)' }} />
       </div>
     );
   }
@@ -124,13 +124,13 @@ export function PushToggle() {
         className="flex items-center gap-3 px-3 py-2.5 rounded-xl"
         style={{
           background: 'var(--surface2, rgba(255,255,255,0.03))',
-          border: '1px solid var(--border, rgba(26,40,64,0.6))',
-          color: 'var(--muted, #5a7090)',
+          border: '1px solid var(--border, rgb(var(--rgb-border) / 0.6))',
+          color: 'var(--muted, var(--muted))',
         }}
       >
         <div
           className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-          style={{ background: 'rgba(26,40,64,0.5)' }}
+          style={{ background: 'rgb(var(--rgb-border) / 0.5)' }}
         >
           <BellSlashIcon className="w-4 h-4" />
         </div>
@@ -165,26 +165,26 @@ export function PushToggle() {
       <div
         className="flex items-center gap-3 px-3 py-2.5 rounded-xl"
         style={{
-          background: 'linear-gradient(135deg, rgba(0,229,176,0.10), rgba(0,229,176,0.04))',
-          border: '1px solid rgba(0,229,176,0.28)',
-          boxShadow: '0 0 0 1px rgba(0,229,176,0.04)',
+          background: 'linear-gradient(135deg, rgb(var(--rgb-accent) / 0.10), rgb(var(--rgb-accent) / 0.04))',
+          border: '1px solid rgb(var(--rgb-accent) / 0.28)',
+          boxShadow: '0 0 0 1px rgb(var(--rgb-accent) / 0.04)',
         }}
       >
         <div
           className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
           style={{
-            background: 'rgba(0,229,176,0.15)',
-            border: '1px solid rgba(0,229,176,0.3)',
-            boxShadow: '0 0 10px rgba(0,229,176,0.2)',
+            background: 'rgb(var(--rgb-accent) / 0.15)',
+            border: '1px solid rgb(var(--rgb-accent) / 0.3)',
+            boxShadow: '0 0 10px rgb(var(--rgb-accent) / 0.2)',
           }}
         >
-          <BellAlertIconSolid className="w-4 h-4" style={{ color: '#00e5b0' }} />
+          <BellAlertIconSolid className="w-4 h-4" style={{ color: 'var(--accent)' }} />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-[12px] font-black" style={{ color: '#00e5b0' }}>
+          <div className="text-[12px] font-black" style={{ color: 'var(--accent)' }}>
             התראות פעילות בדפדפן
           </div>
-          <div className="text-[10px] font-medium" style={{ color: 'var(--muted, #5a7090)' }}>
+          <div className="text-[10px] font-medium" style={{ color: 'var(--muted, var(--muted))' }}>
             נקבל התרעה ברגע שיעד מחיר נפרץ
           </div>
         </div>
@@ -194,7 +194,7 @@ export function PushToggle() {
           disabled={busy}
           className="relative w-10 h-[22px] rounded-full transition-all duration-200 disabled:opacity-50 shrink-0"
           style={{
-            background: 'linear-gradient(135deg, #00e5b0, #00c49a)',
+            background: 'linear-gradient(135deg, var(--accent), var(--accent2))',
             boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.2)',
           }}
           aria-label="כבה התראות"
@@ -221,24 +221,24 @@ export function PushToggle() {
         disabled={busy}
         className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all active:scale-[0.98] disabled:opacity-50"
         style={{
-          background: 'linear-gradient(135deg, rgba(0,229,176,0.08), rgba(0,229,176,0.03))',
-          border: '1px solid rgba(0,229,176,0.22)',
+          background: 'linear-gradient(135deg, rgb(var(--rgb-accent) / 0.08), rgb(var(--rgb-accent) / 0.03))',
+          border: '1px solid rgb(var(--rgb-accent) / 0.22)',
         }}
       >
         <div
           className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
           style={{
-            background: 'rgba(0,229,176,0.12)',
-            border: '1px solid rgba(0,229,176,0.28)',
+            background: 'rgb(var(--rgb-accent) / 0.12)',
+            border: '1px solid rgb(var(--rgb-accent) / 0.28)',
           }}
         >
-          <BellIcon className="w-4 h-4" style={{ color: '#00e5b0' }} />
+          <BellIcon className="w-4 h-4" style={{ color: 'var(--accent)' }} />
         </div>
         <div className="flex-1 min-w-0 text-start">
-          <div className="text-[12px] font-black" style={{ color: 'var(--text, #e8f0ff)' }}>
+          <div className="text-[12px] font-black" style={{ color: 'var(--text, var(--text))' }}>
             {busy ? 'רושם…' : 'הפעל התראות בדפדפן'}
           </div>
-          <div className="text-[10px] font-medium" style={{ color: 'var(--muted, #5a7090)' }}>
+          <div className="text-[10px] font-medium" style={{ color: 'var(--muted, var(--muted))' }}>
             עדכון מיידי כשיעד מחיר נפרץ
           </div>
         </div>
@@ -246,15 +246,15 @@ export function PushToggle() {
         <div
           className="relative w-10 h-[22px] rounded-full shrink-0"
           style={{
-            background: 'rgba(26,40,64,0.8)',
-            border: '1px solid rgba(26,40,64,0.9)',
+            background: 'rgb(var(--rgb-border) / 0.8)',
+            border: '1px solid rgb(var(--rgb-border) / 0.9)',
           }}
         >
           <div
             className="absolute top-0.5 w-[18px] h-[18px] rounded-full"
             style={{
               left: 2,
-              background: 'rgba(90,112,144,0.9)',
+              background: 'rgb(var(--rgb-muted) / 0.9)',
               boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
             }}
           />
@@ -264,9 +264,9 @@ export function PushToggle() {
         <div
           className="mt-2 text-[11px] px-3 py-2 rounded-lg"
           style={{
-            background: 'rgba(255,77,106,0.08)',
-            border: '1px solid rgba(255,77,106,0.22)',
-            color: '#ff8080',
+            background: 'rgb(var(--rgb-red) / 0.08)',
+            border: '1px solid rgb(var(--rgb-red) / 0.22)',
+            color: 'var(--red)',
           }}
         >
           ⚠ {error}

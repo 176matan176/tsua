@@ -22,7 +22,7 @@ function Sparkline({ stock }: { stock: StockScore }) {
   const isUp = (stock.changePercent ?? 0) >= 0;
   return (
     <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} className="shrink-0">
-      <path d={d} fill="none" stroke={isUp ? '#00e5b0' : '#ff4d6a'} strokeWidth="1.5"
+      <path d={d} fill="none" stroke={isUp ? 'var(--accent)' : 'var(--red)'} strokeWidth="1.5"
         strokeLinecap="round" strokeLinejoin="round" opacity="0.85" />
     </svg>
   );
@@ -32,8 +32,8 @@ function SentimentBar({ s }: { s: StockScore['sentiment'] }) {
   if (s.total === 0) return null;
   return (
     <div className="flex h-1 rounded-full overflow-hidden w-16" style={{ background: 'var(--border)' }}>
-      <div style={{ width: `${s.bullish}%`, background: '#00e5b0' }} />
-      <div style={{ width: `${s.bearish}%`, background: '#ff4d6a' }} />
+      <div style={{ width: `${s.bullish}%`, background: 'var(--accent)' }} />
+      <div style={{ width: `${s.bearish}%`, background: 'var(--red)' }} />
     </div>
   );
 }
@@ -78,9 +78,9 @@ function HotRow({ stock }: { stock: StockScore }) {
       <div
         className="w-7 h-7 rounded-xl flex items-center justify-center text-[10px] font-black shrink-0"
         style={{
-          background: isUp ? 'rgba(0,229,176,0.1)' : 'rgba(255,77,106,0.1)',
-          border: `1px solid ${isUp ? 'rgba(0,229,176,0.2)' : 'rgba(255,77,106,0.2)'}`,
-          color: isUp ? '#00e5b0' : '#ff4d6a',
+          background: isUp ? 'rgb(var(--rgb-accent) / 0.1)' : 'rgb(var(--rgb-red) / 0.1)',
+          border: `1px solid ${isUp ? 'rgb(var(--rgb-accent) / 0.2)' : 'rgb(var(--rgb-red) / 0.2)'}`,
+          color: isUp ? 'var(--accent)' : 'var(--red)',
         }}
       >
         {stock.ticker.slice(0, 2)}
@@ -101,7 +101,7 @@ function HotRow({ stock }: { stock: StockScore }) {
         <div className="text-xs font-black font-mono tabular-nums" style={{ color: 'var(--text)' }} dir="ltr">
           {stock.price != null ? stock.price.toFixed(2) : '—'}
         </div>
-        <div className="text-[10px] font-bold tabular-nums" style={{ color: isUp ? '#00e5b0' : '#ff4d6a' }} dir="ltr">
+        <div className="text-[10px] font-bold tabular-nums" style={{ color: isUp ? 'var(--accent)' : 'var(--red)' }} dir="ltr">
           {pctStr}
         </div>
       </div>
@@ -168,7 +168,7 @@ export function HotStocksWidget() {
               onClick={() => setMarket(m)}
               className="text-[10px] font-bold px-2 py-0.5 rounded-lg transition-all"
               style={market === m
-                ? { background: 'rgba(0,229,176,0.15)', color: '#00e5b0', border: '1px solid rgba(0,229,176,0.25)' }
+                ? { background: 'rgb(var(--rgb-accent) / 0.15)', color: 'var(--accent)', border: '1px solid rgb(var(--rgb-accent) / 0.25)' }
                 : { background: 'var(--surface2)', color: 'var(--muted)', border: '1px solid var(--border)' }
               }
             >

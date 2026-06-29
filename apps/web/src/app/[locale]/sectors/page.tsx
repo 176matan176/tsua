@@ -21,10 +21,10 @@ export default function SectorsPage() {
             </p>
           </div>
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg shrink-0"
-            style={{ background: 'rgba(0,229,176,0.08)', border: '1px solid rgba(0,229,176,0.2)' }}
+            style={{ background: 'rgb(var(--rgb-accent) / 0.08)', border: '1px solid rgb(var(--rgb-accent) / 0.2)' }}
           >
-            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#00e5b0' }} />
-            <span className="text-xs font-bold" style={{ color: '#00e5b0' }}>LIVE</span>
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'var(--accent)' }} />
+            <span className="text-xs font-bold" style={{ color: 'var(--accent)' }}>LIVE</span>
           </div>
         </div>
 

@@ -104,7 +104,7 @@ export function CompanyOverview({
         ) : (
           <div
             className="w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg shrink-0"
-            style={{ background: 'rgba(0,229,176,0.1)', color: '#00e5b0', border: '1px solid rgba(0,229,176,0.2)' }}
+            style={{ background: 'rgb(var(--rgb-accent) / 0.1)', color: 'var(--accent)', border: '1px solid rgb(var(--rgb-accent) / 0.2)' }}
           >
             {ticker.slice(0, 2)}
           </div>

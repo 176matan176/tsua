@@ -52,7 +52,7 @@ function MetricCard({
   return (
     <div
       className="rounded-2xl p-4 relative overflow-hidden"
-      style={{ background: 'rgba(13,20,36,0.8)', border: '1px solid rgba(26,40,64,0.7)' }}
+      style={{ background: 'rgb(var(--rgb-bg2) / 0.8)', border: '1px solid rgb(var(--rgb-border) / 0.7)' }}
     >
       <div
         className="absolute inset-0 opacity-40 pointer-events-none"
@@ -109,10 +109,10 @@ export function AdminDashboard({ viewerEmail, locale }: { viewerEmail: string; l
   if (loading && !stats) {
     return (
       <div className="space-y-4" dir="rtl">
-        <div className="h-10 w-48 rounded-xl animate-pulse" style={{ background: 'rgba(26,40,64,0.6)' }} />
+        <div className="h-10 w-48 rounded-xl animate-pulse" style={{ background: 'rgb(var(--rgb-border) / 0.6)' }} />
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[1,2,3,4].map(i => (
-            <div key={i} className="h-28 rounded-2xl animate-pulse" style={{ background: 'rgba(26,40,64,0.5)' }} />
+            <div key={i} className="h-28 rounded-2xl animate-pulse" style={{ background: 'rgb(var(--rgb-border) / 0.5)' }} />
           ))}
         </div>
       </div>
@@ -121,8 +121,8 @@ export function AdminDashboard({ viewerEmail, locale }: { viewerEmail: string; l
 
   if (error) {
     return (
-      <div dir="rtl" className="rounded-2xl p-6 text-center" style={{ background: 'rgba(255,77,106,0.08)', border: '1px solid rgba(255,77,106,0.25)' }}>
-        <p className="text-sm font-bold" style={{ color: '#ff4d6a' }}>שגיאה בטעינת נתונים</p>
+      <div dir="rtl" className="rounded-2xl p-6 text-center" style={{ background: 'rgb(var(--rgb-red) / 0.08)', border: '1px solid rgb(var(--rgb-red) / 0.25)' }}>
+        <p className="text-sm font-bold" style={{ color: 'var(--red)' }}>שגיאה בטעינת נתונים</p>
         <p className="text-xs text-tsua-muted mt-1">{error}</p>
       </div>
     );
@@ -137,7 +137,7 @@ export function AdminDashboard({ viewerEmail, locale }: { viewerEmail: string; l
         <div>
           <h1 className="text-2xl font-black text-tsua-text flex items-center gap-2">
             <span>🎛️ חדר בקרה</span>
-            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md" style={{ background: 'rgba(0,229,176,0.15)', color: '#00e5b0', border: '1px solid rgba(0,229,176,0.3)' }}>
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md" style={{ background: 'rgb(var(--rgb-accent) / 0.15)', color: 'var(--accent)', border: '1px solid rgb(var(--rgb-accent) / 0.3)' }}>
               ADMIN
             </span>
           </h1>
@@ -146,7 +146,7 @@ export function AdminDashboard({ viewerEmail, locale }: { viewerEmail: string; l
           </p>
         </div>
         <span className="flex items-center gap-1.5 text-[11px] text-tsua-muted">
-          <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#00e5b0' }} />
+          <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'var(--accent)' }} />
           LIVE
         </span>
       </div>
@@ -157,14 +157,14 @@ export function AdminDashboard({ viewerEmail, locale }: { viewerEmail: string; l
           label="משתמשים"
           value={stats.totals.users.toLocaleString('he-IL')}
           delta={`+${stats.deltas.users24h} ב-24ש׳ · +${stats.deltas.users7d} ב-7ימ׳`}
-          accent="#00e5b0"
+          accent="var(--accent)"
           icon="👥"
         />
         <MetricCard
           label="פוסטים"
           value={stats.totals.posts.toLocaleString('he-IL')}
           delta={`+${stats.deltas.posts24h} ב-24ש׳ · +${stats.deltas.posts7d} ב-7ימ׳`}
-          accent="#4dabf7"
+          accent="var(--blue)"
           icon="📝"
         />
         <MetricCard
@@ -185,12 +185,12 @@ export function AdminDashboard({ viewerEmail, locale }: { viewerEmail: string; l
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <section
           className="rounded-2xl overflow-hidden"
-          style={{ background: 'rgba(13,20,36,0.8)', border: '1px solid rgba(26,40,64,0.7)' }}
+          style={{ background: 'rgb(var(--rgb-bg2) / 0.8)', border: '1px solid rgb(var(--rgb-border) / 0.7)' }}
         >
-          <div className="px-4 py-3" style={{ borderBottom: '1px solid rgba(26,40,64,0.6)' }}>
+          <div className="px-4 py-3" style={{ borderBottom: '1px solid rgb(var(--rgb-border) / 0.6)' }}>
             <h2 className="text-sm font-black text-tsua-text">🆕 הרשמות אחרונות</h2>
           </div>
-          <div className="divide-y" style={{ borderColor: 'rgba(26,40,64,0.35)' }}>
+          <div className="divide-y" style={{ borderColor: 'rgb(var(--rgb-border) / 0.35)' }}>
             {stats.recentUsers.length === 0 && (
               <p className="text-xs text-tsua-muted text-center py-6">אין הרשמות חדשות</p>
             )}
@@ -204,7 +204,7 @@ export function AdminDashboard({ viewerEmail, locale }: { viewerEmail: string; l
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={u.avatar_url} alt="" className="w-9 h-9 rounded-full object-cover" />
                 ) : (
-                  <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-black" style={{ background: 'rgba(0,229,176,0.15)', color: '#00e5b0' }}>
+                  <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-black" style={{ background: 'rgb(var(--rgb-accent) / 0.15)', color: 'var(--accent)' }}>
                     {(u.display_name ?? u.username ?? '?')[0]?.toUpperCase()}
                   </div>
                 )}
@@ -223,12 +223,12 @@ export function AdminDashboard({ viewerEmail, locale }: { viewerEmail: string; l
 
         <section
           className="rounded-2xl overflow-hidden"
-          style={{ background: 'rgba(13,20,36,0.8)', border: '1px solid rgba(26,40,64,0.7)' }}
+          style={{ background: 'rgb(var(--rgb-bg2) / 0.8)', border: '1px solid rgb(var(--rgb-border) / 0.7)' }}
         >
-          <div className="px-4 py-3" style={{ borderBottom: '1px solid rgba(26,40,64,0.6)' }}>
+          <div className="px-4 py-3" style={{ borderBottom: '1px solid rgb(var(--rgb-border) / 0.6)' }}>
             <h2 className="text-sm font-black text-tsua-text">🏆 יוצרים מובילים (7 ימים)</h2>
           </div>
-          <div className="divide-y" style={{ borderColor: 'rgba(26,40,64,0.35)' }}>
+          <div className="divide-y" style={{ borderColor: 'rgb(var(--rgb-border) / 0.35)' }}>
             {stats.topAuthors.length === 0 && (
               <p className="text-xs text-tsua-muted text-center py-6">עדיין אין פוסטים השבוע</p>
             )}
@@ -243,7 +243,7 @@ export function AdminDashboard({ viewerEmail, locale }: { viewerEmail: string; l
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={a.profile.avatar_url} alt="" className="w-8 h-8 rounded-full object-cover" />
                 ) : (
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black" style={{ background: 'rgba(77,171,247,0.15)', color: '#4dabf7' }}>
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black" style={{ background: 'rgba(77,171,247,0.15)', color: 'var(--blue)' }}>
                     {(a.profile?.display_name ?? a.profile?.username ?? '?')[0]?.toUpperCase()}
                   </div>
                 )}
@@ -262,12 +262,12 @@ export function AdminDashboard({ viewerEmail, locale }: { viewerEmail: string; l
       {/* Recent posts */}
       <section
         className="rounded-2xl overflow-hidden"
-        style={{ background: 'rgba(13,20,36,0.8)', border: '1px solid rgba(26,40,64,0.7)' }}
+        style={{ background: 'rgb(var(--rgb-bg2) / 0.8)', border: '1px solid rgb(var(--rgb-border) / 0.7)' }}
       >
-        <div className="px-4 py-3" style={{ borderBottom: '1px solid rgba(26,40,64,0.6)' }}>
+        <div className="px-4 py-3" style={{ borderBottom: '1px solid rgb(var(--rgb-border) / 0.6)' }}>
           <h2 className="text-sm font-black text-tsua-text">📝 פוסטים אחרונים</h2>
         </div>
-        <div className="divide-y" style={{ borderColor: 'rgba(26,40,64,0.35)' }}>
+        <div className="divide-y" style={{ borderColor: 'rgb(var(--rgb-border) / 0.35)' }}>
           {stats.recentPosts.length === 0 && (
             <p className="text-xs text-tsua-muted text-center py-6">אין פוסטים חדשים</p>
           )}
@@ -282,8 +282,8 @@ export function AdminDashboard({ viewerEmail, locale }: { viewerEmail: string; l
                   <span
                     className="text-[9px] font-bold px-1.5 py-0.5 rounded-md"
                     style={{
-                      background: p.sentiment === 'bullish' ? 'rgba(0,229,176,0.15)' : p.sentiment === 'bearish' ? 'rgba(255,77,106,0.15)' : 'rgba(154,177,204,0.15)',
-                      color: p.sentiment === 'bullish' ? '#00e5b0' : p.sentiment === 'bearish' ? '#ff4d6a' : '#9ab1cc',
+                      background: p.sentiment === 'bullish' ? 'rgb(var(--rgb-accent) / 0.15)' : p.sentiment === 'bearish' ? 'rgb(var(--rgb-red) / 0.15)' : 'rgba(154,177,204,0.15)',
+                      color: p.sentiment === 'bullish' ? 'var(--accent)' : p.sentiment === 'bearish' ? 'var(--red)' : '#9ab1cc',
                     }}
                   >
                     {p.sentiment === 'bullish' ? 'שורי' : p.sentiment === 'bearish' ? 'דובי' : 'נייטרלי'}

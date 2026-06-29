@@ -105,9 +105,9 @@ export function PWAInstallPrompt() {
       dir="rtl"
       className="fixed bottom-20 md:bottom-6 inset-x-3 md:inset-x-auto md:right-6 md:max-w-sm z-[90] rounded-2xl overflow-hidden animate-slideUp"
       style={{
-        background: 'linear-gradient(135deg, rgba(13,20,36,0.98), rgba(20,30,50,0.98))',
-        border: '1px solid rgba(0,229,176,0.3)',
-        boxShadow: '0 12px 48px rgba(0,0,0,0.45), 0 0 0 1px rgba(0,229,176,0.12)',
+        background: 'linear-gradient(135deg, rgb(var(--rgb-bg2) / 0.98), rgb(var(--rgb-card2) / 0.98))',
+        border: '1px solid rgb(var(--rgb-accent) / 0.3)',
+        boxShadow: '0 12px 48px rgba(0,0,0,0.45), 0 0 0 1px rgb(var(--rgb-accent) / 0.12)',
         backdropFilter: 'blur(16px)',
       }}
     >
@@ -115,7 +115,7 @@ export function PWAInstallPrompt() {
         <div className="flex items-start gap-3">
           <div
             className="shrink-0 w-11 h-11 rounded-xl flex items-center justify-center text-2xl"
-            style={{ background: 'rgba(0,229,176,0.15)', border: '1px solid rgba(0,229,176,0.3)' }}
+            style={{ background: 'rgb(var(--rgb-accent) / 0.15)', border: '1px solid rgb(var(--rgb-accent) / 0.3)' }}
           >
             📱
           </div>
@@ -133,7 +133,7 @@ export function PWAInstallPrompt() {
             onClick={dismiss}
             aria-label="סגור"
             className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-tsua-muted hover:text-tsua-text transition-colors"
-            style={{ background: 'rgba(26,40,64,0.5)' }}
+            style={{ background: 'rgb(var(--rgb-border) / 0.5)' }}
           >
             ✕
           </button>
@@ -144,9 +144,9 @@ export function PWAInstallPrompt() {
             onClick={install}
             className="mt-3 w-full h-10 rounded-xl font-bold text-sm transition-all active:scale-[0.98]"
             style={{
-              background: 'linear-gradient(135deg, #00e5b0, #00c896)',
-              color: '#060b16',
-              boxShadow: '0 4px 16px rgba(0,229,176,0.3)',
+              background: 'linear-gradient(135deg, var(--accent), #00c896)',
+              color: 'var(--bg)',
+              boxShadow: '0 4px 16px rgb(var(--rgb-accent) / 0.3)',
             }}
           >
             התקן עכשיו

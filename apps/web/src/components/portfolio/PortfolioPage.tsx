@@ -52,7 +52,7 @@ function TradeModal({ ticker, currentPrice, availableCash, availableShares, mode
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}>
-      <div className="w-full max-w-sm rounded-2xl p-6 space-y-4 animate-slide-up" style={{ background: 'rgba(13,20,36,0.98)', border: '1px solid rgba(26,40,64,0.9)' }}>
+      <div className="w-full max-w-sm rounded-2xl p-6 space-y-4 animate-slide-up" style={{ background: 'rgb(var(--rgb-bg2) / 0.98)', border: '1px solid rgb(var(--rgb-border) / 0.9)' }}>
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-black text-tsua-text">
             {mode === 'buy' ? `קנה ${ticker}` : `מכור ${ticker}`}
@@ -60,7 +60,7 @@ function TradeModal({ ticker, currentPrice, availableCash, availableShares, mode
           <button onClick={onClose} className="text-tsua-muted hover:text-tsua-text text-xl">✕</button>
         </div>
 
-        <div className="rounded-xl p-3" style={{ background: 'rgba(15,25,41,0.6)', border: '1px solid rgba(26,40,64,0.7)' }}>
+        <div className="rounded-xl p-3" style={{ background: 'rgb(var(--rgb-card) / 0.6)', border: '1px solid rgb(var(--rgb-border) / 0.7)' }}>
           <div className="flex justify-between text-sm">
             <span className="text-tsua-muted">{'מחיר נוכחי'}</span>
             <span className="font-bold text-tsua-text" dir="ltr">${currentPrice.toFixed(2)}</span>
@@ -85,16 +85,16 @@ function TradeModal({ ticker, currentPrice, availableCash, availableShares, mode
           <div className="flex items-center gap-2">
             <button onClick={() => setShares(s => Math.max(1, s - 1))}
               className="w-9 h-9 rounded-xl font-bold text-tsua-text transition-colors"
-              style={{ background: 'rgba(26,40,64,0.6)', border: '1px solid rgba(26,40,64,0.8)' }}>−</button>
+              style={{ background: 'rgb(var(--rgb-border) / 0.6)', border: '1px solid rgb(var(--rgb-border) / 0.8)' }}>−</button>
             <input
               type="number" min={1} value={shares}
               onChange={e => setShares(Math.max(1, parseInt(e.target.value) || 1))}
               className="flex-1 text-center rounded-xl py-2 text-sm font-bold text-tsua-text focus:outline-none"
-              style={{ background: 'rgba(8,13,26,0.8)', border: '1px solid rgba(26,40,64,0.8)' }}
+              style={{ background: 'rgb(var(--rgb-bg) / 0.8)', border: '1px solid rgb(var(--rgb-border) / 0.8)' }}
             />
             <button onClick={() => setShares(s => s + 1)}
               className="w-9 h-9 rounded-xl font-bold text-tsua-green transition-colors"
-              style={{ background: 'rgba(0,229,176,0.1)', border: '1px solid rgba(0,229,176,0.2)' }}>+</button>
+              style={{ background: 'rgb(var(--rgb-accent) / 0.1)', border: '1px solid rgb(var(--rgb-accent) / 0.2)' }}>+</button>
           </div>
         </div>
 
@@ -104,23 +104,23 @@ function TradeModal({ ticker, currentPrice, availableCash, availableShares, mode
             <button key={n} onClick={() => setShares(n)}
               className="flex-1 text-xs font-bold py-1.5 rounded-lg transition-all"
               style={shares === n
-                ? { background: 'rgba(0,229,176,0.15)', color: '#00e5b0', border: '1px solid rgba(0,229,176,0.3)' }
-                : { background: 'rgba(15,25,41,0.5)', color: '#5a7090', border: '1px solid rgba(26,40,64,0.6)' }}>
+                ? { background: 'rgb(var(--rgb-accent) / 0.15)', color: 'var(--accent)', border: '1px solid rgb(var(--rgb-accent) / 0.3)' }
+                : { background: 'rgb(var(--rgb-card) / 0.5)', color: 'var(--muted)', border: '1px solid rgb(var(--rgb-border) / 0.6)' }}>
               {n}
             </button>
           ))}
         </div>
 
         {/* Total */}
-        <div className="rounded-xl p-3" style={{ background: mode === 'buy' ? 'rgba(0,229,176,0.05)' : 'rgba(255,77,106,0.05)', border: `1px solid ${mode === 'buy' ? 'rgba(0,229,176,0.15)' : 'rgba(255,77,106,0.15)'}` }}>
+        <div className="rounded-xl p-3" style={{ background: mode === 'buy' ? 'rgb(var(--rgb-accent) / 0.05)' : 'rgb(var(--rgb-red) / 0.05)', border: `1px solid ${mode === 'buy' ? 'rgb(var(--rgb-accent) / 0.15)' : 'rgb(var(--rgb-red) / 0.15)'}` }}>
           <div className="flex justify-between">
             <span className="text-sm text-tsua-muted">{'סה"כ עסקה'}</span>
-            <span className="text-lg font-black" style={{ color: mode === 'buy' ? '#00e5b0' : '#ff4d6a' }} dir="ltr">
+            <span className="text-lg font-black" style={{ color: mode === 'buy' ? 'var(--accent)' : 'var(--red)' }} dir="ltr">
               ${total.toLocaleString(undefined, { maximumFractionDigits: 2 })}
             </span>
           </div>
           {!canAfford && (
-            <div className="text-xs mt-1" style={{ color: '#ff4d6a' }}>
+            <div className="text-xs mt-1" style={{ color: 'var(--red)' }}>
               {mode === 'buy' ? '⚠️ אין מספיק מזומן' : '⚠️ אין מספיק מניות'}
             </div>
           )}
@@ -130,14 +130,14 @@ function TradeModal({ ticker, currentPrice, availableCash, availableShares, mode
         <div className="flex gap-2">
           <button onClick={onClose}
             className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-tsua-muted transition-colors"
-            style={{ background: 'rgba(15,25,41,0.5)', border: '1px solid rgba(26,40,64,0.7)' }}>
+            style={{ background: 'rgb(var(--rgb-card) / 0.5)', border: '1px solid rgb(var(--rgb-border) / 0.7)' }}>
             {'ביטול'}
           </button>
           <button
             onClick={() => { if (canAfford) { onConfirm(shares); onClose(); } }}
             disabled={!canAfford}
             className="flex-1 py-2.5 rounded-xl text-sm font-black text-tsua-bg transition-all disabled:opacity-40"
-            style={{ background: mode === 'buy' ? 'linear-gradient(135deg, #00e5b0, #00c49a)' : 'linear-gradient(135deg, #ff4d6a, #cc3355)' }}>
+            style={{ background: mode === 'buy' ? 'linear-gradient(135deg, var(--accent), var(--accent2))' : 'linear-gradient(135deg, var(--red), #cc3355)' }}>
             {mode === 'buy' ? 'קנה' : 'מכור'}
           </button>
         </div>
@@ -167,13 +167,13 @@ function HoldingCard({ h, onTrade }: { h: Holding; onTrade: (ticker: string, mod
     <div
       className="rounded-2xl p-4 transition-all"
       style={{
-        background: live?.flash === 'up' ? 'rgba(0,229,176,0.07)' : live?.flash === 'down' ? 'rgba(255,77,106,0.07)' : 'rgba(15,25,41,0.7)',
-        border: '1px solid rgba(26,40,64,0.8)',
+        background: live?.flash === 'up' ? 'rgb(var(--rgb-accent) / 0.07)' : live?.flash === 'down' ? 'rgb(var(--rgb-red) / 0.07)' : 'rgb(var(--rgb-card) / 0.7)',
+        border: '1px solid rgb(var(--rgb-border) / 0.8)',
       }}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-xs text-tsua-bg" style={{ background: 'linear-gradient(135deg, #00e5b0, #3b82f6)' }}>
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-xs text-tsua-bg" style={{ background: 'linear-gradient(135deg, var(--accent), var(--blue))' }}>
             {h.ticker.slice(0, 2)}
           </div>
           <div>
@@ -183,10 +183,10 @@ function HoldingCard({ h, onTrade }: { h: Holding; onTrade: (ticker: string, mod
         </div>
         <div className="text-right">
           <div className="font-black text-tsua-text transition-colors duration-300" dir="ltr"
-            style={{ color: live?.flash === 'up' ? '#00e5b0' : live?.flash === 'down' ? '#ff4d6a' : '#e8f0ff' }}>
+            style={{ color: live?.flash === 'up' ? 'var(--accent)' : live?.flash === 'down' ? 'var(--red)' : 'var(--text)' }}>
             {cur}{value.toLocaleString(undefined, { maximumFractionDigits: 0 })}
           </div>
-          <div className="text-xs font-bold" style={{ color: up ? '#00e5b0' : '#ff4d6a' }} dir="ltr">
+          <div className="text-xs font-bold" style={{ color: up ? 'var(--accent)' : 'var(--red)' }} dir="ltr">
             {up ? '+' : ''}{pnlPct.toFixed(1)}%
           </div>
         </div>
@@ -200,12 +200,12 @@ function HoldingCard({ h, onTrade }: { h: Holding; onTrade: (ticker: string, mod
           {'מחיר נוכחי:'}{' '}
           <span
             className="font-semibold transition-colors duration-300"
-            style={{ color: live?.flash === 'up' ? '#00e5b0' : live?.flash === 'down' ? '#ff4d6a' : '#e8f0ff' }}
+            style={{ color: live?.flash === 'up' ? 'var(--accent)' : live?.flash === 'down' ? 'var(--red)' : 'var(--text)' }}
           >
             {cur}{currentPrice.toFixed(2)}
           </span>
           {!hasLive && (
-            <span className="ms-1" style={{ color: '#ffd166' }} title="לא התקבל מחיר חי — מוצג מחיר העלות">
+            <span className="ms-1" style={{ color: 'var(--gold)' }} title="לא התקבל מחיר חי — מוצג מחיר העלות">
               ⚠️
             </span>
           )}
@@ -213,12 +213,12 @@ function HoldingCard({ h, onTrade }: { h: Holding; onTrade: (ticker: string, mod
         <div className="flex gap-2">
           <button onClick={() => onTrade(h.ticker, 'buy')}
             className="text-xs font-bold px-3 py-1 rounded-lg"
-            style={{ background: 'rgba(0,229,176,0.1)', color: '#00e5b0', border: '1px solid rgba(0,229,176,0.2)' }}>
+            style={{ background: 'rgb(var(--rgb-accent) / 0.1)', color: 'var(--accent)', border: '1px solid rgb(var(--rgb-accent) / 0.2)' }}>
             {'קנה'}
           </button>
           <button onClick={() => onTrade(h.ticker, 'sell')}
             className="text-xs font-bold px-3 py-1 rounded-lg"
-            style={{ background: 'rgba(255,77,106,0.1)', color: '#ff4d6a', border: '1px solid rgba(255,77,106,0.2)' }}>
+            style={{ background: 'rgb(var(--rgb-red) / 0.1)', color: 'var(--red)', border: '1px solid rgb(var(--rgb-red) / 0.2)' }}>
             {'מכור'}
           </button>
         </div>
@@ -470,7 +470,7 @@ export function PortfolioPage() {
         <div className="text-5xl mb-4">💼</div>
         <h2 className="text-xl font-black text-tsua-text mb-2">{'תיק וירטואלי'}</h2>
         <p className="text-tsua-muted text-sm mb-6">{'התחבר כדי לנהל תיק השקעות וירטואלי'}</p>
-        <a href={`/${locale}/login`} className="px-6 py-2.5 rounded-xl text-tsua-bg font-black text-sm" style={{ background: 'linear-gradient(135deg,#00e5b0,#00c49a)' }}>
+        <a href={`/${locale}/login`} className="px-6 py-2.5 rounded-xl text-tsua-bg font-black text-sm" style={{ background: 'linear-gradient(135deg,var(--accent),var(--accent2))' }}>
           {'כניסה'}
         </a>
       </div>
@@ -481,7 +481,7 @@ export function PortfolioPage() {
     return (
       <div className="space-y-4">
         {[1,2,3].map(i => (
-          <div key={i} className="h-20 rounded-2xl animate-pulse" style={{ background: 'rgba(13,20,36,0.7)', border: '1px solid rgba(26,40,64,0.7)' }} />
+          <div key={i} className="h-20 rounded-2xl animate-pulse" style={{ background: 'rgb(var(--rgb-bg2) / 0.7)', border: '1px solid rgb(var(--rgb-border) / 0.7)' }} />
         ))}
       </div>
     );
@@ -492,14 +492,14 @@ export function PortfolioPage() {
   // for the next mount.
   if (loadError && holdings.length === 0) {
     return (
-      <div className="rounded-2xl p-8 text-center" style={{ background: 'rgba(13,20,36,0.7)', border: '1px solid rgba(26,40,64,0.7)' }}>
+      <div className="rounded-2xl p-8 text-center" style={{ background: 'rgb(var(--rgb-bg2) / 0.7)', border: '1px solid rgb(var(--rgb-border) / 0.7)' }}>
         <div className="text-3xl mb-2">📡</div>
         <h2 className="text-base font-bold text-tsua-text">לא ניתן לטעון את התיק</h2>
         <p className="text-sm text-tsua-muted mt-1">נסה לרענן בעוד מספר רגעים</p>
         <button
           onClick={() => { setLoading(true); fetchPortfolio(); }}
           className="mt-4 text-xs font-semibold px-4 py-2 rounded-lg text-tsua-text hover:text-tsua-accent transition-colors"
-          style={{ background: 'rgba(15,25,41,0.6)', border: '1px solid rgba(26,40,64,0.7)' }}
+          style={{ background: 'rgb(var(--rgb-card) / 0.6)', border: '1px solid rgb(var(--rgb-border) / 0.7)' }}
         >
           🔄 נסה שוב
         </button>
@@ -537,7 +537,7 @@ export function PortfolioPage() {
           <button
             onClick={() => setTradeModal({ ticker: holdings[0].ticker, mode: 'buy' })}
             className="text-sm font-bold px-4 py-2 rounded-xl text-tsua-bg"
-            style={{ background: 'linear-gradient(135deg, #00e5b0, #00c49a)' }}
+            style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent2))' }}
             title={`הוסף לפוזיציה הקיימת ב-${holdings[0].ticker}`}
           >
             + {'קנה עוד'}
@@ -546,7 +546,7 @@ export function PortfolioPage() {
           <a
             href={`/${locale}/markets`}
             className="text-sm font-bold px-4 py-2 rounded-xl text-tsua-bg"
-            style={{ background: 'linear-gradient(135deg, #00e5b0, #00c49a)' }}
+            style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent2))' }}
           >
             + {'מצא מניה לקניה'}
           </a>
@@ -556,9 +556,9 @@ export function PortfolioPage() {
       {/* Main value card */}
       <div
         className="rounded-2xl p-5 relative overflow-hidden"
-        style={{ background: 'rgba(15,25,41,0.8)', border: isPositive ? '1px solid rgba(0,229,176,0.2)' : '1px solid rgba(255,77,106,0.2)' }}
+        style={{ background: 'rgb(var(--rgb-card) / 0.8)', border: isPositive ? '1px solid rgb(var(--rgb-accent) / 0.2)' : '1px solid rgb(var(--rgb-red) / 0.2)' }}
       >
-        <div className="absolute inset-0" style={{ background: isPositive ? 'radial-gradient(ellipse at top right, rgba(0,229,176,0.05), transparent 60%)' : 'radial-gradient(ellipse at top right, rgba(255,77,106,0.05), transparent 60%)' }} />
+        <div className="absolute inset-0" style={{ background: isPositive ? 'radial-gradient(ellipse at top right, rgb(var(--rgb-accent) / 0.05), transparent 60%)' : 'radial-gradient(ellipse at top right, rgb(var(--rgb-red) / 0.05), transparent 60%)' }} />
         <div className="relative">
           <div className="text-xs text-tsua-muted mb-1 flex items-center gap-1.5">
             {'שווי תיק כולל'}
@@ -580,7 +580,7 @@ export function PortfolioPage() {
             {fxMissing && (
               <span
                 className="text-[10px]"
-                style={{ color: '#ffd166' }}
+                style={{ color: 'var(--gold)' }}
                 title="לא הצלחנו למשוך שער USD/ILS — הסיכום מציג רק את חלק השקלי"
               >
                 ⚠️ שער USD לא זמין
@@ -603,10 +603,10 @@ export function PortfolioPage() {
           )}
           {/* Total P&L vs ₪100,000 starting capital */}
           <div className="flex items-center gap-3 mt-1">
-            <span className="text-lg font-bold" style={{ color: isPositive ? '#00e5b0' : '#ff4d6a' }} dir="ltr">
+            <span className="text-lg font-bold" style={{ color: isPositive ? 'var(--accent)' : 'var(--red)' }} dir="ltr">
               {isPositive ? '+' : ''}₪{totalReturn.toLocaleString(undefined, { maximumFractionDigits: 0 })}
             </span>
-            <span className="text-sm font-bold px-2 py-0.5 rounded-full" style={isPositive ? { background: 'rgba(0,229,176,0.12)', color: '#00e5b0' } : { background: 'rgba(255,77,106,0.12)', color: '#ff4d6a' }}>
+            <span className="text-sm font-bold px-2 py-0.5 rounded-full" style={isPositive ? { background: 'rgb(var(--rgb-accent) / 0.12)', color: 'var(--accent)' } : { background: 'rgb(var(--rgb-red) / 0.12)', color: 'var(--red)' }}>
               {isPositive ? '+' : ''}{totalReturnPct.toFixed(2)}%
             </span>
             <span className="text-xs text-tsua-muted">{'מתוך ₪100,000'}</span>
@@ -615,7 +615,7 @@ export function PortfolioPage() {
           {holdings.length > 0 && (
             <div className="flex items-center gap-2 mt-1">
               <span className="text-xs text-tsua-muted">{'היום:'}</span>
-              <span className="text-xs font-bold" style={{ color: todayChange >= 0 ? '#00e5b0' : '#ff4d6a' }} dir="ltr">
+              <span className="text-xs font-bold" style={{ color: todayChange >= 0 ? 'var(--accent)' : 'var(--red)' }} dir="ltr">
                 {todayChange >= 0 ? '+' : ''}₪{todayChange.toLocaleString(undefined, { maximumFractionDigits: 0 })}
               </span>
             </div>
@@ -623,11 +623,11 @@ export function PortfolioPage() {
         </div>
 
         {/* Sub stats */}
-        <div className="grid grid-cols-3 gap-3 mt-4 pt-4" style={{ borderTop: '1px solid rgba(26,40,64,0.6)' }}>
+        <div className="grid grid-cols-3 gap-3 mt-4 pt-4" style={{ borderTop: '1px solid rgb(var(--rgb-border) / 0.6)' }}>
           {[
-            { label: 'מזומן', value: `₪${Math.max(0, cash).toLocaleString(undefined, { maximumFractionDigits: 0 })}`, color: '#00e5b0' },
-            { label: 'מושקע', value: `₪${investedValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, color: '#3b82f6' },
-            { label: 'מניות', value: holdings.length.toString(), color: '#f5b942' },
+            { label: 'מזומן', value: `₪${Math.max(0, cash).toLocaleString(undefined, { maximumFractionDigits: 0 })}`, color: 'var(--accent)' },
+            { label: 'מושקע', value: `₪${investedValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, color: 'var(--blue)' },
+            { label: 'מניות', value: holdings.length.toString(), color: 'var(--gold)' },
           ].map(s => (
             <div key={s.label} className="text-center">
               <div className="text-sm font-black" style={{ color: s.color }}>{s.value}</div>
@@ -638,11 +638,11 @@ export function PortfolioPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 p-1 rounded-xl" style={{ background: 'rgba(15,25,41,0.6)', border: '1px solid rgba(26,40,64,0.8)' }}>
+      <div className="flex gap-1 p-1 rounded-xl" style={{ background: 'rgb(var(--rgb-card) / 0.6)', border: '1px solid rgb(var(--rgb-border) / 0.8)' }}>
         {([['holdings', '📊 אחזקות'], ['history', '📋 היסטוריה'], ['leaderboard', '🏆 דירוג']] as ['holdings'|'history'|'leaderboard', string][]).map(([t, label]) => (
           <button key={t} onClick={() => setTab(t)}
             className="flex-1 text-xs font-semibold py-2 rounded-lg transition-all"
-            style={tab === t ? { background: 'linear-gradient(135deg, #00e5b0, #00c49a)', color: '#080d1a' } : { color: '#5a7090' }}>
+            style={tab === t ? { background: 'linear-gradient(135deg, var(--accent), var(--accent2))', color: '#080d1a' } : { color: 'var(--muted)' }}>
             {label}
           </button>
         ))}
@@ -665,14 +665,14 @@ export function PortfolioPage() {
       {tab === 'history' && (
         <div className="space-y-2">
           {transactions.map(tx => (
-            <div key={tx.id} className="flex items-center gap-3 p-3 rounded-2xl" style={{ background: 'rgba(15,25,41,0.7)', border: '1px solid rgba(26,40,64,0.8)' }}>
+            <div key={tx.id} className="flex items-center gap-3 p-3 rounded-2xl" style={{ background: 'rgb(var(--rgb-card) / 0.7)', border: '1px solid rgb(var(--rgb-border) / 0.8)' }}>
               <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black shrink-0"
-                style={tx.type === 'buy' ? { background: 'rgba(0,229,176,0.15)', color: '#00e5b0' } : { background: 'rgba(255,77,106,0.15)', color: '#ff4d6a' }}>
+                style={tx.type === 'buy' ? { background: 'rgb(var(--rgb-accent) / 0.15)', color: 'var(--accent)' } : { background: 'rgb(var(--rgb-red) / 0.15)', color: 'var(--red)' }}>
                 {tx.type === 'buy' ? '▲' : '▼'}
               </div>
               <div className="flex-1">
                 <div className="text-sm font-bold text-tsua-text">
-                  {tx.type === 'buy' ? 'קנה' : 'מכור'} <span style={{ color: '#00e5b0' }}>${tx.ticker}</span>
+                  {tx.type === 'buy' ? 'קנה' : 'מכור'} <span style={{ color: 'var(--accent)' }}>${tx.ticker}</span>
                 </div>
                 <div className="text-xs text-tsua-muted">{tx.executed_at?.slice(0,10)} · {tx.shares} {'מניות'}</div>
               </div>
@@ -693,13 +693,13 @@ export function PortfolioPage() {
           {PORTFOLIO_LEADERS.map(leader => (
             <div key={leader.rank}
               className="flex items-center gap-3 p-3 rounded-2xl"
-              style={{ background: (leader as any).isMe ? 'rgba(0,229,176,0.06)' : 'rgba(15,25,41,0.7)', border: (leader as any).isMe ? '1px solid rgba(0,229,176,0.2)' : '1px solid rgba(26,40,64,0.8)' }}>
+              style={{ background: (leader as any).isMe ? 'rgb(var(--rgb-accent) / 0.06)' : 'rgb(var(--rgb-card) / 0.7)', border: (leader as any).isMe ? '1px solid rgb(var(--rgb-accent) / 0.2)' : '1px solid rgb(var(--rgb-border) / 0.8)' }}>
               <div className="w-7 text-center text-sm font-bold shrink-0">
                 {leader.rank === 1 ? '🥇' : leader.rank === 2 ? '🥈' : leader.rank === 3 ? '🥉' : `#${leader.rank}`}
               </div>
               <div
                 className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-tsua-bg text-sm shrink-0"
-                style={{ background: 'linear-gradient(135deg, #00e5b0, #3b82f6)' }}>
+                style={{ background: 'linear-gradient(135deg, var(--accent), var(--blue))' }}>
                 {leader.displayName.charAt(0)}
               </div>
               <div className="flex-1">
@@ -707,7 +707,7 @@ export function PortfolioPage() {
                 <div className="text-xs text-tsua-muted">₪{leader.portfolioValue.toLocaleString()}</div>
               </div>
               <div className="text-right">
-                <div className="text-base font-black" style={{ color: '#00e5b0' }}>+{leader.returnPct}%</div>
+                <div className="text-base font-black" style={{ color: 'var(--accent)' }}>+{leader.returnPct}%</div>
               </div>
             </div>
           ))}
