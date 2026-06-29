@@ -29,15 +29,15 @@ export function TermsConsent() {
     >
       <div
         className="w-full max-w-md rounded-2xl overflow-hidden"
-        style={{ background: 'rgba(10,16,30,0.99)', border: '1px solid rgba(26,40,64,0.8)', boxShadow: '0 24px 64px rgba(0,0,0,0.8)' }}
+        style={{ background: 'rgb(var(--rgb-card) / 0.99)', border: '1px solid rgb(var(--rgb-border) / 0.8)', boxShadow: '0 24px 64px rgba(0,0,0,0.5)' }}
         dir="rtl"
       >
         {/* Header */}
         <div className="px-6 py-5 flex items-center gap-3"
-          style={{ borderBottom: '1px solid rgba(26,40,64,0.6)', background: 'rgba(0,229,176,0.04)' }}>
+          style={{ borderBottom: '1px solid rgb(var(--rgb-border) / 0.6)', background: 'rgb(var(--rgb-accent) / 0.04)' }}>
           <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-            style={{ background: 'rgba(0,229,176,0.12)', border: '1px solid rgba(0,229,176,0.25)' }}>
-            <ShieldCheckIcon className="w-5 h-5" style={{ color: '#00e5b0' }} />
+            style={{ background: 'rgb(var(--rgb-accent) / 0.12)', border: '1px solid rgb(var(--rgb-accent) / 0.25)' }}>
+            <ShieldCheckIcon className="w-5 h-5" style={{ color: 'var(--accent)' }} />
           </div>
           <div>
             <h2 className="text-base font-black text-tsua-text">ברוכים הבאים לתשואה 👋</h2>
@@ -64,22 +64,22 @@ export function TermsConsent() {
             <div className="relative shrink-0 mt-0.5" onClick={() => setChecked(v => !v)}>
               <div className="w-5 h-5 rounded-md flex items-center justify-center transition-all duration-200"
                 style={{
-                  background: checked ? '#00e5b0' : 'rgba(15,25,41,0.8)',
-                  border: checked ? '1px solid #00e5b0' : '1px solid rgba(26,40,64,0.8)',
-                  boxShadow: checked ? '0 0 10px rgba(0,229,176,0.3)' : 'none',
+                  background: checked ? 'var(--accent)' : 'rgb(var(--rgb-card) / 0.8)',
+                  border: checked ? '1px solid var(--accent)' : '1px solid rgb(var(--rgb-border) / 0.8)',
+                  boxShadow: checked ? '0 0 10px rgb(var(--rgb-accent) / 0.3)' : 'none',
                 }}>
                 {checked && (
                   <svg className="w-3 h-3" viewBox="0 0 12 12" fill="none">
-                    <path d="M2 6l3 3 5-5" stroke="#060b16" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M2 6l3 3 5-5" stroke="var(--accent-contrast)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 )}
               </div>
             </div>
             <span className="text-xs text-tsua-muted leading-relaxed select-none">
               קראתי והסכמתי ל
-              <Link href="/terms" target="_blank" className="font-semibold mx-1 hover:underline" style={{ color: '#00e5b0' }}>תנאי השימוש</Link>
+              <Link href="/terms" target="_blank" className="font-semibold mx-1 hover:underline" style={{ color: 'var(--accent)' }}>תנאי השימוש</Link>
               ול
-              <Link href="/privacy" target="_blank" className="font-semibold mx-1 hover:underline" style={{ color: '#00e5b0' }}>מדיניות הפרטיות</Link>
+              <Link href="/privacy" target="_blank" className="font-semibold mx-1 hover:underline" style={{ color: 'var(--accent)' }}>מדיניות הפרטיות</Link>
               , ומבין שהתוכן אינו ייעוץ השקעות.
             </span>
           </label>
@@ -90,10 +90,11 @@ export function TermsConsent() {
           <button
             onClick={accept}
             disabled={!checked}
-            className="w-full py-3 rounded-xl text-sm font-black text-tsua-bg transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.98]"
+            className="w-full py-3 rounded-xl text-sm font-black transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.98]"
             style={{
-              background: checked ? 'linear-gradient(135deg, #00e5b0, #00c49a)' : 'rgba(26,40,64,0.6)',
-              boxShadow: checked ? '0 4px 20px rgba(0,229,176,0.3)' : 'none',
+              background: checked ? 'linear-gradient(135deg, var(--accent), var(--accent2))' : 'rgb(var(--rgb-border) / 0.6)',
+              color: 'var(--accent-contrast)',
+              boxShadow: checked ? '0 4px 20px rgb(var(--rgb-accent) / 0.3)' : 'none',
             }}
           >
             כניסה לאתר →

@@ -12,8 +12,23 @@ PER-FILE DEFINITION OF DONE (check all before ticking a file):
   ( ) toggled theme live in browser — readable + correct in light & dark
   ( ) removed now-dead [style*="..."] hacks for this file from globals.css
 
-STATUS: not started. Comprehensive plan finalized 2026-06-29.
+STATUS: IN PROGRESS. Comprehensive plan finalized 2026-06-29.
         (supersedes the earlier 613/65 draft)
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║ CHECKPOINT 1 — DONE & DEPLOYED (commit b2da195, pushed to master)      ║
+║ ROOT CAUSE FOUND via live app: a hydration mismatch in ThemeToggle     ║
+║ made React discard the SSR document and WIPE data-theme off <html>,    ║
+║ reverting the app to dark on every load. This — not the hardcoded      ║
+║ colors — was the main reason the theme "didn't respond well."          ║
+║   Fix: ThemeContext stable init + mount-effect sync;                   ║
+║        layout.tsx <html suppressHydrationWarning>.                     ║
+║   Verified in-browser: data-theme persists, toggle works, 0 errors.    ║
+╚═══════════════════════════════════════════════════════════════════════╝
+NOTE: Many components ALREADY theme correctly via existing globals.css
+overrides (verified: home page chrome + cards render light fine). So the
+remaining work targets the genuinely-uncovered components (e.g. modals)
+rather than blindly rewriting everything. Prioritize by visible breakage.
 
 ─── TIER 1 — GLOBAL CHROME ────────────────────────────────────────────
  [ ] MobileNavDrawer.tsx
@@ -81,7 +96,11 @@ STATUS: not started. Comprehensive plan finalized 2026-06-29.
  [ ] ResetPasswordPage.tsx
  [ ] ReferralsCard.tsx
  [ ] ForgotPasswordPage.tsx
- [ ] TermsConsent.tsx
+ [x] TermsConsent.tsx  — 2026-06-29, checkpoint 2. Verified both themes
+        via computed styles (light card rgba(255,254,249); dark rgba(15,25,41)).
+        Kept black scrim + drop shadow (intentional in both themes). Used
+        --accent-contrast for checkmark + button text. Gates the whole app,
+        so this was the most visible breakage.
  [ ] InfoTooltip.tsx
  [ ] PWAInstallPrompt.tsx
  [ ] error.tsx
