@@ -38,6 +38,7 @@
   --hot-tint:        rgba(245,130,32,0.15);
   --hot-border:      rgba(245,130,32,0.25);
   --value:           #c8d8f0;
+  --post-text:       #c0d4ee;
 
   /* RGB triplets — Tailwind utility palette */
   --rgb-bg:      6 11 22;
@@ -83,6 +84,7 @@
   --hot-tint:        rgba(200,97,0,0.10);
   --hot-border:      rgba(200,97,0,0.22);
   --value:           #1a2332;
+  --post-text:       #0c1520;
 
   /* RGB triplets — Tailwind utility palette */
   --rgb-bg:      242 237 228;

@@ -510,7 +510,7 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
               dir="auto"
               className="break-words whitespace-pre-wrap"
               style={{
-                color: '#c0d4ee',
+                color: 'var(--post-text)',
                 fontSize: '14.5px',
                 lineHeight: '1.7',
                 fontWeight: 400,
