@@ -39,8 +39,8 @@ function formatRevenue(n: number | null): string {
 
 function hourLabel(h: EarningEntry['hour']): { text: string; icon: string; color: string } {
   switch (h) {
-    case 'bmo': return { text: 'לפני פתיחה', icon: '🌅', color: '#ffa94d' };
-    case 'amc': return { text: 'אחרי סגירה', icon: '🌙', color: '#8b8cf7' };
+    case 'bmo': return { text: 'לפני פתיחה', icon: '🌅', color: 'var(--hot)' };
+    case 'amc': return { text: 'אחרי סגירה', icon: '🌙', color: 'var(--violet)' };
     case 'dmh': return { text: 'במהלך מסחר', icon: '☀️', color: 'var(--accent)' };
     default:    return { text: 'שעה לא ידועה', icon: '⏱', color: 'var(--muted)' };
   }
@@ -66,7 +66,7 @@ function beatBadge(actual: number | null, estimate: number | null): { label: str
   const diffPct = ((actual - estimate) / Math.abs(estimate)) * 100;
   if (diffPct > 2)  return { label: `✓ ${diffPct.toFixed(1)}%`, color: 'var(--accent)' };
   if (diffPct < -2) return { label: `✗ ${diffPct.toFixed(1)}%`, color: 'var(--red)' };
-  return { label: `= ${diffPct.toFixed(1)}%`, color: '#ffa94d' };
+  return { label: `= ${diffPct.toFixed(1)}%`, color: 'var(--hot)' };
 }
 
 function groupByDate(entries: EarningEntry[]): Record<string, EarningEntry[]> {

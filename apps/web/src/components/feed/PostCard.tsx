@@ -576,12 +576,12 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
               >
                 <ChatBubbleOvalLeftIcon
                   className="w-[17px] h-[17px] transition-colors group-hover/reply:text-blue-400"
-                  style={{ color: showReplies ? '#60a5fa' : 'rgb(var(--rgb-muted) / 0.7)' }}
+                  style={{ color: showReplies ? 'var(--blue)' : 'rgb(var(--rgb-muted) / 0.7)' }}
                 />
                 {replyCount > 0 && (
                   <span
                     className="text-[11px] font-bold font-mono tabular-nums transition-colors group-hover/reply:text-blue-400"
-                    style={{ color: showReplies ? '#60a5fa' : 'rgb(var(--rgb-muted) / 0.7)' }}
+                    style={{ color: showReplies ? 'var(--blue)' : 'rgb(var(--rgb-muted) / 0.7)' }}
                   >
                     {replyCount}
                   </span>
@@ -696,7 +696,7 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
                         <button
                           onClick={() => { setShareOpen(false); setReportOpen(true); }}
                           className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-[12px] font-semibold transition-colors hover:bg-red-500/8"
-                          style={{ color: '#ff8c8c', borderTop: '2px solid rgb(var(--rgb-border) / 0.7)' }}
+                          style={{ color: 'var(--red)', borderTop: '2px solid rgb(var(--rgb-border) / 0.7)' }}
                         >
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                             <line x1="4" y1="22" x2="4" y2="15"/>

@@ -43,14 +43,14 @@ function IndicatorCard({ ind }: { ind: MacroIndicator }) {
     // Inflation above 3% is warning; above 5% is concern
     if (ind.value != null) {
       if (ind.value > 5) valueColor = 'var(--red)';
-      else if (ind.value > 3) valueColor = '#f58220';
+      else if (ind.value > 3) valueColor = 'var(--hot)';
       else if (ind.value >= 1) valueColor = 'var(--accent)';
-      else valueColor = '#f58220'; // deflation also concerning
+      else valueColor = 'var(--hot)'; // deflation also concerning
     }
   } else if (ind.key.endsWith('-unemp')) {
     if (ind.value != null) {
       if (ind.value > 6) valueColor = 'var(--red)';
-      else if (ind.value > 4.5) valueColor = '#f58220';
+      else if (ind.value > 4.5) valueColor = 'var(--hot)';
       else valueColor = 'var(--accent)';
     }
   }

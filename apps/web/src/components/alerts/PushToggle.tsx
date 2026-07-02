@@ -146,7 +146,7 @@ export function PushToggle() {
         style={{
           background: 'rgba(255,80,80,0.06)',
           border: '1px solid rgba(255,80,80,0.22)',
-          color: '#ffb0b0',
+          color: 'var(--red)',
         }}
       >
         <div

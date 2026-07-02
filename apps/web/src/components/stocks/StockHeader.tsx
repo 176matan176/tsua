@@ -295,7 +295,7 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
             </span>
             {/* Industry badge if available */}
             {data?.industry && (
-              <span className="hidden sm:inline text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: 'rgb(var(--rgb-blue) / 0.08)', color: '#60a5fa', border: '1px solid rgb(var(--rgb-blue) / 0.2)' }}>
+              <span className="hidden sm:inline text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: 'rgb(var(--rgb-blue) / 0.08)', color: 'var(--blue)', border: '1px solid rgb(var(--rgb-blue) / 0.2)' }}>
                 {data.industry}
               </span>
             )}
@@ -406,7 +406,7 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
 
             const xUp = (xChangePct ?? 0) >= 0;
             const label = isPre ? 'מסחר מוקדם' : 'מסחר מאוחר';
-            const labelColor = isPre ? 'var(--gold)' : '#a78bfa';
+            const labelColor = isPre ? 'var(--gold)' : 'var(--violet)';
             const timeStr = xTime
               ? new Date(xTime).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })
               : null;

@@ -105,7 +105,7 @@ export function renderPostBody(text: string, opts: RenderOptions): ReactNode {
           onClick={(e) => e.stopPropagation()}
           className="font-medium transition-colors"
           style={{
-            color: '#60a5fa',
+            color: 'var(--blue)',
             textDecoration: 'underline',
             textUnderlineOffset: '2px',
             textDecorationColor: 'rgba(96, 165, 250, 0.4)',

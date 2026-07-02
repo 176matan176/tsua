@@ -109,7 +109,7 @@ function HotRow({ stock }: { stock: StockScore }) {
         className="text-[9px] font-black px-1.5 py-0.5 rounded-lg shrink-0"
         style={{
           background: stock.hotScore >= 60 ? 'rgba(245,130,32,0.15)' : 'var(--surface2)',
-          color:      stock.hotScore >= 60 ? '#f58220'               : 'var(--muted)',
+          color:      stock.hotScore >= 60 ? 'var(--hot)'               : 'var(--muted)',
           border:    `1px solid ${stock.hotScore >= 60 ? 'rgba(245,130,32,0.25)' : 'var(--border)'}`,
         }}
       >

@@ -27,7 +27,7 @@ export default function EarningsPage() {
             className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full shrink-0 self-start"
             style={{
               background: 'rgba(139,140,247,0.12)',
-              color: '#8b8cf7',
+              color: 'var(--violet)',
               border: '1px solid rgba(139,140,247,0.3)',
             }}
           >
