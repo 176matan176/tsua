@@ -237,7 +237,7 @@ export function LiveStream({ topic, topicHe, topicEn }: LiveStreamProps) {
                   ? { background: 'rgb(var(--rgb-accent) / 0.15)', color: 'var(--accent)', border: '1px solid rgb(var(--rgb-accent) / 0.3)' }
                   : s === 'bearish'
                   ? { background: 'rgb(var(--rgb-red) / 0.15)', color: 'var(--red)', border: '1px solid rgb(var(--rgb-red) / 0.3)' }
-                  : { background: 'rgb(var(--rgb-muted) / 0.2)', color: '#8aaccf', border: '1px solid rgb(var(--rgb-muted) / 0.3)' }
+                  : { background: 'rgb(var(--rgb-muted) / 0.2)', color: 'var(--text2)', border: '1px solid rgb(var(--rgb-muted) / 0.3)' }
                 : { background: 'rgb(var(--rgb-card) / 0.6)', color: 'var(--muted)', border: '1px solid rgb(var(--rgb-border) / 0.6)' }
               }
             >
@@ -261,7 +261,7 @@ export function LiveStream({ topic, topicHe, topicEn }: LiveStreamProps) {
             style={{
               background: 'rgb(var(--rgb-bg) / 0.8)',
               border: inputFocused ? '1px solid rgb(var(--rgb-accent) / 0.35)' : '1px solid rgb(var(--rgb-border) / 0.7)',
-              color: '#d4e4ff',
+              color: 'var(--text)',
               boxShadow: inputFocused ? '0 0 0 3px rgb(var(--rgb-accent) / 0.06)' : 'none',
             }}
           />
@@ -325,7 +325,7 @@ function StreamPostCard({ post, onLike }: { post: StreamPost; onLike: () => void
         </div>
 
         {/* Body */}
-        <p className="text-xs leading-relaxed break-words" style={{ color: '#b0c4de' }} dir="auto">
+        <p className="text-xs leading-relaxed break-words" style={{ color: 'var(--text2)' }} dir="auto">
           {post.body}
         </p>
 

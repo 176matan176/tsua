@@ -282,8 +282,8 @@ export function AdminDashboard({ viewerEmail, locale }: { viewerEmail: string; l
                   <span
                     className="text-[9px] font-bold px-1.5 py-0.5 rounded-md"
                     style={{
-                      background: p.sentiment === 'bullish' ? 'rgb(var(--rgb-accent) / 0.15)' : p.sentiment === 'bearish' ? 'rgb(var(--rgb-red) / 0.15)' : 'rgba(154,177,204,0.15)',
-                      color: p.sentiment === 'bullish' ? 'var(--accent)' : p.sentiment === 'bearish' ? 'var(--red)' : '#9ab1cc',
+                      background: p.sentiment === 'bullish' ? 'rgb(var(--rgb-accent) / 0.15)' : p.sentiment === 'bearish' ? 'rgb(var(--rgb-red) / 0.15)' : 'rgb(var(--rgb-text2) / 0.15)',
+                      color: p.sentiment === 'bullish' ? 'var(--accent)' : p.sentiment === 'bearish' ? 'var(--red)' : 'var(--text2)',
                     }}
                   >
                     {p.sentiment === 'bullish' ? 'שורי' : p.sentiment === 'bearish' ? 'דובי' : 'נייטרלי'}

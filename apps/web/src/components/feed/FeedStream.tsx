@@ -603,7 +603,7 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
                 { keys: ['?'], desc: 'הצג עזרה זו' },
               ].map(row => (
                 <div key={row.desc} className="flex items-center justify-between">
-                  <span className="text-[12px]" style={{ color: '#a0b4cc' }}>{row.desc}</span>
+                  <span className="text-[12px]" style={{ color: 'var(--text2)' }}>{row.desc}</span>
                   <div className="flex gap-1">
                     {row.keys.map(k => (
                       <kbd
@@ -684,7 +684,7 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
               onClick={() => { setSentimentFilter('all'); setLangFilter('all'); }}
               className="ms-auto text-[11px] font-bold transition-colors"
               style={{ color: 'var(--muted)' }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#e5ecf5'}
+              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--text)'}
               onMouseLeave={(e) => e.currentTarget.style.color = 'var(--muted)'}
             >
               נקה ✕

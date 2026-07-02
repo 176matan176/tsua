@@ -51,7 +51,7 @@ function TrendingRow({ item }: { item: TrendingItem }) {
       <span
         className="text-xs font-black font-mono w-12 truncate transition-colors"
         style={{
-          color: price.flash ? (price.flash === 'up' ? 'var(--accent)' : 'var(--red)') : '#d4e4ff',
+          color: price.flash ? (price.flash === 'up' ? 'var(--accent)' : 'var(--red)') : 'var(--text)',
           textShadow: price.flash ? `0 0 8px ${price.flash === 'up' ? 'rgb(var(--rgb-accent) / 0.6)' : 'rgb(var(--rgb-red) / 0.6)'}` : 'none',
         }}
       >
@@ -148,7 +148,7 @@ export function TrendingWidget() {
               className="px-1.5 py-0.5 text-[9px] font-bold transition-colors"
               style={{
                 background: windowKey === w ? 'rgb(var(--rgb-accent) / 0.18)' : 'transparent',
-                color: windowKey === w ? 'var(--accent)' : '#9ab1cc',
+                color: windowKey === w ? 'var(--accent)' : 'var(--text2)',
               }}
             >
               {w === '24h' ? '24ש\'' : '7ימ\''}

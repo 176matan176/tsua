@@ -65,7 +65,7 @@ function DiscussionRow({ row, rank }: { row: TrendingTicker; rank: number }) {
         )}
 
         {/* Mentions count */}
-        <span className="flex items-center gap-1 text-[10px] font-bold" style={{ color: '#7a8ca5' }}>
+        <span className="flex items-center gap-1 text-[10px] font-bold" style={{ color: 'var(--muted)' }}>
           <ChatBubbleLeftRightIcon className="w-3 h-3" />
           {row.mentions}
         </span>

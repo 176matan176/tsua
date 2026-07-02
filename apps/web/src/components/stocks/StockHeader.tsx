@@ -326,7 +326,7 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
             <p
               className="mt-2 text-[13px] leading-relaxed max-w-3xl"
               style={{
-                color: 'var(--muted, #9ab1cc)',
+                color: 'var(--muted, var(--text2))',
                 fontWeight: 500,
               }}
             >

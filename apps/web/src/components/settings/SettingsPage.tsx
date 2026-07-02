@@ -270,7 +270,7 @@ export function SettingsPage() {
                 style={{
                   background: 'rgb(var(--rgb-bg) / 0.6)',
                   border: '1px solid rgb(var(--rgb-border) / 0.8)',
-                  color: '#d4e4ff',
+                  color: 'var(--text)',
                 }}
                 dir="ltr"
               />
@@ -299,7 +299,7 @@ export function SettingsPage() {
               style={{
                 background: 'rgb(var(--rgb-bg) / 0.6)',
                 border: confirmPw && confirmPw !== newPw ? '1px solid rgb(var(--rgb-red) / 0.5)' : '1px solid rgb(var(--rgb-border) / 0.8)',
-                color: '#d4e4ff',
+                color: 'var(--text)',
               }}
               dir="ltr"
             />
@@ -448,7 +448,7 @@ export function SettingsPage() {
               placeholder={email}
               dir="ltr"
               className="w-full text-sm rounded-xl px-3 py-2 mb-3 focus:outline-none"
-              style={{ background: 'rgb(var(--rgb-bg) / 0.6)', border: '1px solid rgb(var(--rgb-red) / 0.2)', color: '#d4e4ff' }}
+              style={{ background: 'rgb(var(--rgb-bg) / 0.6)', border: '1px solid rgb(var(--rgb-red) / 0.2)', color: 'var(--text)' }}
             />
             <button
               disabled={deleteConfirm !== email || deleteLoading}

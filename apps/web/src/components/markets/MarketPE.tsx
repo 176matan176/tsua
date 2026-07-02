@@ -130,7 +130,7 @@ export function MarketPE() {
                   {r.source === 'estimate' && r.pe !== null && (
                     <span
                       className="text-[9px] font-bold px-1.5 py-0.5 rounded"
-                      style={{ background: 'rgba(200,216,240,0.12)', color: '#8a9bb3' }}
+                      style={{ background: 'rgba(200,216,240,0.12)', color: 'var(--text2)' }}
                       title="הנתון לא זמין דרך ה-API — מוצג ערך מקורב מעודכן רבעונית"
                     >
                       מקורב

@@ -201,7 +201,7 @@ export function Sidebar() {
           <div className="min-w-0 flex-1">
             <div
               className="text-[13px] font-bold truncate"
-              style={{ color: '#ddeeff', letterSpacing: '-0.01em' }}
+              style={{ color: 'var(--text)', letterSpacing: '-0.01em' }}
             >
               {displayName}
             </div>

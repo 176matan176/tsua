@@ -241,7 +241,7 @@ export function NewsPage() {
                 padding: '7px 14px',
                 borderRadius: '999px',
                 background: active ? 'var(--accent)' : 'rgb(var(--rgb-card) / 0.6)',
-                color: active ? '#080d1a' : '#9ab1cc',
+                color: active ? '#080d1a' : 'var(--text2)',
                 border: active ? '1px solid transparent' : '1px solid rgb(var(--rgb-border) / 0.7)',
               }}
             >
@@ -417,7 +417,7 @@ function NewsCard({ article }: { article: NewsArticle }) {
           </span>
           <span
             className="text-[10px] flex items-center gap-1"
-            style={{ color: isStale ? 'var(--gold)' : 'rgba(154,177,204,0.7)' }}
+            style={{ color: isStale ? 'var(--gold)' : 'rgb(var(--rgb-text2) / 0.7)' }}
             title={isStale ? `הכתבה מ-${article.publishedAt.toLocaleString('he-IL')}` : undefined}
           >
             {isStale && <span>⚠️</span>}

@@ -58,7 +58,7 @@ function StockPill({ ticker, exchange }: { ticker: string; exchange: string }) {
             className="px-2 py-1.5 flex items-center gap-1.5"
             style={{ background: 'rgb(var(--rgb-bg2) / 0.95)' }}
           >
-            <span className="text-[11px] font-bold font-mono tabular-nums" style={{ color: '#a0b4cc' }}>
+            <span className="text-[11px] font-bold font-mono tabular-nums" style={{ color: 'var(--text2)' }}>
               {live.price >= 1000 ? live.price.toLocaleString('en', { maximumFractionDigits: 0 }) : live.price.toFixed(2)}
             </span>
             <span
@@ -447,7 +447,7 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
                 <Link
                   href={`/${locale}/profile/${post.author.username}`}
                   className="text-[15px] font-black transition-colors hover:text-tsua-green"
-                  style={{ color: '#ddeeff', letterSpacing: '-0.01em' }}
+                  style={{ color: 'var(--text)', letterSpacing: '-0.01em' }}
                 >
                   {post.author.displayName ?? post.author.username}
                 </Link>
@@ -497,7 +497,7 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
                 href={`/${locale}/posts/${post.id}`}
                 className="text-[11px] font-mono transition-colors hover:underline"
                 style={{ color: 'rgb(var(--rgb-muted) / 0.7)' }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#a0b4cc')}
+                onMouseEnter={e => (e.currentTarget.style.color = 'var(--text2)')}
                 onMouseLeave={e => (e.currentTarget.style.color = 'rgb(var(--rgb-muted) / 0.7)')}
                 onClick={e => e.stopPropagation()}
               >
@@ -676,7 +676,7 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
                           className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-[12px] font-semibold transition-colors hover:bg-white/5"
                           style={{ color: 'var(--text)', borderTop: '1px solid rgb(var(--rgb-border) / 0.5)' }}
                         >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a0b4cc" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                             <circle cx="18" cy="5" r="3"/>
                             <circle cx="6" cy="12" r="3"/>
                             <circle cx="18" cy="19" r="3"/>

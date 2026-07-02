@@ -109,7 +109,7 @@ export function InfoTooltip({ term, text, size = 14, placement = 'top' }: InfoTo
               {term!.example && (
                 <div
                   className="mt-2 pt-2 text-[10px] leading-snug"
-                  style={{ borderTop: '1px solid rgb(var(--rgb-accent) / 0.15)', color: '#8aa0c0' }}
+                  style={{ borderTop: '1px solid rgb(var(--rgb-accent) / 0.15)', color: 'var(--text2)' }}
                 >
                   <span className="font-bold" style={{ color: 'var(--accent)' }}>דוגמה: </span>
                   {term!.example}
