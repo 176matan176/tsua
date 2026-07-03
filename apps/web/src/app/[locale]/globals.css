@@ -697,12 +697,15 @@ main { animation: fade-in 0.3s ease-out; }
 
 @keyframes marketScroll {
   0%   { transform: translateX(0); }
-  100% { transform: translateX(-33.333%); }
+  100% { transform: translateX(-50%); }
 }
 .market-scroll {
   display: flex;
   width: max-content;
-  animation: marketScroll 45s linear infinite;
+  /* -50% of (group×2) = exactly one group per cycle. 180s keeps the same
+     ~20px/s speed the old 45s/-33.33% version had. */
+  animation: marketScroll 180s linear infinite;
+  will-change: transform;
 }
 .market-bar-wrap:hover .market-scroll {
   animation-play-state: paused;

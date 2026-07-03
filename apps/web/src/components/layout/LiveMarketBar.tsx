@@ -66,8 +66,14 @@ const Divider = () => (
 );
 
 export function LiveMarketBar() {
-  // Triple the items so the seam is never visible even on ultra-wide screens
-  const items = [...INDICES, ...INDICES, ...INDICES];
+  // Seamless infinite marquee: build one GROUP that is wider than any
+  // realistic viewport (4×6 indices ≈ 3,600px), then render it exactly
+  // TWICE and animate translateX(-50%). When the animation wraps, copy 2
+  // sits pixel-identical to where copy 1 started — no gap, no jump.
+  // (The old ×3 + -33.33% version left a blank gap on screens wider than
+  // ~1,800px because one group was narrower than the viewport.)
+  const GROUP = [...INDICES, ...INDICES, ...INDICES, ...INDICES];
+  const items = [...GROUP, ...GROUP];
 
   return (
     <div
