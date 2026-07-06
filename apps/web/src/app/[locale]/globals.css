@@ -707,8 +707,12 @@ main { animation: fade-in 0.3s ease-out; }
   animation: marketScroll 180s linear infinite;
   will-change: transform;
 }
-.market-bar-wrap:hover .market-scroll {
-  animation-play-state: paused;
+/* Pause-on-hover is desktop-only: on touch devices :hover sticks after a
+   tap, freezing the marquee permanently ("the banner stopped"). */
+@media (hover: hover) and (pointer: fine) {
+  .market-bar-wrap:hover .market-scroll {
+    animation-play-state: paused;
+  }
 }
 
 /* ─── Fresh Post Slide-In ──────────────────────────────────────────────
