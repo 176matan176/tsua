@@ -702,6 +702,12 @@ main { animation: fade-in 0.3s ease-out; }
 .market-scroll {
   display: flex;
   width: max-content;
+  /* Anchor the strip to the LEFT even on RTL pages. Without this, the
+     over-wide block anchors to the RIGHT in dir=rtl, so translateX(-50%)
+     scrolls the content away into blank space for most of the cycle
+     ("the reports end and nothing comes back"). The overflow:hidden
+     wrapper is a BFC, so it still contains the float (height intact). */
+  float: left;
   /* -50% of (group×2) = exactly one group per cycle. 180s keeps the same
      ~20px/s speed the old 45s/-33.33% version had. */
   animation: marketScroll 180s linear infinite;
