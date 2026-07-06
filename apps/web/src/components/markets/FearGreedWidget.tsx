@@ -22,9 +22,9 @@ const LABELS: Record<string, string> = {
 
 function getColor(v: number) {
   if (v <= 25) return 'var(--red)';
-  if (v <= 45) return '#ff8c42';
+  if (v <= 45) return 'var(--fear)';
   if (v <= 55) return 'var(--gold)';
-  if (v <= 75) return '#06d6a0';
+  if (v <= 75) return 'var(--greed)';
   return 'var(--accent)';
 }
 
@@ -174,7 +174,7 @@ export function FearGreedWidget() {
                     RIGHT  = start of reading = פחד קיצוני (red)
                     LEFT   = end of reading   = חמדנות קיצונית (green) */}
               <div className="relative w-full h-2.5 rounded-full overflow-hidden mt-2"
-                style={{ background: 'linear-gradient(to left, var(--red), #ff8c42, var(--gold), #06d6a0, var(--accent))' }}>
+                style={{ background: 'linear-gradient(to left, var(--red), var(--fear), var(--gold), var(--greed), var(--accent))' }}>
                 <div
                   className="absolute top-1/2 w-3 h-3 rounded-full border-2 border-white"
                   style={{

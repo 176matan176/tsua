@@ -74,7 +74,7 @@ function classifySource(source: string | null): SourceMeta {
     return { key: 'investing', nameHe: 'Investing.com', color: '#0066b2' };
   }
   if (s.includes('bitcoin') || s.includes('ביטקוין')) {
-    return { key: 'bitcoin', nameHe: source ?? 'קריפטו', color: '#f7931a' };
+    return { key: 'bitcoin', nameHe: source ?? 'קריפטו', color: 'var(--btc)' };
   }
   // Long-tail: keep the original name, neutral color.
   return { key: 'other', nameHe: source ?? 'מקור לא ידוע', color: 'var(--muted)' };

@@ -21,14 +21,14 @@ export default function CryptoPage() {
             style={{ background: 'rgba(247,147,26,0.08)', border: '1px solid rgba(247,147,26,0.25)' }}
           >
             <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#f7931a' }} />
-            <span className="text-xs font-bold" style={{ color: '#f7931a' }}>24/7 LIVE</span>
+            <span className="text-xs font-bold" style={{ color: 'var(--btc)' }}>24/7 LIVE</span>
           </div>
         </div>
 
         <div className="mt-4 p-3 rounded-xl text-[11px] leading-relaxed"
           style={{ background: 'rgba(247,147,26,0.05)', border: '1px solid rgba(247,147,26,0.15)', color: 'var(--text2)' }}
         >
-          <span className="font-bold" style={{ color: '#f7931a' }}>⚠️ חשוב:</span>{' '}
+          <span className="font-bold" style={{ color: 'var(--btc)' }}>⚠️ חשוב:</span>{' '}
           קריפטו הוא נכס תנודתי במיוחד. מחירים יכולים לנוע ב-10%+ ביום. הנתונים כאן הם למטרת מידע בלבד —
           אינם מהווים ייעוץ השקעות.
         </div>

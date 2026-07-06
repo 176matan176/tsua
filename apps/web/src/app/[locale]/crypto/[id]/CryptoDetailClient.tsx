@@ -136,7 +136,7 @@ export function CryptoDetailClient({ coinId }: { coinId: string }) {
                 </span>
                 {data.marketCapRank && (
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                    style={{ background: 'rgba(247,147,26,0.1)', color: '#f7931a', border: '1px solid rgba(247,147,26,0.25)' }}
+                    style={{ background: 'rgba(247,147,26,0.1)', color: 'var(--btc)', border: '1px solid rgba(247,147,26,0.25)' }}
                   >
                     #{data.marketCapRank}
                   </span>

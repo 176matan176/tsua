@@ -39,6 +39,10 @@
   --hot-border:      rgba(245,130,32,0.25);
   --value:           #c8d8f0;
   --post-text:       #c0d4ee;
+  /* Semantic data colors that need a darker light-mode variant */
+  --fear:            #ff8c42;
+  --greed:           #06d6a0;
+  --btc:             #f7931a;
   --violet:          #a78bfa;
 
   /* RGB triplets — Tailwind utility palette */
@@ -86,6 +90,10 @@
   --hot-border:      rgba(200,97,0,0.22);
   --value:           #1a2332;
   --post-text:       #0c1520;
+  /* Semantic data colors that need a darker light-mode variant */
+  --fear:            #b45309;
+  --greed:           #047857;
+  --btc:             #b45309;
   --violet:          #6d28d9;
 
   /* RGB triplets — Tailwind utility palette */

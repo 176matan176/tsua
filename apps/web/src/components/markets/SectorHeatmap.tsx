@@ -30,24 +30,27 @@ interface SectorHeatmapProps {
  * dark-red ↔ gray ↔ dark-green gradient. Intensity saturates at ±3%.
  */
 function heatColor(pct: number | null): { bg: string; border: string; text: string } {
-  if (pct == null) return { bg: 'rgba(26,40,64,0.4)', border: 'rgba(26,40,64,0.7)', text: '#5a7090' };
+  // Theme-aware via CSS variables: in dark mode the --rgb-* triplets equal
+  // the old literals exactly; in light mode the tokens resolve to the darker
+  // readable palette (neon #00e5b0 text on cream was contrast ratio 1.3).
+  if (pct == null) return { bg: 'rgb(var(--rgb-border) / 0.4)', border: 'rgb(var(--rgb-border) / 0.7)', text: 'rgb(var(--rgb-muted))' };
   const clamped = Math.max(-3, Math.min(3, pct));
   const intensity = Math.abs(clamped) / 3; // 0 → 1
   if (clamped >= 0) {
     // Green
     const alpha = 0.1 + intensity * 0.35;
     return {
-      bg: `rgba(0,229,176,${alpha.toFixed(2)})`,
-      border: `rgba(0,229,176,${(0.2 + intensity * 0.4).toFixed(2)})`,
-      text: '#00e5b0',
+      bg: `rgb(var(--rgb-accent) / ${alpha.toFixed(2)})`,
+      border: `rgb(var(--rgb-accent) / ${(0.2 + intensity * 0.4).toFixed(2)})`,
+      text: 'var(--accent)',
     };
   }
   // Red
   const alpha = 0.1 + intensity * 0.35;
   return {
-    bg: `rgba(255,77,106,${alpha.toFixed(2)})`,
-    border: `rgba(255,77,106,${(0.2 + intensity * 0.4).toFixed(2)})`,
-    text: '#ff4d6a',
+    bg: `rgb(var(--rgb-red) / ${alpha.toFixed(2)})`,
+    border: `rgb(var(--rgb-red) / ${(0.2 + intensity * 0.4).toFixed(2)})`,
+    text: 'var(--red)',
   };
 }
 

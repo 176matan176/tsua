@@ -193,7 +193,9 @@ export function OwnershipPie({ ticker }: PieProps) {
                       />
                       <span className="text-xs text-tsua-text truncate">{s.label}</span>
                     </div>
-                    <span className="text-xs font-black font-mono tabular-nums" style={{ color: s.color }} dir="ltr">
+                    {/* Neutral text — the colored dot next to the label carries the
+                        slice color; mint/amber text was unreadable on light cards. */}
+                    <span className="text-xs font-black font-mono tabular-nums" style={{ color: 'var(--text)' }} dir="ltr">
                       {s.pct.toFixed(1)}%
                     </span>
                   </div>
