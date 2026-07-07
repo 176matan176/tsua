@@ -156,7 +156,10 @@ async function fetchGoogleNewsBatch(query: string): Promise<OutArticle[]> {
       // article's og:description after dedupe+slice (cheaper than 100+ fetches).
       const published = item.pubDate ? new Date(item.pubDate) : null;
       return {
-        id: `gnews-${idx}-${Buffer.from(item.link).toString('base64').slice(0, 10)}`,
+        // Key by the END of the base64 link — the first 10 chars encode
+        // "https://" and were identical for every article, producing
+        // duplicate React keys downstream. The tail varies per article.
+        id: `gnews-${idx}-${Buffer.from(item.link).toString('base64').slice(-16)}`,
         source: parsedSource,
         titleHe: title,
         titleEn: null,

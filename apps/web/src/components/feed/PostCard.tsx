@@ -500,6 +500,7 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
                 onMouseEnter={e => (e.currentTarget.style.color = 'var(--text2)')}
                 onMouseLeave={e => (e.currentTarget.style.color = 'rgb(var(--rgb-muted) / 0.7)')}
                 onClick={e => e.stopPropagation()}
+                suppressHydrationWarning
               >
                 {timeAgo}
               </Link>
@@ -554,6 +555,8 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
               {/* Like */}
               <button
                 onClick={toggleLike}
+                aria-label={liked ? 'הסר לייק' : 'לייק'}
+                aria-pressed={liked}
                 className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all duration-200 hover:bg-red-500/8 group/like"
               >
                 <span className={`transition-all duration-200 ${likeAnim ? 'scale-[1.3]' : 'scale-100'}`}>
@@ -572,6 +575,7 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
               {/* Reply */}
               <button
                 onClick={isReply ? undefined : (replyCount > 0 ? toggleRepliesPanel : handleReplyClick)}
+                aria-label="תגובות"
                 className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all duration-200 hover:bg-blue-500/8 group/reply"
               >
                 <ChatBubbleOvalLeftIcon
@@ -592,6 +596,8 @@ export function PostCard({ post, onLikeToggle, isReply = false, isFresh = false 
               {!isReply && (
                 <button
                   onClick={toggleRepost}
+                  aria-label={reposted ? 'בטל שיתוף מחדש' : 'שתף מחדש'}
+                  aria-pressed={reposted}
                   className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all duration-200 hover:bg-green-500/8 group/repost"
                 >
                   {reposted

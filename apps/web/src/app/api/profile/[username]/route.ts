@@ -18,15 +18,25 @@ export async function GET(_req: NextRequest, { params }: { params: { username: s
   const supabase = createSupabase();
   const { data: { user } } = await supabase.auth.getUser();
 
+  // NOTE: real column names are followers_count / following_count, and there
+  // is NO post_count column — the old select referenced all three wrongly,
+  // which made this query error and EVERY profile page return 404.
   const { data: profile, error } = await supabase
     .from('profiles')
-    .select('id, username, display_name, avatar_url, bio, is_verified, rating, followers, following, post_count, created_at')
+    .select('id, username, display_name, avatar_url, bio, is_verified, rating, followers_count, following_count, created_at')
     .eq('username', params.username)
     .single();
 
   if (error || !profile) {
     return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
   }
+
+  // Actual post count (no column for it) — cheap head-only count query
+  const { count: postCount } = await supabase
+    .from('posts')
+    .select('id', { count: 'exact', head: true })
+    .eq('author_id', profile.id)
+    .is('parent_id', null);
 
   // Check if current user follows this profile
   let isFollowing = false;
@@ -56,6 +66,10 @@ export async function GET(_req: NextRequest, { params }: { params: { username: s
   return NextResponse.json({
     profile: {
       ...profile,
+      // Map DB column names to the keys the client components expect
+      followers: profile.followers_count ?? 0,
+      following: profile.following_count ?? 0,
+      post_count: postCount ?? 0,
       isMe: user?.id === profile.id,
       isFollowing,
     },

@@ -57,10 +57,12 @@ export async function GET(req: NextRequest) {
       const supabase = createSupabase();
       const { data } = await supabase
         .from('profiles')
-        .select('id, username, display_name, avatar_url, is_verified, followers')
+        // Column is followers_count — selecting "followers" errored the whole
+        // query, so user search silently returned 0 results forever.
+        .select('id, username, display_name, avatar_url, is_verified, followers_count')
         .or(`username.ilike.%${q}%,display_name.ilike.%${q}%`)
         .limit(5);
-      results.users = data ?? [];
+      results.users = (data ?? []).map(u => ({ ...u, followers: u.followers_count ?? 0 }));
     } catch { /* ignore */ }
   }
 

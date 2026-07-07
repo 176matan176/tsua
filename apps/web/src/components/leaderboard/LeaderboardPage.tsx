@@ -114,7 +114,9 @@ export function LeaderboardPage() {
     setError(null);
 
     const apiPeriod = period === 'alltime' ? 'all' : period;
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/leaderboard?period=${apiPeriod}&category=${category}`;
+    // Local Next route — the old external API (Railway) was shut down and
+    // returned "Application not found", leaving this page permanently broken.
+    const url = `/api/leaderboard?period=${apiPeriod}&category=${category}`;
 
     fetch(url)
       .then(res => {
