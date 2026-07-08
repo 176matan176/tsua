@@ -39,7 +39,11 @@ export function PriceProvider({ children }: { children: React.ReactNode }) {
 
   // Connect to backend Socket.io
   useEffect(() => {
-    const wsUrl = process.env.NEXT_PUBLIC_WS_URL || process.env.NEXT_PUBLIC_API_URL;
+    // Explicit WS opt-in only. NEXT_PUBLIC_API_URL used to double as the
+    // socket host, but it pointed at a retired Railway app — every visitor
+    // burned 10 failed websocket handshakes before giving up. A REST API URL
+    // is not evidence of a socket server; require NEXT_PUBLIC_WS_URL.
+    const wsUrl = process.env.NEXT_PUBLIC_WS_URL;
     if (!wsUrl) return;
 
     const socket = io(wsUrl, {
