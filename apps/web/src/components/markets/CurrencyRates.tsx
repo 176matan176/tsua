@@ -112,7 +112,7 @@ export function CurrencyRates() {
           >
             {showWarning
               ? <span>⚠️</span>
-              : <span className="inline-block w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'var(--accent)' }} />
+              : <span className="inline-block w-1.5 h-1.5 rounded-full animate-pulse breathe-dot" style={{ background: 'var(--accent)' }} />
             }
             <span className={showWarning ? '' : 'text-tsua-muted'}>עודכן {fmtTime(updated)}</span>
           </span>
@@ -140,7 +140,7 @@ export function CurrencyRates() {
                       - cold-failed → "—" so the row doesn't spin forever
                       - has rate → render */}
                 {r.rate === null && loading ? (
-                  <div className="w-16 h-4 rounded animate-pulse" style={{ background: 'rgb(var(--rgb-border) / 0.6)' }} />
+                  <div className="w-16 h-4 rounded animate-pulse breathe-shimmer" style={{ background: 'rgb(var(--rgb-border) / 0.6)' }} />
                 ) : r.rate === null ? (
                   <span className="text-sm font-black font-mono text-tsua-muted" dir="ltr">—</span>
                 ) : (

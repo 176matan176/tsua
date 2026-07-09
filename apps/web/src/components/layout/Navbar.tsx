@@ -308,7 +308,7 @@ export function Navbar() {
                 <span style={{ color: 'var(--text, var(--text))', fontWeight: 900, fontSize: '15px', letterSpacing: '-0.02em' }}>תשואה</span>
                 <div className="flex items-center gap-1">
                   <span
-                    className="w-1 h-1 rounded-full animate-pulse"
+                    className="w-1 h-1 rounded-full animate-pulse breathe-dot"
                     style={{ background: 'var(--accent)', boxShadow: '0 0 4px rgb(var(--rgb-accent) / 0.8)' }}
                   />
                   <span style={{ color: 'rgb(var(--rgb-accent) / 0.7)', fontSize: '8px', fontFamily: 'monospace', letterSpacing: '0.12em' }}>LIVE</span>
@@ -345,7 +345,7 @@ export function Navbar() {
               <span style={{ color: 'var(--text)', fontWeight: 900, fontSize: '15px', letterSpacing: '-0.02em' }}>תשואה</span>
               <div className="flex items-center gap-1">
                 <span
-                  className="w-1 h-1 rounded-full animate-pulse"
+                  className="w-1 h-1 rounded-full animate-pulse breathe-dot"
                   style={{ background: 'var(--accent)', boxShadow: '0 0 4px rgb(var(--rgb-accent) / 0.8)' }}
                 />
                 <span style={{ color: 'rgb(var(--rgb-accent) / 0.6)', fontSize: '8px', fontFamily: 'monospace', letterSpacing: '0.12em' }}>LIVE</span>

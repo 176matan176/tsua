@@ -20,7 +20,7 @@ export default function CryptoPage() {
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg shrink-0"
             style={{ background: 'rgba(247,147,26,0.08)', border: '1px solid rgba(247,147,26,0.25)' }}
           >
-            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#f7931a' }} />
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse breathe-dot" style={{ background: '#f7931a' }} />
             <span className="text-xs font-bold" style={{ color: 'var(--btc)' }}>24/7 LIVE</span>
           </div>
         </div>
