@@ -129,7 +129,7 @@ export function HotStocks() {
   // honest per-row signal — header staying green a bit longer is fine.
   const [liveYet, setLiveYet] = useState(false);
   return (
-    <div className="rounded-2xl overflow-hidden" style={{ background: 'rgb(var(--rgb-card) / 0.7)', border: '1px solid rgb(var(--rgb-border) / 0.8)' }}>
+    <div className="rounded-2xl overflow-hidden breathe-card" style={{ background: 'rgb(var(--rgb-card) / 0.7)', border: '1px solid rgb(var(--rgb-border) / 0.8)' }}>
       <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid rgb(var(--rgb-border) / 0.6)' }}>
         <h3 className="text-sm font-bold text-tsua-text">🔥 מניות רותחות</h3>
         {liveYet && (

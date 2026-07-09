@@ -17,7 +17,7 @@ function IndexCard({ nameHe, nameEn, symbol, flag, label }: typeof INDICES[0]) {
 
   return (
     <div
-      className="relative overflow-hidden rounded-2xl p-3.5 cursor-pointer transition-all duration-300 group"
+      className="relative overflow-hidden rounded-2xl p-3.5 cursor-pointer transition-all duration-300 group breathe-card"
       style={{
         background: 'rgb(var(--rgb-bg2) / 0.7)',
         border: '1px solid rgb(var(--rgb-border) / 0.7)',
