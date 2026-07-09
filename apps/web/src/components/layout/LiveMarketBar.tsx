@@ -24,7 +24,7 @@ const TickerItem = memo(function TickerItem({ symbol, label, flag }: { symbol: s
     <div className="flex items-center gap-2 px-4 shrink-0" dir="ltr">
       <span className="text-xs shrink-0">{flag}</span>
       <span className="text-xs font-bold text-tsua-muted font-mono">{label}</span>
-      <div className="w-14 h-3 rounded animate-pulse" style={{ background: 'rgb(var(--rgb-border) / 0.6)' }} />
+      <div className="w-14 h-3 rounded animate-pulse breathe-shimmer" style={{ background: 'rgb(var(--rgb-border) / 0.6)' }} />
     </div>
   );
 
@@ -43,7 +43,7 @@ const TickerItem = memo(function TickerItem({ symbol, label, flag }: { symbol: s
       <span className="text-xs shrink-0">{flag}</span>
       <span className="text-xs font-bold text-tsua-muted font-mono group-hover:text-tsua-text transition-colors">{label}</span>
       <span
-        className="text-xs font-black font-mono transition-colors duration-300 tabular-nums"
+        className={`text-xs font-black font-mono transition-colors duration-300 tabular-nums ${live.flash ? 'breathe-pop' : ''}`}
         style={{ color: live.flash === 'up' ? 'var(--accent)' : live.flash === 'down' ? 'var(--red)' : 'var(--text2)' }}
       >
         {live.price >= 1000 ? live.price.toLocaleString('en', { maximumFractionDigits: 0 }) : live.price.toFixed(2)}
@@ -98,7 +98,7 @@ export function LiveMarketBar() {
         style={{ background: 'rgb(var(--rgb-bg) / 0.95)', borderRight: '1px solid rgb(var(--rgb-border) / 0.4)' }}
       >
         <span
-          className="w-1.5 h-1.5 rounded-full animate-pulse shrink-0 me-1.5"
+          className="w-1.5 h-1.5 rounded-full animate-pulse breathe-dot shrink-0 me-1.5"
           style={{ background: 'var(--accent)', boxShadow: '0 0 6px rgb(var(--rgb-accent) / 0.8)' }}
         />
         <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--accent)' }}>שוק</span>
