@@ -756,3 +756,51 @@ main { animation: fade-in 0.3s ease-out; }
 @media (prefers-reduced-motion: reduce) {
   .tsua-fresh-post { animation: none; }
 }
+
+/* ═══════════════ breathe layer — alive-mode visuals ═══════════════
+   Every rule here is gated on <html data-breathe="on"> (set from
+   src/lib/breathe.ts). Flip the constant to 'off' to restore pre-feature
+   behavior exactly. Spec: docs/superpowers/specs/2026-07-09-breathing-ux-design.md */
+@media (prefers-reduced-motion: no-preference) {
+
+  @keyframes breatheFlashUp {
+    0%   { background-color: rgb(var(--rgb-accent) / 0.16); }
+    100% { background-color: transparent; }
+  }
+  @keyframes breatheFlashDown {
+    0%   { background-color: rgb(var(--rgb-red) / 0.16); }
+    100% { background-color: transparent; }
+  }
+  @keyframes breathePop {
+    0%   { transform: scale(1); }
+    35%  { transform: scale(1.12); }
+    100% { transform: scale(1); }
+  }
+  @keyframes breatheDot {
+    0%, 100% { opacity: 1;   transform: scale(1); }
+    50%      { opacity: 0.4; transform: scale(0.8); }
+  }
+  @keyframes breatheCard {
+    0%, 100% { box-shadow: 0 0 0 rgb(var(--rgb-accent) / 0); }
+    50%      { box-shadow: 0 0 14px rgb(var(--rgb-accent) / 0.07); }
+  }
+  @keyframes breatheShimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* Transient — applied only while PriceContext flash state is set */
+  [data-breathe="on"] .breathe-flash-up   { animation: breatheFlashUp 1.2s ease-out; border-radius: 6px; }
+  [data-breathe="on"] .breathe-flash-down { animation: breatheFlashDown 1.2s ease-out; border-radius: 6px; }
+  [data-breathe="on"] .breathe-pop        { display: inline-block; animation: breathePop 0.5s ease-out; }
+
+  /* Persistent ambience */
+  [data-breathe="on"] .breathe-dot  { animation: breatheDot 1.6s ease-in-out infinite; box-shadow: 0 0 6px rgb(var(--rgb-accent) / 0.7); }
+  [data-breathe="on"] .breathe-card { animation: breatheCard 4s ease-in-out infinite; }
+  [data-breathe="on"] .breathe-shimmer {
+    background-image: linear-gradient(90deg, transparent 30%, rgb(var(--rgb-text) / 0.07) 50%, transparent 70%);
+    background-size: 200% 100%;
+    animation: breatheShimmer 1.6s linear infinite;
+  }
+}
+/* ═══════════════ end breathe layer ═══════════════ */
