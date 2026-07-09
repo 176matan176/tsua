@@ -87,7 +87,7 @@ function HotRow({ symbol, nameHe, flag, tag }: typeof HOT[0]) {
         {live ? (
           <>
             <div
-              className="text-sm font-black font-mono tabular-nums"
+              className={`text-sm font-black font-mono tabular-nums px-1 ${live.flash === 'up' ? 'breathe-flash-up breathe-pop' : live.flash === 'down' ? 'breathe-flash-down breathe-pop' : ''}`}
               style={{ color: live.flash === 'up' ? 'var(--accent)' : live.flash === 'down' ? 'var(--red)' : 'var(--text2)' }}
               dir="ltr"
             >

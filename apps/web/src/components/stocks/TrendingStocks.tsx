@@ -52,7 +52,7 @@ function TrendRow({ ticker, nameHe, nameEn, exchange }: typeof TRENDING[0]) {
           <>
             <div
               dir="ltr"
-              className="text-sm font-black font-mono tabular-nums transition-colors duration-300"
+              className={`text-sm font-black font-mono tabular-nums transition-colors duration-300 px-1 ${live.flash === 'up' ? 'breathe-flash-up breathe-pop' : live.flash === 'down' ? 'breathe-flash-down breathe-pop' : ''}`}
               style={{ color: live.flash === 'up' ? 'var(--accent)' : live.flash === 'down' ? 'var(--red)' : 'var(--text2)' }}
             >
               {live.price.toFixed(2)}
