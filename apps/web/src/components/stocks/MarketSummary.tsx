@@ -74,7 +74,7 @@ function IndexCard({ nameHe, nameEn, symbol, flag, label }: typeof INDICES[0]) {
         {live ? (
           <div
             dir="ltr"
-            className="text-lg font-black font-mono tracking-tight tabular-nums transition-colors duration-300"
+            className={`text-lg font-black font-mono tracking-tight tabular-nums transition-colors duration-300 px-1 ${live.flash === 'up' ? 'breathe-flash-up breathe-pop' : live.flash === 'down' ? 'breathe-flash-down breathe-pop' : ''}`}
             style={{
               color: live.flash === 'up' ? 'var(--accent)' : live.flash === 'down' ? 'var(--red)' : 'var(--text)',
             }}

@@ -304,7 +304,7 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
                 live or pinned to the last server-side fetch. */}
             {priceSource === 'live' && (
               <span className="flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgb(var(--rgb-accent) / 0.08)', color: 'var(--accent)', border: '1px solid rgb(var(--rgb-accent) / 0.2)' }}>
-                <span className="w-1.5 h-1.5 rounded-full bg-tsua-green animate-pulse inline-block" />
+                <span className="w-1.5 h-1.5 rounded-full bg-tsua-green animate-pulse breathe-dot inline-block" />
                 LIVE
               </span>
             )}
@@ -354,7 +354,7 @@ export function StockHeader({ ticker, onDataLoaded }: StockHeaderProps) {
           <div className="mt-4 flex items-end gap-3">
             <span
               dir="ltr"
-              className="text-4xl font-black font-mono transition-colors duration-300"
+              className={`text-4xl font-black font-mono transition-colors duration-300 ${flash ? 'breathe-pop' : ''}`}
               style={{ color: flash === 'up' ? 'var(--accent)' : flash === 'down' ? 'var(--red)' : 'var(--text)' }}
             >
               {price !== null
