@@ -36,3 +36,6 @@ apps/api/prisma/migrations/
 .railway
 
 .vercel
+
+# Brainstorm visual companion sessions
+.superpowers/
