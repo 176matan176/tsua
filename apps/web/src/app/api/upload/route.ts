@@ -6,6 +6,11 @@ export const dynamic = 'force-dynamic';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+// Only buckets the app actually writes to (PostComposer, ProfilePage).
+// Without this allowlist any authenticated user could upload into ANY
+// storage bucket by naming it in the form field.
+const ALLOWED_BUCKETS = ['post-images', 'avatars'];
+const SAFE_EXT = /^[a-z0-9]{2,5}$/;
 
 function createSupabase() {
   const cookieStore = cookies();
@@ -27,10 +32,14 @@ export async function POST(req: NextRequest) {
   const bucket = (formData.get('bucket') as string) || 'post-images';
 
   if (!file) return NextResponse.json({ error: 'No file provided' }, { status: 400 });
+  if (!ALLOWED_BUCKETS.includes(bucket)) return NextResponse.json({ error: 'Invalid bucket' }, { status: 400 });
   if (file.size > MAX_FILE_SIZE) return NextResponse.json({ error: 'הקובץ גדול מדי (מקסימום 5MB)' }, { status: 400 });
   if (!ALLOWED_TYPES.includes(file.type)) return NextResponse.json({ error: 'סוג קובץ לא נתמך' }, { status: 400 });
 
-  const ext = file.name.split('.').pop() ?? 'jpg';
+  // Sanitize the extension — file.name is attacker-controlled and could
+  // smuggle path segments ("x.png/../../y") or odd extensions into the key.
+  const rawExt = (file.name.split('.').pop() ?? 'jpg').toLowerCase();
+  const ext = SAFE_EXT.test(rawExt) ? rawExt : 'jpg';
   const path = `${user.id}/${Date.now()}.${ext}`;
 
   const { data, error } = await supabase.storage

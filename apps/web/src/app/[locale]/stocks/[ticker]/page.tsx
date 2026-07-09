@@ -133,9 +133,10 @@ export default function StockPage({ params }: StockPageProps) {
         id={`jsonld-stock-${ticker}`}
         type="application/ld+json"
         // Inline JSON-LD: small payload, doesn't need to be fetched, gets
-        // picked up by Google during crawl. `dangerouslySetInnerHTML` is the
-        // standard way to do this — content is server-controlled, not user.
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        // picked up by Google during crawl. The payload includes third-party
+        // API data (company names/descriptions), so escape `<` — a value
+        // containing "</script>" would otherwise break out of the tag (XSS).
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
       />
       <StockPageClient ticker={ticker} />
     </>
