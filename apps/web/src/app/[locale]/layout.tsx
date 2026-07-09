@@ -15,6 +15,7 @@ import { ServiceWorkerRegister } from '@/components/pwa/ServiceWorkerRegister';
 import { PWAInstallPrompt } from '@/components/pwa/PWAInstallPrompt';
 import { TermsConsent } from '@/components/layout/TermsConsent';
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import { BREATHE } from '@/lib/breathe';
 import { OnboardingModal } from '@/components/ui/OnboardingModal';
 import './globals.css';
 
@@ -100,7 +101,7 @@ export default async function RootLayout({ children, params: { locale } }: RootL
     // suppressHydrationWarning: the boot script writes data-theme + colorScheme
     // to <html> before hydration, so these attributes intentionally differ from
     // the server output. Without this, React treats it as a mismatch.
-    <html lang={locale} dir={dir} suppressHydrationWarning>
+    <html lang={locale} dir={dir} data-breathe={BREATHE} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
