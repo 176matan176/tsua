@@ -8,7 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import {
   HomeIcon, ChartBarIcon, UsersIcon, BellIcon, NewspaperIcon, DocumentTextIcon, TrophyIcon, BriefcaseIcon,
   BookmarkIcon, Cog6ToothIcon, FireIcon, Squares2X2Icon, CurrencyDollarIcon, ScaleIcon, CalendarDaysIcon,
-  ShieldCheckIcon,
+  ShieldCheckIcon, BookOpenIcon,
 } from '@heroicons/react/24/outline';
 import { ShieldCheckIcon as ShieldCheckIconSolid } from '@heroicons/react/24/solid';
 import { TrendingWidget } from './TrendingWidget';
@@ -28,6 +28,7 @@ import {
   CurrencyDollarIcon as CurrencyDollarIconSolid,
   ScaleIcon as ScaleIconSolid,
   CalendarDaysIcon as CalendarDaysIconSolid,
+  BookOpenIcon as BookOpenIconSolid,
 } from '@heroicons/react/24/solid';
 
 const NAV_ITEMS = [
@@ -37,6 +38,7 @@ const NAV_ITEMS = [
   { key: 'crypto',      icon: CurrencyDollarIcon, iconActive: CurrencyDollarIconSolid, href: '/crypto',   label: '₿ קריפטו' },
   { key: 'compare',     icon: ScaleIcon,        iconActive: ScaleIconSolid,        href: '/compare',     label: '⚖️ השוואה' },
   { key: 'earnings',    icon: CalendarDaysIcon, iconActive: CalendarDaysIconSolid, href: '/earnings',    label: '📅 דוחות' },
+  { key: 'glossary',    icon: BookOpenIcon,     iconActive: BookOpenIconSolid,     href: '/glossary',    label: '📖 מילון' },
   { key: 'hot',         icon: FireIcon,         iconActive: FireIconSolid,         href: '/hot',         label: '🔥 חמות' },
   { key: 'news',        icon: NewspaperIcon,    iconActive: NewspaperIconSolid,    href: '/news',        label: 'חדשות' },
   { key: 'rooms',       icon: UsersIcon,        iconActive: UsersIconSolid,        href: '/rooms',       label: 'חדרים' },
