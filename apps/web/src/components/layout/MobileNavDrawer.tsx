@@ -25,6 +25,7 @@ import {
   CalendarDaysIcon,
   MegaphoneIcon,
   ShieldCheckIcon,
+  BookOpenIcon,
 } from '@heroicons/react/24/outline';
 import { useAuth } from '@/contexts/AuthContext';
 import { ThemeToggle } from './ThemeToggle';
@@ -153,6 +154,7 @@ export function MobileNavDrawer({ isOpen, onClose }: Props) {
     { href: '/hot',      icon: FireIcon,           label: 'חמות', badge: '🔥' },
     { href: '/compare',  icon: ScaleIcon,          label: 'השוואה' },
     { href: '/earnings', icon: CalendarDaysIcon,   label: 'דוחות כספיים' },
+    { href: '/glossary', icon: BookOpenIcon,       label: 'מילון המשקיע' },
   ];
 
   // Personal (only shown for logged in user)
