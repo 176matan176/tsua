@@ -232,15 +232,21 @@ export function PriceProvider({ children }: { children: React.ReactNode }) {
     // up from 30s to 5s without a page reload, and slow back down at close.
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
+    const isHidden = () =>
+      typeof document !== 'undefined' && document.visibilityState === 'hidden';
+
     function scheduleNext() {
-      if (typeof document !== 'undefined' && document.visibilityState === 'hidden') {
-        // Tab is in the background — pause polling to save battery and avoid
-        // hammering Vercel for nothing. visibilitychange handler resumes us.
-        return;
-      }
-      const ms = getPollIntervalMs();
+      // Keep the loop ALIVE even while hidden — just skip the network call and
+      // re-check on a slow heartbeat. The old code bailed out entirely when
+      // hidden and relied on `visibilitychange` to restart; but iOS standalone
+      // PWAs routinely never fire that event on launch / app-switch resume, so
+      // polling stopped forever and prices froze after the very first fetch
+      // ("numbers never change on the phone"). A 15s heartbeat self-heals the
+      // moment the tab is really visible again, without hammering the API while
+      // genuinely backgrounded.
+      const ms = isHidden() ? 15_000 : getPollIntervalMs();
       timeoutId = setTimeout(async () => {
-        await poll();
+        if (!isHidden()) await poll();
         scheduleNext();
       }, ms);
     }
@@ -252,30 +258,37 @@ export function PriceProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    function onVisibility() {
-      if (document.visibilityState === 'visible') {
-        // Tab back in focus — refresh immediately so the user sees current
-        // prices instead of whatever was on screen when they left, then
-        // resume normal cadence.
-        clearScheduled();
-        poll();
-        scheduleNext();
-      } else {
-        clearScheduled();
-      }
+    function onResume() {
+      // Any signal that we're (probably) foreground again → refresh now and
+      // restart the single active loop. Guard against the visibilitychange that
+      // fires with state 'hidden' (backgrounding) — the heartbeat handles that.
+      if (isHidden()) return;
+      clearScheduled();
+      poll();
+      scheduleNext();
     }
 
     // First poll fires immediately so the bar doesn't sit empty waiting.
     poll();
     scheduleNext();
     if (typeof document !== 'undefined') {
-      document.addEventListener('visibilitychange', onVisibility);
+      document.addEventListener('visibilitychange', onResume);
+    }
+    if (typeof window !== 'undefined') {
+      // focus + pageshow are far more reliable than visibilitychange on iOS
+      // standalone PWAs (which is where the freeze was reported).
+      window.addEventListener('focus', onResume);
+      window.addEventListener('pageshow', onResume);
     }
 
     return () => {
       clearScheduled();
       if (typeof document !== 'undefined') {
-        document.removeEventListener('visibilitychange', onVisibility);
+        document.removeEventListener('visibilitychange', onResume);
+      }
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('focus', onResume);
+        window.removeEventListener('pageshow', onResume);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
