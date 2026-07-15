@@ -763,13 +763,25 @@ main { animation: fade-in 0.3s ease-out; }
    behavior exactly. Spec: docs/superpowers/specs/2026-07-09-breathing-ux-design.md */
 @media (prefers-reduced-motion: no-preference) {
 
+  /* TradingView / Yahoo-style price pulse. The peak is a saturated accent/red
+     wash (0.6α) with a matching outer glow and a brief pure-white text flash,
+     decaying smoothly to transparent over 800ms so the eye is pulled straight
+     to the number that just moved. Colors stay tokenized so both themes track;
+     the white text-flash is an intentional fixed highlight (readable over the
+     saturated peak in dark AND light), same exemption as chart/OG colors. */
   @keyframes breatheFlashUp {
-    0%   { background-color: rgb(var(--rgb-accent) / 0.16); }
-    100% { background-color: transparent; }
+    0%   { background-color: rgb(var(--rgb-accent) / 0.6);
+           color: #fff;
+           box-shadow: 0 0 14px rgb(var(--rgb-accent) / 0.5); }
+    100% { background-color: rgb(var(--rgb-accent) / 0);
+           box-shadow: 0 0 0 rgb(var(--rgb-accent) / 0); }
   }
   @keyframes breatheFlashDown {
-    0%   { background-color: rgb(var(--rgb-red) / 0.16); }
-    100% { background-color: transparent; }
+    0%   { background-color: rgb(var(--rgb-red) / 0.6);
+           color: #fff;
+           box-shadow: 0 0 14px rgb(var(--rgb-red) / 0.5); }
+    100% { background-color: rgb(var(--rgb-red) / 0);
+           box-shadow: 0 0 0 rgb(var(--rgb-red) / 0); }
   }
   @keyframes breathePop {
     0%   { transform: scale(1); }
@@ -790,8 +802,8 @@ main { animation: fade-in 0.3s ease-out; }
   }
 
   /* Transient — applied only while PriceContext flash state is set */
-  [data-breathe="on"] .breathe-flash-up   { animation: breatheFlashUp 1.2s ease-out; border-radius: 6px; }
-  [data-breathe="on"] .breathe-flash-down { animation: breatheFlashDown 1.2s ease-out; border-radius: 6px; }
+  [data-breathe="on"] .breathe-flash-up   { animation: breatheFlashUp 800ms cubic-bezier(0.22, 1, 0.36, 1); border-radius: 6px; will-change: background-color; }
+  [data-breathe="on"] .breathe-flash-down { animation: breatheFlashDown 800ms cubic-bezier(0.22, 1, 0.36, 1); border-radius: 6px; will-change: background-color; }
   [data-breathe="on"] .breathe-pop        { display: inline-block; animation: breathePop 0.5s ease-out; }
 
   /* Persistent ambience */

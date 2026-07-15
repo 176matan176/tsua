@@ -86,8 +86,10 @@ function HotRow({ symbol, nameHe, flag, tag }: typeof HOT[0]) {
       <div className="text-end shrink-0">
         {live ? (
           <>
+            {/* Pulse is scoped to the price block itself (not the whole row) so
+                the eye is pulled to the number that moved — TradingView-style. */}
             <div
-              className={`text-sm font-black font-mono tabular-nums px-1 ${live.flash === 'up' ? 'breathe-flash-up breathe-pop' : live.flash === 'down' ? 'breathe-flash-down breathe-pop' : ''}`}
+              className={`text-sm font-black font-mono tabular-nums px-1.5 py-0.5 rounded-md inline-block ${live.flash === 'up' ? 'breathe-flash-up breathe-pop' : live.flash === 'down' ? 'breathe-flash-down breathe-pop' : ''}`}
               style={{ color: live.flash === 'up' ? 'var(--accent)' : live.flash === 'down' ? 'var(--red)' : 'var(--text2)' }}
               dir="ltr"
             >
@@ -95,8 +97,9 @@ function HotRow({ symbol, nameHe, flag, tag }: typeof HOT[0]) {
                 ? live.price.toLocaleString('en', { maximumFractionDigits: 0 })
                 : live.price.toFixed(2)}
             </div>
+            {/* The change-% chip pulses in the same direction as the tick. */}
             <div
-              className="text-[11px] font-bold tabular-nums"
+              className={`text-[11px] font-bold tabular-nums px-1.5 py-0.5 rounded-md inline-block mt-0.5 ${live.flash === 'up' ? 'breathe-flash-up breathe-pop' : live.flash === 'down' ? 'breathe-flash-down breathe-pop' : ''}`}
               dir="ltr"
               style={{ color: live.changePercent >= 0 ? 'var(--accent)' : 'var(--red)' }}
             >

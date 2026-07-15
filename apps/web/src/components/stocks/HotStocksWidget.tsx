@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import { buildSparklinePoints, type StockScore } from '@/lib/hotStocks';
+import { useLivePrice } from '@/contexts/PriceContext';
 
 interface HotResponse {
   market: string;
@@ -56,9 +57,19 @@ function SkeletonRow() {
 
 function HotRow({ stock }: { stock: StockScore }) {
   const locale  = useLocale();
-  const isUp    = (stock.changePercent ?? 0) >= 0;
-  const pctStr  = stock.changePercent != null
-    ? `${isUp ? '+' : ''}${stock.changePercent.toFixed(2)}%`
+  // Live overlay: subscribe this row to the shared PriceContext so its number
+  // ticks + pulses like the market tape. Falls back to the /api/stocks/hot
+  // snapshot until (or if) a live quote arrives for this ticker.
+  const live    = useLivePrice(stock.ticker);
+  const price          = live?.price ?? stock.price;
+  const changePercent  = live?.changePercent ?? stock.changePercent;
+  const flash          = live?.flash ?? null;
+  const flashCls = flash === 'up'   ? 'breathe-flash-up breathe-pop'
+                 : flash === 'down' ? 'breathe-flash-down breathe-pop'
+                 : '';
+  const isUp    = (changePercent ?? 0) >= 0;
+  const pctStr  = changePercent != null
+    ? `${isUp ? '+' : ''}${changePercent.toFixed(2)}%`
     : '—';
 
   return (
@@ -98,10 +109,20 @@ function HotRow({ stock }: { stock: StockScore }) {
       </div>
       <Sparkline stock={stock} />
       <div className="text-end shrink-0 min-w-[52px]">
-        <div className="text-xs font-black font-mono tabular-nums" style={{ color: 'var(--text)' }} dir="ltr">
-          {stock.price != null ? stock.price.toFixed(2) : '—'}
+        {/* Price + change pulse in the tick direction — pill-scoped so the eye
+            catches the number that moved, TradingView-style. */}
+        <div
+          className={`text-xs font-black font-mono tabular-nums px-1.5 py-0.5 rounded-md inline-block ${flashCls}`}
+          style={{ color: flash === 'up' ? 'var(--accent)' : flash === 'down' ? 'var(--red)' : 'var(--text)' }}
+          dir="ltr"
+        >
+          {price != null ? price.toFixed(2) : '—'}
         </div>
-        <div className="text-[10px] font-bold tabular-nums" style={{ color: isUp ? 'var(--accent)' : 'var(--red)' }} dir="ltr">
+        <div
+          className={`text-[10px] font-bold tabular-nums px-1.5 py-0.5 rounded-md inline-block mt-0.5 ${flashCls}`}
+          style={{ color: isUp ? 'var(--accent)' : 'var(--red)' }}
+          dir="ltr"
+        >
           {pctStr}
         </div>
       </div>

@@ -35,21 +35,19 @@ const TickerItem = memo(function TickerItem({ symbol, label, flag }: { symbol: s
       href={`/${locale}/stocks/${symbol}`}
       dir="ltr"
       className="flex items-center gap-2 px-4 shrink-0 transition-all duration-200 hover:bg-white/5 rounded-lg group"
-      style={
-        live.flash === 'up'   ? { background: 'rgb(var(--rgb-accent) / 0.1)' } :
-        live.flash === 'down' ? { background: 'rgb(var(--rgb-red) / 0.1)' } : {}
-      }
     >
       <span className="text-xs shrink-0">{flag}</span>
       <span className="text-xs font-bold text-tsua-muted font-mono group-hover:text-tsua-text transition-colors">{label}</span>
+      {/* Pulse scoped to the price + change chips (not the whole item) so each
+          index ticks like a TradingView tape. */}
       <span
-        className={`text-xs font-black font-mono transition-colors duration-300 tabular-nums ${live.flash ? 'breathe-pop' : ''}`}
+        className={`text-xs font-black font-mono transition-colors duration-300 tabular-nums px-1 rounded-md ${live.flash === 'up' ? 'breathe-flash-up breathe-pop' : live.flash === 'down' ? 'breathe-flash-down breathe-pop' : ''}`}
         style={{ color: live.flash === 'up' ? 'var(--accent)' : live.flash === 'down' ? 'var(--red)' : 'var(--text2)' }}
       >
         {live.price >= 1000 ? live.price.toLocaleString('en', { maximumFractionDigits: 0 }) : live.price.toFixed(2)}
       </span>
       <span
-        className="text-[11px] font-bold tabular-nums px-1.5 py-0.5 rounded-md"
+        className={`text-[11px] font-bold tabular-nums px-1.5 py-0.5 rounded-md ${live.flash === 'up' ? 'breathe-flash-up breathe-pop' : live.flash === 'down' ? 'breathe-flash-down breathe-pop' : ''}`}
         style={{
           background: isUp ? 'rgb(var(--rgb-accent) / 0.1)' : 'rgb(var(--rgb-red) / 0.1)',
           color: isUp ? 'var(--accent)' : 'var(--red)',
