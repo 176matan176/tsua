@@ -28,6 +28,29 @@ export interface Quote {
 
 const ZERO: Quote = { c: 0, d: 0, dp: 0, o: 0, h: 0, l: 0, pc: 0, v: 0 };
 
+// In-memory quote cache with an explicit TTL.
+//
+// We deliberately do NOT rely on Next.js's fetch Data Cache (`next:{revalidate}`)
+// for live quotes. It is bypassed in `next dev` (so prices tick fresh every
+// poll) but ACTIVE and aggressive in production builds / on Vercel, where it
+// served the same quote far longer than the intended window — the client polled
+// /api/stocks/batch every 2s but kept getting an identical price, so prices
+// looked frozen and the green/red pulses never fired IN PRODUCTION ONLY. That's
+// why the bug was invisible in dev.
+//
+// A module-scope TTL memo behaves identically in dev and prod, and still dedupes
+// concurrent polls within a warm instance (one upstream hit per symbol per TTL).
+// Same module-scope-cache pattern already used for `crumbCache` below.
+const quoteMemo = new Map<string, { at: number; q: Quote }>();
+function memoGet(key: string, ttlSeconds: number): Quote | null {
+  const hit = quoteMemo.get(key);
+  if (hit && Date.now() - hit.at < ttlSeconds * 1000) return hit.q;
+  return null;
+}
+function memoSet(key: string, q: Quote): void {
+  if (q.c > 0) quoteMemo.set(key, { at: Date.now(), q });
+}
+
 /**
  * Some symbols use a caret prefix on Yahoo to disambiguate the index from a
  * (delisted or hypothetical) equity of the same name. We accept the friendlier
@@ -51,15 +74,23 @@ const YAHOO_SYMBOL_ALIASES: Record<string, string> = {
  * Used as a fallback whenever Finnhub fails or returns 0.
  */
 export async function fetchYahooQuote(symbol: string, revalidate = 60): Promise<Quote> {
+  const memoKey = 'Y:' + symbol;
+  const cached = memoGet(memoKey, revalidate);
+  if (cached) return cached;
   try {
     const yahooSymbol = YAHOO_SYMBOL_ALIASES[symbol] ?? symbol;
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yahooSymbol)}?interval=1d&range=2d`;
+    // range=1d so `chartPreviousClose` is YESTERDAY's close (the correct daily
+    // reference). range=2d returned the close from TWO days ago, which inflated
+    // the daily change % whenever Yahoo was the source (e.g. AAPL showed +5%
+    // instead of +1%). We only read `meta.*` fields below, all present at 1d.
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yahooSymbol)}?interval=1d&range=1d`;
     const r = await fetch(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; TsuaBot/1.0; +https://tsua-rho.vercel.app)',
         'Accept': 'application/json',
       },
-      next: { revalidate },
+      // TTL is enforced by the module-scope memo above, not Next's Data Cache.
+      cache: 'no-store',
     });
     if (!r.ok) return ZERO;
     const data = await r.json();
@@ -75,7 +106,9 @@ export async function fetchYahooQuote(symbol: string, revalidate = 60): Promise<
     const v  = Number(meta.regularMarketVolume) || 0;
     const d  = c - pc;
     const dp = pc ? (d / pc) * 100 : 0;
-    return { c, d, dp, o, h, l, pc, v };
+    const q: Quote = { c, d, dp, o, h, l, pc, v };
+    memoSet(memoKey, q);
+    return q;
   } catch {
     return ZERO;
   }
@@ -90,7 +123,8 @@ async function fetchFinnhubQuote(symbol: string, revalidate = 60): Promise<Quote
   try {
     const r = await fetch(
       `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${FINNHUB_KEY}`,
-      { next: { revalidate } },
+      // Freshness is governed by fetchQuote's module-scope memo, not Next's cache.
+      { cache: 'no-store' },
     );
     if (!r.ok) return null;        // covers 429s and 5xx
     const q = await r.json();
@@ -115,9 +149,13 @@ async function fetchFinnhubQuote(symbol: string, revalidate = 60): Promise<Quote
  * Always returns a Quote; check `c > 0` to know if we have valid data.
  */
 export async function fetchQuote(symbol: string, revalidate = 60): Promise<Quote> {
+  const memoKey = 'Q:' + symbol;
+  const cached = memoGet(memoKey, revalidate);
+  if (cached) return cached;
   const finnhub = await fetchFinnhubQuote(symbol, revalidate);
-  if (finnhub) return finnhub;
-  return fetchYahooQuote(symbol, revalidate);
+  const q = finnhub ?? await fetchYahooQuote(symbol, revalidate);
+  memoSet(memoKey, q);
+  return q;
 }
 
 /**
