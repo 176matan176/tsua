@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchQuotes } from '@/lib/quotes';
+import { fetchYahooQuotes } from '@/lib/quotes';
 
 // Per-request fresh — clients poll this every 5s during market hours.
 // The upstream Yahoo/Finnhub call is cached for 10s (was 60s) so prices
@@ -22,7 +22,9 @@ export async function GET(req: NextRequest) {
   if (!symbols) return NextResponse.json({});
 
   const tickers = [...new Set(symbols.split(',').map(s => s.trim().toUpperCase()))].slice(0, 20);
-  const quotes = await fetchQuotes(tickers, UPSTREAM_CACHE_SECONDS);
+  // Yahoo-only: Finnhub's free tier serves stale quotes, which froze the live
+  // ticker in production. Yahoo's chart endpoint ticks in real time.
+  const quotes = await fetchYahooQuotes(tickers, UPSTREAM_CACHE_SECONDS);
 
   const data: Record<string, { price: number; change: number; changePercent: number }> = {};
   tickers.forEach((ticker, i) => {

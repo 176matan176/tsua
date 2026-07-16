@@ -170,6 +170,26 @@ export async function fetchQuotes(symbols: string[], revalidate = 60): Promise<Q
 }
 
 /**
+ * Yahoo-only batch fetch — used by the live-polling /api/stocks/batch route.
+ *
+ * WHY not the Finnhub-first fetchQuote(): Finnhub's FREE tier returns
+ * stale/slowly-updating quotes (observed: NVDA frozen at one price for 12s+
+ * while Yahoo's chart endpoint ticked in real time). Since production has a
+ * Finnhub key it preferred that stale feed, so prices looked frozen on the
+ * live site even though the client polled every 2s. Yahoo's chart endpoint is
+ * genuinely live and covers the full symbol universe we poll (US equities,
+ * ETFs, TASE via alias, ^VIX/^TNX indices, GC=F/CL=F futures), so the live
+ * path uses it directly. Slower widgets (markets/hot/sectors) keep Finnhub
+ * first for its volume data — they don't need sub-minute freshness.
+ */
+export async function fetchYahooQuotes(symbols: string[], revalidate = 60): Promise<Quote[]> {
+  const results = await Promise.allSettled(
+    symbols.map((s) => fetchYahooQuote(s, revalidate)),
+  );
+  return results.map((r) => (r.status === 'fulfilled' ? r.value : ZERO));
+}
+
+/**
  * Yahoo `quoteSummary` returns derived metrics like trailing/forward PE,
  * dividend yield, EPS — which Finnhub's free tier does NOT expose for ETFs
  * (SPY/QQQ/DIA/EIS all come back empty). Used by the indices P/E widget.
