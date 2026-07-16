@@ -171,24 +171,27 @@ export function PriceProvider({ children }: { children: React.ReactNode }) {
 
     const externalApi = process.env.NEXT_PUBLIC_API_URL;
 
-    const poll = async () => {
-      const tickers = Array.from(subscriptionsRef.current);
-      if (tickers.length === 0) return;
+    // /api/stocks/batch caps at 20 symbols per request (server-side
+    // .slice(0, 20)). A busy screen easily subscribes to more than that — the
+    // Markets page alone exceeds 20 — so sending everything in one request
+    // silently dropped the overflow tickers. Split into ≤20-symbol chunks and
+    // fire them in parallel so every subscribed symbol actually gets a quote.
+    const BATCH_LIMIT = 20;
 
+    const fetchGroup = async (group: string[]) => {
+      const symbols = group.join(',');
+      const internal = `/api/stocks/batch?symbols=${symbols}`;
       // Try external first (faster + has volume etc.); fall back to internal
       // route which always works as long as Finnhub/Yahoo are reachable.
       const url = externalApi
-        ? `${externalApi}/api/v1/stocks/batch?symbols=${tickers.join(',')}`
-        : `/api/stocks/batch?symbols=${tickers.join(',')}`;
-
+        ? `${externalApi}/api/v1/stocks/batch?symbols=${symbols}`
+        : internal;
       try {
         const res = await fetch(url, { cache: 'no-store' });
         if (!res.ok) {
-          // If the external API failed and we haven't tried internal yet, try it.
           if (externalApi) {
-            const r2 = await fetch(`/api/stocks/batch?symbols=${tickers.join(',')}`, { cache: 'no-store' });
-            if (!r2.ok) return;
-            return applyBatch(await r2.json());
+            const r2 = await fetch(internal, { cache: 'no-store' });
+            if (r2.ok) applyBatch(await r2.json());
           }
           return;
         }
@@ -197,11 +200,22 @@ export function PriceProvider({ children }: { children: React.ReactNode }) {
         // Last-ditch: try the internal route from a thrown fetch.
         if (externalApi) {
           try {
-            const r2 = await fetch(`/api/stocks/batch?symbols=${tickers.join(',')}`, { cache: 'no-store' });
+            const r2 = await fetch(internal, { cache: 'no-store' });
             if (r2.ok) applyBatch(await r2.json());
           } catch { /* swallow — next interval will retry */ }
         }
       }
+    };
+
+    const poll = async () => {
+      const tickers = Array.from(subscriptionsRef.current);
+      if (tickers.length === 0) return;
+
+      const groups: string[][] = [];
+      for (let i = 0; i < tickers.length; i += BATCH_LIMIT) {
+        groups.push(tickers.slice(i, i + BATCH_LIMIT));
+      }
+      await Promise.all(groups.map(fetchGroup));
     };
 
     function applyBatch(data: Record<string, { price: number; change: number; changePercent: number }>) {

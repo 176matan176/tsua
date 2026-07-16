@@ -10,6 +10,12 @@ import { MarketPE } from './MarketPE';
 import { HotStocks } from './HotStocks';
 import { SectorHeatmap as LiveSectorHeatmap } from './SectorHeatmap';
 import { MacroWidget } from './MacroWidget';
+import { CryptoCommodities } from './CryptoCommodities';
+import { ActiveETFs } from './ActiveETFs';
+import { MacroEventsCalendar } from './MacroEventsCalendar';
+import { BondYields } from './BondYields';
+import { VixWidget } from './VixWidget';
+import { ShillerCAPE } from './ShillerCAPE';
 import { useLocale } from 'next-intl';
 import { useLivePrice } from '@/contexts/PriceContext';
 
@@ -480,18 +486,38 @@ export function MarketsPage() {
         )}
       </div>
 
+      {/* Active ETFs + Crypto & Commodities */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <ActiveETFs />
+        <CryptoCommodities />
+      </div>
+
       {/* Sector heatmap + Currency Rates */}
       <div className="grid grid-cols-1 md:grid-cols-[1fr_240px] gap-4">
         <SectorHeatmapCard locale={locale} />
         <CurrencyRates />
       </div>
 
-      {/* Fear & Greed + Market P/E + Hot Stocks */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Sentiment & volatility — Fear&Greed beside VIX */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FearGreedWidget />
-        <MarketPE />
-        <HotStocks />
+        <VixWidget />
       </div>
+
+      {/* Valuation depth — trailing P/E beside long-run Shiller CAPE */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <MarketPE />
+        <ShillerCAPE />
+      </div>
+
+      {/* Rates & calendar — 10Y bond yields beside upcoming macro events */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <BondYields />
+        <MacroEventsCalendar />
+      </div>
+
+      {/* Hot stocks */}
+      <HotStocks />
 
       {/* Macro data */}
       <MacroWidget />
