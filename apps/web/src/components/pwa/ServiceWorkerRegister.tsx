@@ -27,10 +27,12 @@ export function ServiceWorkerRegister() {
     if (process.env.NODE_ENV !== 'production') return; // skip in dev
 
     let cancelled = false;
+    let reg: ServiceWorkerRegistration | null = null;
 
     (async () => {
       try {
         const registration = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
+        reg = registration;
 
         if (cancelled) return;
 
@@ -61,6 +63,20 @@ export function ServiceWorkerRegister() {
       }
     })();
 
+    // Re-check for a new SW whenever the app returns to the foreground. This is
+    // the critical path for installed PWAs — especially iOS standalone, which
+    // restores the app from a frozen snapshot WITHOUT re-running the load-time
+    // update() above, so a device could otherwise sit on stale JS for days.
+    // On visible/pageshow we poke update(); if a new SW is found it activates
+    // and the controllerchange handler below reloads into fresh code.
+    const checkForUpdate = () => {
+      if (typeof document !== 'undefined' && document.visibilityState !== 'visible') return;
+      reg?.update().catch(() => { /* offline / throttled — retry next resume */ });
+    };
+    document.addEventListener('visibilitychange', checkForUpdate);
+    window.addEventListener('pageshow', checkForUpdate);
+    window.addEventListener('focus', checkForUpdate);
+
     // Auto-reload once the new SW takes over — keeps the SPA's JS in sync
     // with whatever HTML/JS the new SW will now serve.
     let reloading = false;
@@ -74,6 +90,9 @@ export function ServiceWorkerRegister() {
     return () => {
       cancelled = true;
       navigator.serviceWorker.removeEventListener('controllerchange', onControllerChange);
+      document.removeEventListener('visibilitychange', checkForUpdate);
+      window.removeEventListener('pageshow', checkForUpdate);
+      window.removeEventListener('focus', checkForUpdate);
     };
   }, []);
 
