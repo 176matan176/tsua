@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { SECTORS } from '@/lib/sectors';
-import { fetchQuotes } from '@/lib/quotes';
+import { fetchYahooQuotes } from '@/lib/quotes';
 import { MARKET_CAPS } from '@/lib/marketCaps';
 
 export const dynamic = 'force-dynamic';
@@ -109,7 +109,7 @@ export async function GET() {
   // Fetch quotes + caps in parallel. Each map produces a Promise.all
   // separately so a slow market-cap call doesn't block any quote.
   const [quotes, caps] = await Promise.all([
-    fetchQuotes(allTickers, 60),
+    fetchYahooQuotes(allTickers, 60),
     Promise.all(allTickers.map(fetchMarketCap)),
   ]);
 

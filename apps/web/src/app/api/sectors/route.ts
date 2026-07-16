@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { SECTORS } from '@/lib/sectors';
-import { fetchQuotes } from '@/lib/quotes';
+import { fetchYahooQuotes } from '@/lib/quotes';
 
 // Per-request fresh (same reasoning as /api/markets — ISR served 40-minute-
 // old heatmaps in low-traffic windows). The expensive Yahoo/Finnhub calls
@@ -18,7 +18,8 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   try {
     const tickers = SECTORS.map((s) => s.etf);
-    const quotes = await fetchQuotes(tickers);
+    // Yahoo-live: Finnhub's free tier serves stale quotes (see /api/stocks/batch).
+    const quotes = await fetchYahooQuotes(tickers);
 
     const sectors = SECTORS.map((sector, i) => {
       const q = quotes[i];
