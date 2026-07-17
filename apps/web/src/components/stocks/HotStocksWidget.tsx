@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import { buildSparklinePoints, type StockScore } from '@/lib/hotStocks';
 import { useLivePrice } from '@/contexts/PriceContext';
+import { MarketStatusDot } from '@/components/ui/MarketStatusDot';
 
 interface HotResponse {
   market: string;
@@ -181,7 +182,12 @@ export function HotStocksWidget() {
         style={{ borderBottom: '1px solid var(--border2)' }}
         dir="rtl"
       >
-        <span className="text-sm font-black" style={{ color: 'var(--text)' }}>🔥 מניות חמות</span>
+        <span className="text-sm font-black flex items-center gap-1.5" style={{ color: 'var(--text)' }}>
+          🔥 מניות חמות
+          {/* Both universes (incl. the "ת"א" tab) are US-listed names — their
+              prices move on New York hours, so one US dot is the honest signal. */}
+          <MarketStatusDot market="US" />
+        </span>
         <div className="flex gap-1 me-auto">
           {(['il', 'us'] as const).map(m => (
             <button

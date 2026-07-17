@@ -18,6 +18,8 @@ import { VixWidget } from './VixWidget';
 import { ShillerCAPE } from './ShillerCAPE';
 import { useLocale } from 'next-intl';
 import { useLivePrice } from '@/contexts/PriceContext';
+import { MarketStatusDot } from '@/components/ui/MarketStatusDot';
+import { marketForSymbol } from '@/lib/marketHours';
 
 interface IndexData {
   symbol: string; nameHe: string; nameEn: string;
@@ -86,6 +88,7 @@ function IndexCard({ idx }: { idx: IndexData }) {
             <div className="text-xs text-tsua-muted flex items-center gap-1.5">
               <span>{idx.flag}</span>
               <span className="font-mono">{idx.symbol}</span>
+              <MarketStatusDot market={marketForSymbol(idx.symbol)} />
             </div>
             <div className="font-bold text-tsua-text text-sm mt-0.5">{idx.nameHe}</div>
           </div>
@@ -122,6 +125,7 @@ function IndexCard({ idx }: { idx: IndexData }) {
           <div className="text-xs text-tsua-muted flex items-center gap-1.5">
             <span>{idx.flag}</span>
             <span className="font-mono">{idx.symbol}</span>
+            <MarketStatusDot market={marketForSymbol(idx.symbol)} />
           </div>
           <div className="font-bold text-tsua-text text-sm mt-0.5">
             {idx.nameHe}

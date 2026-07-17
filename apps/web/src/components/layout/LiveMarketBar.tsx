@@ -4,6 +4,8 @@ import { memo } from 'react';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import { useLivePrice } from '@/contexts/PriceContext';
+import { MarketStatusDot } from '@/components/ui/MarketStatusDot';
+import { marketForSymbol } from '@/lib/marketHours';
 
 // Only market indices — US (S&P, NASDAQ, Dow, Russell) + Tel Aviv (TA 35, TA 125)
 const INDICES = [
@@ -37,6 +39,9 @@ const TickerItem = memo(function TickerItem({ symbol, label, flag }: { symbol: s
       className="flex items-center gap-2 px-4 shrink-0 transition-all duration-200 hover:bg-white/5 rounded-lg group"
     >
       <span className="text-xs shrink-0">{flag}</span>
+      {/* Open/closed dot follows where the symbol actually TRADES — e.g. EIS
+          shows a 🇮🇱 flag but is NYSE-listed, so it gets the US session dot. */}
+      <MarketStatusDot market={marketForSymbol(symbol)} />
       <span className="text-xs font-bold text-tsua-muted font-mono group-hover:text-tsua-text transition-colors">{label}</span>
       {/* Pulse scoped to the price + change chips (not the whole item) so each
           index ticks like a TradingView tape. */}

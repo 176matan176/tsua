@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import { useLivePrice } from '@/contexts/PriceContext';
+import { MarketStatusDot } from '@/components/ui/MarketStatusDot';
 
 // After this much wall-time without a price showing up in the PriceContext,
 // the row stops showing a skeleton and shows "—" + ⚠️ instead. Otherwise a
@@ -134,7 +135,12 @@ export function HotStocks() {
   return (
     <div className="rounded-2xl overflow-hidden breathe-card" style={{ background: 'rgb(var(--rgb-card) / 0.7)', border: '1px solid rgb(var(--rgb-border) / 0.8)' }}>
       <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid rgb(var(--rgb-border) / 0.6)' }}>
-        <h3 className="text-sm font-bold text-tsua-text">🔥 מניות רותחות</h3>
+        <h3 className="text-sm font-bold text-tsua-text flex items-center gap-1.5">
+          🔥 מניות רותחות
+          {/* All names in this list are US-listed (incl. the Israeli ones) —
+              one US session dot tells the whole story. */}
+          <MarketStatusDot market="US" />
+        </h3>
         {liveYet && (
           <span className="flex items-center gap-1.5 text-[10px] text-tsua-muted">
             <span className="inline-block w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'var(--accent)' }} />
