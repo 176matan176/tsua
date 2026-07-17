@@ -41,7 +41,7 @@ const NAV_ITEMS = [
   { key: 'glossary',    icon: BookOpenIcon,     iconActive: BookOpenIconSolid,     href: '/glossary',    label: '📖 מילון' },
   { key: 'hot',         icon: FireIcon,         iconActive: FireIconSolid,         href: '/hot',         label: '🔥 חמות' },
   { key: 'news',        icon: NewspaperIcon,    iconActive: NewspaperIconSolid,    href: '/news',        label: 'חדשות' },
-  { key: 'rooms',       icon: UsersIcon,        iconActive: UsersIconSolid,        href: '/rooms',       label: 'חדרים' },
+  { key: 'rooms',       icon: UsersIcon,        iconActive: UsersIconSolid,        href: '/rooms',       label: 'קהילות' },
   { key: 'leaderboard', icon: TrophyIcon,       iconActive: TrophyIconSolid,       href: '/leaderboard', label: 'לידרבורד' },
   { key: 'bookmarks',   icon: BookmarkIcon,     iconActive: BookmarkSolid,         href: '/bookmarks',   label: 'שמורים' },
   { key: 'portfolio',   icon: BriefcaseIcon,    iconActive: BriefcaseIconSolid,    href: '/portfolio',   label: 'תיק השקעות' },

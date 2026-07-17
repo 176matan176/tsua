@@ -143,7 +143,7 @@ export function MobileNavDrawer({ isOpen, onClose }: Props) {
     { href: '/markets',     icon: ChartBarIcon,  label: 'שווקים' },
     { href: '/news',        icon: NewspaperIcon, label: 'חדשות' },
     { href: '/leaderboard', icon: TrophyIcon,    label: 'לידרבורד' },
-    { href: '/rooms',       icon: UsersIcon,     label: 'חדרים' },
+    { href: '/rooms',       icon: UsersIcon,     label: 'קהילות' },
     { href: '/live',        icon: MegaphoneIcon, label: 'פיד חי' },
   ];
 

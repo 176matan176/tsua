@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocale } from 'next-intl';
 import { PaperAirplaneIcon } from '@heroicons/react/24/solid';
+import { getCommunity } from '@/lib/communities';
 
 interface Message {
   id: string;
@@ -25,6 +26,7 @@ interface RoomChatProps {
 
 export function RoomChat({ slug }: RoomChatProps) {
   const locale = useLocale();
+  const community = getCommunity(slug);
   const [messages, setMessages] = useState<Message[]>(MOCK_MESSAGES);
   const [input, setInput] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -49,13 +51,21 @@ export function RoomChat({ slug }: RoomChatProps) {
 
   return (
     <div className="bg-tsua-card border border-tsua-border rounded-2xl flex flex-col h-[600px]">
-      {/* Header */}
+      {/* Header — resolved from the slug (used to hardcode "יומאים" for every
+          community). Unknown slug falls back to a generic community title.
+          The fake member count was dropped here — the description is honest. */}
       <div className="border-b border-tsua-border px-4 py-3 flex items-center gap-2">
-        <span className="text-tsua-green font-bold">⚡</span>
+        <span className="text-tsua-green font-bold">{community?.icon ?? '👥'}</span>
         <h2 className="font-bold text-tsua-text">
-          {locale === 'he' ? 'יומאים' : 'Day Traders'}
+          {community
+            ? (locale === 'he' ? community.nameHe : community.nameEn)
+            : (locale === 'he' ? 'קהילה' : 'Community')}
         </h2>
-        <span className="text-xs text-tsua-muted ms-auto">1,243 {locale === 'he' ? 'חברים' : 'members'}</span>
+        {community && (
+          <span className="text-xs text-tsua-muted ms-auto truncate">
+            {locale === 'he' ? community.descHe : community.descEn}
+          </span>
+        )}
       </div>
 
       {/* Messages */}
