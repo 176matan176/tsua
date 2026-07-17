@@ -1,5 +1,6 @@
 import { Fragment, type ReactNode } from 'react';
 import Link from 'next/link';
+import { isIsraeliTicker } from '@/lib/stockOrigin';
 
 /**
  * Render post body text with inline $TICKER and #hashtag linking.
@@ -92,6 +93,11 @@ export function renderPostBody(text: string, opts: RenderOptions): ReactNode {
           }}
         >
           ${t.value}
+          {/* Origin hint — readers instantly see which market the name belongs
+              to (🇮🇱 Israeli company incl. US-listed ones, 🇺🇸 otherwise). */}
+          <span aria-hidden="true" style={{ fontSize: '0.7em', marginInlineStart: '2px', verticalAlign: 'baseline' }}>
+            {isIsraeliTicker(t.value) ? '🇮🇱' : '🇺🇸'}
+          </span>
         </Link>
       );
     }

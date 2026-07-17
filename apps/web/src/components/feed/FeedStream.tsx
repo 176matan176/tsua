@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { PostCard } from './PostCard';
+import { isIsraeliTicker } from '@/lib/stockOrigin';
 import type { Post } from '@/types/shared';
 
 // Mock fallback posts (shown when DB is empty / not set up yet)
@@ -57,6 +58,10 @@ interface FeedStreamProps {
 
 type SentimentFilter = 'all' | 'bullish' | 'bearish' | 'neutral';
 type LangFilter = 'all' | 'he' | 'en';
+/** Market filter: 'il' = posts mentioning Israeli names (incl. US-listed TEVA/
+ *  NICE — matches the hot-stocks tab semantics), 'us' = posts mentioning
+ *  US/world names. Posts without any cashtag only appear under 'all'. */
+type MarketFilter = 'all' | 'il' | 'us';
 
 // Filter chip — small toggleable pill used in the filter bar
 function FilterChip({
@@ -93,6 +98,7 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
 
   const [sentimentFilter, setSentimentFilter] = useState<SentimentFilter>('all');
   const [langFilter, setLangFilter] = useState<LangFilter>('all');
+  const [marketFilter, setMarketFilter] = useState<MarketFilter>('all');
 
   const [posts, setPosts] = useState<Post[]>([]);
   const [pendingPosts, setPendingPosts] = useState<Post[]>([]);
@@ -283,6 +289,11 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
       if (s !== sentimentFilter) return false;
     }
     if (langFilter !== 'all' && p.lang !== langFilter) return false;
+    if (marketFilter !== 'all') {
+      const tickers = (p.stockMentions ?? []).map(m => m.ticker);
+      if (marketFilter === 'il' && !tickers.some(t => isIsraeliTicker(t))) return false;
+      if (marketFilter === 'us' && !tickers.some(t => !isIsraeliTicker(t))) return false;
+    }
     return true;
   });
 
@@ -508,7 +519,7 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
   // Apply client-side filters (re-using the same predicate as the keyboard handler)
   const filteredPosts = filteredPostsForKbd;
 
-  const filtersActive = sentimentFilter !== 'all' || langFilter !== 'all';
+  const filtersActive = sentimentFilter !== 'all' || langFilter !== 'all' || marketFilter !== 'all';
 
   // Pull-to-refresh visuals
   const pullProgress = Math.min(1, pullY / 70);
@@ -679,9 +690,25 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
             title="אנגלית בלבד"
           />
 
+          <div className="mx-1 h-5 w-px" style={{ background: 'rgb(var(--rgb-border) / 0.7)' }} />
+
+          {/* Market filters — toggle chips: tap again to go back to all */}
+          <FilterChip
+            active={marketFilter === 'il'}
+            onClick={() => setMarketFilter(m => (m === 'il' ? 'all' : 'il'))}
+            label='🇮🇱 ת"א'
+            title="פוסטים על מניות ישראליות בלבד"
+          />
+          <FilterChip
+            active={marketFilter === 'us'}
+            onClick={() => setMarketFilter(m => (m === 'us' ? 'all' : 'us'))}
+            label='🇺🇸 ארה"ב'
+            title='פוסטים על מניות ארה"ב בלבד'
+          />
+
           {filtersActive && (
             <button
-              onClick={() => { setSentimentFilter('all'); setLangFilter('all'); }}
+              onClick={() => { setSentimentFilter('all'); setLangFilter('all'); setMarketFilter('all'); }}
               className="ms-auto text-[11px] font-bold transition-colors"
               style={{ color: 'var(--muted)' }}
               onMouseEnter={(e) => e.currentTarget.style.color = 'var(--text)'}
@@ -800,7 +827,7 @@ export function FeedStream({ ticker, onPostsLoaded, showFilters = true }: FeedSt
             {'אין פוסטים שתואמים לסינון'}
           </div>
           <button
-            onClick={() => { setSentimentFilter('all'); setLangFilter('all'); }}
+            onClick={() => { setSentimentFilter('all'); setLangFilter('all'); setMarketFilter('all'); }}
             className="text-xs font-bold px-4 py-2 rounded-lg transition-colors"
             style={{ background: 'rgb(var(--rgb-accent) / 0.1)', color: 'var(--accent)', border: '1px solid rgb(var(--rgb-accent) / 0.3)' }}
           >
