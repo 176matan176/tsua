@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { rateLimit } from '@/lib/rateLimit';
+import { resolveCommunity } from '@/lib/communities';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,6 +25,9 @@ export async function POST(
   req: NextRequest,
   { params }: { params: { slug: string; id: string } }
 ) {
+  const community = resolveCommunity(params.slug);
+  if (!community) return NextResponse.json({ error: 'unknown community' }, { status: 404 });
+
   const supabase = createSupabase();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -62,7 +66,7 @@ export async function POST(
 
   const { error } = await supabase
     .from('message_reactions')
-    .insert({ message_id: params.id, user_id: user.id, emoji, room_slug: params.slug });
+    .insert({ message_id: params.id, user_id: user.id, emoji, room_slug: community.slug });
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ emoji, reacted: true });
 }

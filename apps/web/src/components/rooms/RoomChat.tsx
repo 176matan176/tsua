@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import { PaperAirplaneIcon, TrashIcon } from '@heroicons/react/24/solid';
-import { getCommunity } from '@/lib/communities';
+import { resolveCommunity } from '@/lib/communities';
 import { useAuth } from '@/contexts/AuthContext';
 import { createClient } from '@/lib/supabase/client';
 import { renderPostBody } from '@/components/feed/renderPostBody';
@@ -23,7 +23,10 @@ interface ChatMessage {
 
 export function RoomChat({ slug }: { slug: string }) {
   const locale = useLocale();
-  const community = getCommunity(slug);
+  const community = resolveCommunity(slug);
+  // Canonical room_slug (uppercased ticker for stock communities) so client-side
+  // realtime filters + presence match what the server stores.
+  const roomSlug = community?.slug ?? slug;
   const { user } = useAuth();
   const supabase = createClient();
 
@@ -72,9 +75,9 @@ export function RoomChat({ slug }: { slug: string }) {
     try {
       const suffix = Math.random().toString(36).slice(2, 10);
       channel = supabase
-        .channel(`room-chat:${slug}:${suffix}`)
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'room_messages', filter: `room_slug=eq.${slug}` }, () => { if (!cancelled) refetch(); })
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'message_reactions', filter: `room_slug=eq.${slug}` }, () => { if (!cancelled) refetch(); })
+        .channel(`room-chat:${roomSlug}:${suffix}`)
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'room_messages', filter: `room_slug=eq.${roomSlug}` }, () => { if (!cancelled) refetch(); })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'message_reactions', filter: `room_slug=eq.${roomSlug}` }, () => { if (!cancelled) refetch(); })
         .subscribe();
     } catch (err) { console.warn('[RoomChat] realtime failed', err); }
 
@@ -103,7 +106,7 @@ export function RoomChat({ slug }: { slug: string }) {
     const key = user?.id ?? `guest-${Math.random().toString(36).slice(2, 10)}`;
     let channel: ReturnType<typeof supabase.channel> | null = null;
     try {
-      channel = supabase.channel(`presence:room:${slug}`, { config: { presence: { key } } });
+      channel = supabase.channel(`presence:room:${roomSlug}`, { config: { presence: { key } } });
       channel
         .on('presence', { event: 'sync' }, () => {
           try { setOnlineCount(Object.keys(channel!.presenceState()).length); } catch { /* ignore */ }

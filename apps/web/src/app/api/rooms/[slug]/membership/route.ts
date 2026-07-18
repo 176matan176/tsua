@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
-import { getCommunity } from '@/lib/communities';
+import { resolveCommunity } from '@/lib/communities';
 
 export const dynamic = 'force-dynamic';
 
@@ -37,10 +37,11 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: { slug: string } }
 ) {
-  if (!getCommunity(params.slug)) return NextResponse.json({ error: 'unknown community' }, { status: 404 });
+  const community = resolveCommunity(params.slug);
+  if (!community) return NextResponse.json({ error: 'unknown community' }, { status: 404 });
   const supabase = createSupabase();
   const { data: { user } } = await supabase.auth.getUser();
-  return NextResponse.json(await state(supabase, params.slug, user?.id ?? null));
+  return NextResponse.json(await state(supabase, community.slug, user?.id ?? null));
 }
 
 // POST — join (auth). Idempotent via upsert on the composite PK.
@@ -48,16 +49,17 @@ export async function POST(
   _req: NextRequest,
   { params }: { params: { slug: string } }
 ) {
-  if (!getCommunity(params.slug)) return NextResponse.json({ error: 'unknown community' }, { status: 404 });
+  const community = resolveCommunity(params.slug);
+  if (!community) return NextResponse.json({ error: 'unknown community' }, { status: 404 });
   const supabase = createSupabase();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { error } = await supabase
     .from('room_members')
-    .upsert({ room_slug: params.slug, user_id: user.id }, { onConflict: 'room_slug,user_id' });
+    .upsert({ room_slug: community.slug, user_id: user.id }, { onConflict: 'room_slug,user_id' });
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json(await state(supabase, params.slug, user.id));
+  return NextResponse.json(await state(supabase, community.slug, user.id));
 }
 
 // DELETE — leave (auth)
@@ -65,7 +67,8 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: { slug: string } }
 ) {
-  if (!getCommunity(params.slug)) return NextResponse.json({ error: 'unknown community' }, { status: 404 });
+  const community = resolveCommunity(params.slug);
+  if (!community) return NextResponse.json({ error: 'unknown community' }, { status: 404 });
   const supabase = createSupabase();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -73,8 +76,8 @@ export async function DELETE(
   const { error } = await supabase
     .from('room_members')
     .delete()
-    .eq('room_slug', params.slug)
+    .eq('room_slug', community.slug)
     .eq('user_id', user.id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json(await state(supabase, params.slug, user.id));
+  return NextResponse.json(await state(supabase, community.slug, user.id));
 }

@@ -9,8 +9,9 @@ import { CompanyOverview } from '@/components/stocks/CompanyOverview';
 import { KeyStats } from '@/components/stocks/KeyStats';
 import { StockNews } from '@/components/stocks/StockNews';
 import { OwnershipPie } from '@/components/stocks/OwnershipPie';
+import { RoomChat } from '@/components/rooms/RoomChat';
 
-type Tab = 'feed' | 'news';
+type Tab = 'feed' | 'chat' | 'news';
 
 export function StockPageClient({ ticker }: { ticker: string }) {
   const [stockData, setStockData] = useState<StockData | null>(null);
@@ -93,7 +94,8 @@ export function StockPageClient({ ticker }: { ticker: string }) {
             style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}
           >
             {([
-              ['feed', '💬 דיון קהילתי'],
+              ['feed', '💬 דיון'],
+              ['chat', '⚡ קהילה חיה'],
               ['news', '📰 חדשות'],
             ] as [Tab, string][]).map(([t, label]) => (
               <button
@@ -111,6 +113,7 @@ export function StockPageClient({ ticker }: { ticker: string }) {
           </div>
 
           {tab === 'feed' && <FeedStream ticker={ticker} />}
+          {tab === 'chat' && <RoomChat slug={ticker} />}
           {tab === 'news' && <StockNews ticker={ticker} />}
         </div>
 

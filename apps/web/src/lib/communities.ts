@@ -9,6 +9,8 @@
  * (real chat on Supabase) should replace them with actual membership rows —
  * do not present them as live numbers anywhere new.
  */
+import { getStockHebrewName } from '@/lib/stockDescriptions';
+
 export interface Community {
   slug: string;
   nameHe: string;
@@ -18,6 +20,8 @@ export interface Community {
   members: number;
   isOfficial: boolean;
   icon: string;
+  /** True for auto-generated per-stock communities (slug === ticker). */
+  isStock?: boolean;
 }
 
 export const COMMUNITIES: Community[] = [
@@ -75,4 +79,35 @@ export const COMMUNITIES: Community[] = [
 
 export function getCommunity(slug: string): Community | undefined {
   return COMMUNITIES.find((c) => c.slug === slug);
+}
+
+/**
+ * Resolve a community from a slug — a curated community OR an auto-generated
+ * per-stock community. Every valid ticker (1–6 uppercase letters, optional
+ * .TA) becomes its own live discussion, reusing the whole room stack
+ * (messages / members / reactions / presence). Returns null for junk slugs.
+ *
+ * Callers should use the returned `.slug` as the canonical room_slug so that
+ * /rooms/nvda and /rooms/NVDA don't split into two rooms.
+ */
+export function resolveCommunity(slug: string): Community | null {
+  const curated = COMMUNITIES.find((c) => c.slug === slug);
+  if (curated) return curated;
+
+  const ticker = slug.toUpperCase();
+  if (!/^[A-Z]{1,6}(\.TA)?$/.test(ticker)) return null;
+
+  const heName = getStockHebrewName(ticker);
+  const bare = ticker.replace('.TA', '');
+  return {
+    slug: ticker,
+    nameHe: heName ?? `$${bare}`,
+    nameEn: `$${bare}`,
+    descHe: `דיון חי על ${heName ?? bare}`,
+    descEn: `Live discussion about ${bare}`,
+    members: 0,
+    isOfficial: false,
+    icon: '📈',
+    isStock: true,
+  };
 }

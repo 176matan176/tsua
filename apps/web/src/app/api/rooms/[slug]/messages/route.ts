@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { rateLimit } from '@/lib/rateLimit';
-import { getCommunity } from '@/lib/communities';
+import { resolveCommunity } from '@/lib/communities';
 
 export const dynamic = 'force-dynamic';
 
@@ -84,9 +84,11 @@ export async function GET(
   req: NextRequest,
   { params }: { params: { slug: string } }
 ) {
-  if (!getCommunity(params.slug)) {
+  const community = resolveCommunity(params.slug);
+  if (!community) {
     return NextResponse.json({ error: 'unknown community' }, { status: 404 });
   }
+  const roomSlug = community.slug;
   const limit = Math.min(parseInt(req.nextUrl.searchParams.get('limit') ?? '50', 10) || 50, 100);
   const supabase = createSupabase();
   const { data: { user } } = await supabase.auth.getUser();
@@ -94,7 +96,7 @@ export async function GET(
   const { data, error } = await supabase
     .from('room_messages')
     .select('id, author_id, body, created_at, profiles!author_id (id, username, display_name, avatar_url)')
-    .eq('room_slug', params.slug)
+    .eq('room_slug', roomSlug)
     .order('created_at', { ascending: false })
     .limit(limit);
 
@@ -111,9 +113,11 @@ export async function POST(
   req: NextRequest,
   { params }: { params: { slug: string } }
 ) {
-  if (!getCommunity(params.slug)) {
+  const community = resolveCommunity(params.slug);
+  if (!community) {
     return NextResponse.json({ error: 'unknown community' }, { status: 404 });
   }
+  const roomSlug = community.slug;
   const supabase = createSupabase();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -132,7 +136,7 @@ export async function POST(
 
   const { data, error } = await supabase
     .from('room_messages')
-    .insert({ room_slug: params.slug, author_id: user.id, body: text })
+    .insert({ room_slug: roomSlug, author_id: user.id, body: text })
     .select('id, author_id, body, created_at, profiles!author_id (id, username, display_name, avatar_url)')
     .single();
 
