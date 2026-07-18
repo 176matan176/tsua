@@ -37,6 +37,7 @@ export function RoomChat({ slug }: { slug: string }) {
   const [pickerFor, setPickerFor] = useState<string | null>(null);
   const [membership, setMembership] = useState<{ members: number; isMember: boolean } | null>(null);
   const [joinBusy, setJoinBusy] = useState(false);
+  const [onlineCount, setOnlineCount] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const loadMessages = useCallback(async (signal?: AbortSignal) => {
@@ -93,6 +94,28 @@ export function RoomChat({ slug }: { slug: string }) {
       .then(d => { if (alive && d) setMembership(d); })
       .catch(() => {});
     return () => { alive = false; };
+  }, [slug, user]);
+
+  // Presence — "online now". Realtime-only (no DB table): everyone viewing the
+  // room joins a presence channel; the sync event gives the live participant
+  // set. Guests are counted too (they're here reading).
+  useEffect(() => {
+    const key = user?.id ?? `guest-${Math.random().toString(36).slice(2, 10)}`;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    try {
+      channel = supabase.channel(`presence:room:${slug}`, { config: { presence: { key } } });
+      channel
+        .on('presence', { event: 'sync' }, () => {
+          try { setOnlineCount(Object.keys(channel!.presenceState()).length); } catch { /* ignore */ }
+        })
+        .subscribe(async (status) => {
+          if (status === 'SUBSCRIBED') {
+            try { await channel!.track({ at: Date.now() }); } catch { /* ignore */ }
+          }
+        });
+    } catch (err) { console.warn('[RoomChat] presence failed', err); }
+    return () => { if (channel) { try { supabase.removeChannel(channel); } catch {} } };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug, user]);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages.length]);
@@ -168,16 +191,18 @@ export function RoomChat({ slug }: { slug: string }) {
         <h2 className="font-bold text-tsua-text">
           {community ? (locale === 'he' ? community.nameHe : community.nameEn) : (locale === 'he' ? 'קהילה' : 'Community')}
         </h2>
-        {membership && (
-          <span className="text-xs text-tsua-muted ms-auto tabular-nums" dir="ltr">
-            {membership.members.toLocaleString()} {locale === 'he' ? 'חברים' : 'members'}
-          </span>
-        )}
+        <span className="text-xs ms-auto flex items-center gap-1.5" style={{ color: onlineCount > 0 ? 'var(--accent)' : 'var(--muted)' }}>
+          <span className="inline-block w-1.5 h-1.5 rounded-full" style={{ background: onlineCount > 0 ? 'var(--accent)' : 'var(--muted)' }} />
+          <span className="tabular-nums" dir="ltr">{onlineCount || 1}</span> {locale === 'he' ? 'מחוברים' : 'online'}
+          {membership && membership.members > 0 && (
+            <span className="text-tsua-muted">· <span className="tabular-nums" dir="ltr">{membership.members}</span> {locale === 'he' ? 'חברים' : 'members'}</span>
+          )}
+        </span>
         {user && (
           <button
             onClick={toggleMembership}
             disabled={joinBusy}
-            className={`text-xs font-bold px-3 py-1 rounded-full transition-all disabled:opacity-50 ${membership && !membership.isMember ? 'ms-auto' : ''}`}
+            className="text-xs font-bold px-3 py-1 rounded-full transition-all disabled:opacity-50 shrink-0"
             style={membership?.isMember
               ? { background: 'transparent', color: 'var(--muted)', border: '1px solid rgb(var(--rgb-border))' }
               : { background: 'var(--accent)', color: 'var(--bg)', border: '1px solid var(--accent)' }}
