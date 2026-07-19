@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useLocale } from 'next-intl';
 import Link from 'next/link';
+import { FireIcon } from '@heroicons/react/24/outline';
 import { useLivePrice } from '@/contexts/PriceContext';
 
 /**
@@ -136,8 +137,9 @@ export function TrendingWidget() {
         className="px-3 py-2.5 flex items-center gap-2"
         style={{ borderBottom: '1px solid rgb(var(--rgb-border) / 0.5)' }}
       >
-        <span className="text-[11px] font-black tracking-widest uppercase text-tsua-muted">
-          🔥 מניות חמות
+        <span className="text-[11px] font-semibold tracking-widest uppercase text-tsua-muted flex items-center gap-1.5">
+          <FireIcon className="w-3.5 h-3.5 shrink-0" strokeWidth={1.75} aria-hidden="true" />
+          מניות חמות
         </span>
         <div className="flex-1" />
         <div className="flex items-center rounded-lg overflow-hidden" style={{ background: 'rgb(var(--rgb-border) / 0.5)' }}>

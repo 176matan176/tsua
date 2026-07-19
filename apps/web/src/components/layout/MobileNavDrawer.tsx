@@ -151,7 +151,7 @@ export function MobileNavDrawer({ isOpen, onClose }: Props) {
   const discoveryLinks = [
     { href: '/sectors',  icon: Squares2X2Icon,     label: 'מגזרים' },
     { href: '/crypto',   icon: CurrencyDollarIcon, label: 'קריפטו' },
-    { href: '/hot',      icon: FireIcon,           label: 'חמות', badge: '🔥' },
+    { href: '/hot',      icon: FireIcon,           label: 'חמות' },
     { href: '/compare',  icon: ScaleIcon,          label: 'השוואה' },
     { href: '/earnings', icon: CalendarDaysIcon,   label: 'דוחות כספיים' },
     { href: '/glossary', icon: BookOpenIcon,       label: 'מילון המשקיע' },

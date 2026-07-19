@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import { buildSparklinePoints, type StockScore } from '@/lib/hotStocks';
-import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon, FireIcon } from '@heroicons/react/24/outline';
 import { ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/24/solid';
 
 interface HotResponse {
@@ -93,7 +93,7 @@ function MobileCard({ stock, locale }: { stock: StockScore; locale: string }) {
             className="text-[9px] font-black px-1.5 py-0.5 rounded-md shrink-0"
             style={{ background: stock.hotScore >= 60 ? 'rgba(245,130,32,0.15)' : 'var(--card)', color: stock.hotScore >= 60 ? 'var(--hot)' : 'var(--muted)' }}
           >
-            🔥 {stock.hotScore}
+            <FireIcon className="w-3 h-3 inline-block align-[-1px] me-0.5" strokeWidth={2} aria-hidden="true" />{stock.hotScore}
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -157,7 +157,7 @@ function TableRow({ stock, locale }: { stock: StockScore; locale: string }) {
             border: `1px solid ${stock.hotScore >= 60 ? 'rgba(245,130,32,0.3)' : 'var(--border)'}`,
           }}
         >
-          🔥 {stock.hotScore}
+          <FireIcon className="w-3 h-3 inline-block align-[-1px] me-0.5" strokeWidth={2} aria-hidden="true" />{stock.hotScore}
         </span>
       </div>
       <div className="w-24 shrink-0">
@@ -243,7 +243,7 @@ export function HotPageClient() {
   return (
     <div className="space-y-4" dir="rtl">
       <div>
-        <h1 className="text-2xl font-black" style={{ color: 'var(--text)' }}>🔥 מניות חמות היום</h1>
+        <h1 className="text-2xl font-bold tracking-tight" style={{ color: 'var(--text)' }}>מניות חמות היום</h1>
         {updatedStr && <p className="text-xs mt-1" style={{ color: 'var(--muted)' }}>עודכן לאחרונה: {updatedStr}</p>}
       </div>
 
