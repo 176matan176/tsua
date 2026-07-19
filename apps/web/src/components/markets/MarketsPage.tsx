@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowUpIcon, ArrowDownIcon } from '@heroicons/react/24/solid';
-import { ArrowPathIcon } from '@heroicons/react/24/outline';
+import { ArrowPathIcon, Squares2X2Icon, ArrowTrendingUpIcon, ArrowTrendingDownIcon, PresentationChartLineIcon } from '@heroicons/react/24/outline';
 import { CurrencyRates } from './CurrencyRates';
 import { FearGreedWidget } from './FearGreedWidget';
 import { MarketPE } from './MarketPE';
@@ -235,8 +235,10 @@ function StockTable({ stocks, type }: { stocks: StockRow[]; type: 'gainers' | 'l
         className="flex items-center gap-2 px-4 py-3"
         style={{ borderBottom: '1px solid rgb(var(--rgb-border) / 0.6)' }}
       >
-        <span className="text-lg">{isGainer ? '🚀' : '📉'}</span>
-        <h3 className="text-sm font-black text-tsua-text">
+        {isGainer
+          ? <ArrowTrendingUpIcon className="w-4 h-4 shrink-0" style={{ color: 'var(--accent)' }} strokeWidth={1.75} aria-hidden="true" />
+          : <ArrowTrendingDownIcon className="w-4 h-4 shrink-0" style={{ color: 'var(--red)' }} strokeWidth={1.75} aria-hidden="true" />}
+        <h3 className="text-sm font-semibold text-tsua-text tracking-tight">
           {isGainer ? 'מובילות עולות' : 'מובילות יורדות'}
         </h3>
       </div>
@@ -264,7 +266,10 @@ function SectorHeatmapCard({ locale }: { locale: string }) {
         className="px-4 py-3 flex items-center justify-between"
         style={{ borderBottom: '1px solid rgb(var(--rgb-border) / 0.6)' }}
       >
-        <h3 className="text-sm font-black text-tsua-text">🗺️ מפת מגזרים</h3>
+        <h3 className="text-sm font-semibold text-tsua-text tracking-tight flex items-center gap-2">
+          <Squares2X2Icon className="w-4 h-4 shrink-0" style={{ color: 'var(--muted)' }} strokeWidth={1.75} aria-hidden="true" />
+          מפת מגזרים
+        </h3>
         <Link
           href={`/${locale}/sectors`}
           className="text-[10px] font-bold text-tsua-muted hover:text-tsua-accent transition-colors"
@@ -426,8 +431,9 @@ export function MarketsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-black text-tsua-text">
-            📊 שווקים
+          <h1 className="text-xl font-bold text-tsua-text tracking-tight flex items-center gap-2">
+            <PresentationChartLineIcon className="w-5 h-5 shrink-0" style={{ color: 'var(--muted)' }} strokeWidth={1.75} aria-hidden="true" />
+            שווקים
           </h1>
           {lastUpdated && (
             <p

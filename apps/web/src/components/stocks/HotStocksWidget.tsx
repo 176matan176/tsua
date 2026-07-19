@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
+import { FireIcon } from '@heroicons/react/24/outline';
+import { ChevronLeftIcon } from '@heroicons/react/20/solid';
 import { buildSparklinePoints, type StockScore } from '@/lib/hotStocks';
 import { useLivePrice } from '@/contexts/PriceContext';
 import { MarketStatusDot } from '@/components/ui/MarketStatusDot';
@@ -43,7 +45,7 @@ function SentimentBar({ s }: { s: StockScore['sentiment'] }) {
 function SkeletonRow() {
   return (
     <div className="flex items-center gap-3 px-3 py-2.5">
-      <div className="w-7 h-7 rounded-xl animate-pulse shrink-0" style={{ background: 'var(--border)' }} />
+      <div className="w-7 h-7 rounded-lg animate-pulse shrink-0" style={{ background: 'var(--border)' }} />
       <div className="flex-1 space-y-1.5">
         <div className="h-3 w-20 rounded animate-pulse" style={{ background: 'var(--border)' }} />
         <div className="h-2.5 w-14 rounded animate-pulse" style={{ background: 'var(--border2)' }} />
@@ -58,9 +60,6 @@ function SkeletonRow() {
 
 function HotRow({ stock }: { stock: StockScore }) {
   const locale  = useLocale();
-  // Live overlay: subscribe this row to the shared PriceContext so its number
-  // ticks + pulses like the market tape. Falls back to the /api/stocks/hot
-  // snapshot until (or if) a live quote arrives for this ticker.
   const live    = useLivePrice(stock.ticker);
   const price          = live?.price ?? stock.price;
   const changePercent  = live?.changePercent ?? stock.changePercent;
@@ -72,70 +71,63 @@ function HotRow({ stock }: { stock: StockScore }) {
   const pctStr  = changePercent != null
     ? `${isUp ? '+' : ''}${changePercent.toFixed(2)}%`
     : '—';
+  const isHot = stock.hotScore >= 60;
 
   return (
     <Link
       href={`/${locale}/stocks/${stock.ticker}`}
-      className="flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all duration-150 active:scale-[0.98] group"
+      className="flex items-center gap-2.5 px-3 py-2.5 transition-colors duration-150 group"
       style={{ background: 'transparent' }}
       onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--surface2)'; }}
       onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
     >
-      <span
-        className="w-5 h-5 rounded-lg flex items-center justify-center text-[10px] font-black shrink-0"
-        style={{ background: 'var(--surface2)', color: 'var(--muted)' }}
-      >
+      {/* Rank — quiet numeral, not a colored badge */}
+      <span className="w-4 text-xs font-medium tabular-nums shrink-0 text-center" style={{ color: 'var(--muted)' }}>
         {stock.rank}
       </span>
+      {/* Ticker chip — neutral monochrome; colour is reserved for the price */}
       <div
-        className="w-7 h-7 rounded-xl flex items-center justify-center text-[10px] font-black shrink-0"
-        style={{
-          background: isUp ? 'rgb(var(--rgb-accent) / 0.1)' : 'rgb(var(--rgb-red) / 0.1)',
-          border: `1px solid ${isUp ? 'rgb(var(--rgb-accent) / 0.2)' : 'rgb(var(--rgb-red) / 0.2)'}`,
-          color: isUp ? 'var(--accent)' : 'var(--red)',
-        }}
+        className="w-8 h-8 rounded-lg flex items-center justify-center text-[11px] font-semibold shrink-0"
+        style={{ background: 'var(--surface2)', border: '1px solid var(--border)', color: 'var(--text2)' }}
       >
         {stock.ticker.slice(0, 2)}
       </div>
       <div className="flex-1 min-w-0">
-        <div className="text-xs font-bold truncate" style={{ color: 'var(--text)' }}>{stock.nameHe}</div>
-        <div className="flex items-center gap-1.5 mt-0.5">
+        <div className="text-[13px] font-medium truncate" style={{ color: 'var(--text)' }}>{stock.nameHe}</div>
+        <div className="flex items-center gap-1.5 mt-1">
           <SentimentBar s={stock.sentiment} />
           {stock.mentions24h > 0 && (
-            <span className="text-[9px] font-mono" style={{ color: 'var(--muted)' }}>
-              {stock.mentions24h} 💬
+            <span className="text-[10px] tabular-nums" style={{ color: 'var(--muted)' }}>
+              {stock.mentions24h} · שיחות
             </span>
           )}
         </div>
       </div>
       <Sparkline stock={stock} />
-      <div className="text-end shrink-0 min-w-[52px]">
-        {/* Price + change pulse in the tick direction — pill-scoped so the eye
-            catches the number that moved, TradingView-style. */}
+      <div className="text-end shrink-0 min-w-[54px]">
         <div
-          className={`text-xs font-black font-mono tabular-nums px-1.5 py-0.5 rounded-md inline-block ${flashCls}`}
+          className={`text-[13px] font-semibold font-mono tabular-nums px-1.5 py-0.5 rounded-md inline-block ${flashCls}`}
           style={{ color: flash === 'up' ? 'var(--accent)' : flash === 'down' ? 'var(--red)' : 'var(--text)' }}
           dir="ltr"
         >
           {price != null ? price.toFixed(2) : '—'}
         </div>
         <div
-          className={`text-[10px] font-bold tabular-nums px-1.5 py-0.5 rounded-md inline-block mt-0.5 ${flashCls}`}
+          className={`text-[11px] font-medium tabular-nums px-1.5 py-0.5 rounded-md inline-block mt-0.5 ${flashCls}`}
           style={{ color: isUp ? 'var(--accent)' : 'var(--red)' }}
           dir="ltr"
         >
           {pctStr}
         </div>
       </div>
+      {/* Hot score — icon + number; the "hot" tint appears only when it's earned */}
       <div
-        className="text-[9px] font-black px-1.5 py-0.5 rounded-lg shrink-0"
-        style={{
-          background: stock.hotScore >= 60 ? 'rgba(245,130,32,0.15)' : 'var(--surface2)',
-          color:      stock.hotScore >= 60 ? 'var(--hot)'               : 'var(--muted)',
-          border:    `1px solid ${stock.hotScore >= 60 ? 'rgba(245,130,32,0.25)' : 'var(--border)'}`,
-        }}
+        className="flex items-center gap-0.5 text-[11px] font-semibold tabular-nums shrink-0 w-9 justify-end"
+        style={{ color: isHot ? 'var(--hot)' : 'var(--muted)' }}
+        title={`Hot score: ${stock.hotScore}`}
       >
-        🔥 {stock.hotScore}
+        <FireIcon className="w-3.5 h-3.5" strokeWidth={isHot ? 2 : 1.5} aria-hidden="true" />
+        {stock.hotScore}
       </div>
     </Link>
   );
@@ -178,33 +170,39 @@ export function HotStocksWidget() {
   return (
     <div className="rounded-2xl overflow-hidden" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
       <div
-        className="flex items-center gap-2 px-4 py-3"
+        className="flex items-center gap-2.5 px-4 py-3"
         style={{ borderBottom: '1px solid var(--border2)' }}
         dir="rtl"
       >
-        <span className="text-sm font-black flex items-center gap-1.5" style={{ color: 'var(--text)' }}>
-          🔥 מניות חמות
-          {/* Both universes (incl. the "ת"א" tab) are US-listed names — their
-              prices move on New York hours, so one US dot is the honest signal. */}
+        <FireIcon className="w-4 h-4 shrink-0" style={{ color: 'var(--hot)' }} strokeWidth={1.75} aria-hidden="true" />
+        <h3 className="text-sm font-semibold tracking-tight flex items-center gap-1.5" style={{ color: 'var(--text)' }}>
+          מניות חמות
           <MarketStatusDot market="US" />
-        </span>
-        <div className="flex gap-1 me-auto">
+        </h3>
+        <div className="flex gap-1 me-auto" role="tablist" aria-label="בחירת שוק">
           {(['il', 'us'] as const).map(m => (
             <button
               key={m}
+              role="tab"
+              aria-selected={market === m}
               onClick={() => setMarket(m)}
-              className="text-[10px] font-bold px-2 py-0.5 rounded-lg transition-all"
+              className="text-[11px] font-medium px-2.5 py-1 rounded-md transition-colors"
               style={market === m
-                ? { background: 'rgb(var(--rgb-accent) / 0.15)', color: 'var(--accent)', border: '1px solid rgb(var(--rgb-accent) / 0.25)' }
-                : { background: 'var(--surface2)', color: 'var(--muted)', border: '1px solid var(--border)' }
+                ? { background: 'rgb(var(--rgb-accent) / 0.12)', color: 'var(--accent)' }
+                : { background: 'transparent', color: 'var(--muted)' }
               }
             >
               {m === 'il' ? 'ת"א' : 'ארה"ב'}
             </button>
           ))}
         </div>
-        <Link href={`/${locale}/hot`} className="text-[10px] font-semibold transition-colors" style={{ color: 'var(--muted)' }}>
-          כל המניות ←
+        <Link
+          href={`/${locale}/hot`}
+          className="text-[11px] font-medium flex items-center gap-0.5 transition-colors hover:text-tsua-text"
+          style={{ color: 'var(--muted)' }}
+        >
+          הכל
+          <ChevronLeftIcon className="w-3.5 h-3.5" aria-hidden="true" />
         </Link>
       </div>
       <div className="py-1">

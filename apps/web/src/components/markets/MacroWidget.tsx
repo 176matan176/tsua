@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { GlobeAltIcon } from '@heroicons/react/24/outline';
 import { InfoTooltip } from '@/components/ui/InfoTooltip';
 import { DICTIONARY, type DictEntry } from '@/lib/financialDictionary';
 
@@ -145,7 +146,10 @@ export function MacroWidget() {
         style={{ background: 'var(--card)', border: '1px solid var(--border)' }}
       >
         <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--border2)' }}>
-          <h3 className="text-sm font-black text-tsua-text">🌍 נתוני מקרו</h3>
+          <h3 className="text-sm font-semibold text-tsua-text tracking-tight flex items-center gap-2">
+            <GlobeAltIcon className="w-4 h-4 shrink-0" style={{ color: 'var(--muted)' }} strokeWidth={1.75} aria-hidden="true" />
+            נתוני מקרו
+          </h3>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 p-3">
           {Array.from({ length: 6 }).map((_, i) => (
@@ -165,7 +169,10 @@ export function MacroWidget() {
         style={{ background: 'var(--card)', border: '1px solid var(--border)' }}
       >
         <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--border2)' }}>
-          <h3 className="text-sm font-black text-tsua-text">🌍 נתוני מקרו</h3>
+          <h3 className="text-sm font-semibold text-tsua-text tracking-tight flex items-center gap-2">
+            <GlobeAltIcon className="w-4 h-4 shrink-0" style={{ color: 'var(--muted)' }} strokeWidth={1.75} aria-hidden="true" />
+            נתוני מקרו
+          </h3>
         </div>
         <div className="p-6 text-center">
           <div className="text-2xl mb-1">📡</div>
@@ -193,7 +200,10 @@ export function MacroWidget() {
         className="px-4 py-3 flex items-center justify-between"
         style={{ borderBottom: '1px solid var(--border2)' }}
       >
-        <h3 className="text-sm font-black text-tsua-text">🌍 נתוני מקרו</h3>
+        <h3 className="text-sm font-semibold text-tsua-text tracking-tight flex items-center gap-2">
+            <GlobeAltIcon className="w-4 h-4 shrink-0" style={{ color: 'var(--muted)' }} strokeWidth={1.75} aria-hidden="true" />
+            נתוני מקרו
+          </h3>
         <span className="text-[10px] text-tsua-muted font-mono">
           מעודכן חודשית · FRED + בנק ישראל
         </span>

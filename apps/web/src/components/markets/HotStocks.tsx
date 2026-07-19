@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import { useLivePrice } from '@/contexts/PriceContext';
+import { FireIcon } from '@heroicons/react/24/outline';
 import { MarketStatusDot } from '@/components/ui/MarketStatusDot';
 
 // After this much wall-time without a price showing up in the PriceContext,
@@ -135,8 +136,9 @@ export function HotStocks() {
   return (
     <div className="rounded-2xl overflow-hidden breathe-card" style={{ background: 'rgb(var(--rgb-card) / 0.7)', border: '1px solid rgb(var(--rgb-border) / 0.8)' }}>
       <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid rgb(var(--rgb-border) / 0.6)' }}>
-        <h3 className="text-sm font-bold text-tsua-text flex items-center gap-1.5">
-          🔥 מניות רותחות
+        <h3 className="text-sm font-semibold text-tsua-text tracking-tight flex items-center gap-2">
+          <FireIcon className="w-4 h-4 shrink-0" style={{ color: 'var(--hot)' }} strokeWidth={1.75} aria-hidden="true" />
+          מניות רותחות
           {/* All names in this list are US-listed (incl. the Israeli ones) —
               one US session dot tells the whole story. */}
           <MarketStatusDot market="US" />

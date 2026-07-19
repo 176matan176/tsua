@@ -1,5 +1,6 @@
 'use client';
 
+import { BuildingLibraryIcon } from '@heroicons/react/24/outline';
 import { useLivePrice } from '@/contexts/PriceContext';
 
 function Row({
@@ -56,7 +57,10 @@ export function BondYields() {
   return (
     <div className="rounded-2xl overflow-hidden" style={{ background: 'rgb(var(--rgb-card) / 0.7)', border: '1px solid rgb(var(--rgb-border) / 0.8)' }}>
       <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid rgb(var(--rgb-border) / 0.6)' }}>
-        <h3 className="text-sm font-black text-tsua-text">🏛️ תשואות אג"ח</h3>
+        <h3 className="text-sm font-semibold text-tsua-text tracking-tight flex items-center gap-2">
+          <BuildingLibraryIcon className="w-4 h-4 shrink-0" style={{ color: 'var(--muted)' }} strokeWidth={1.75} aria-hidden="true" />
+          תשואות אג"ח
+        </h3>
         <span className="text-[10px] text-tsua-muted">ממשלתי 10Y</span>
       </div>
 

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import { useLivePrice } from '@/contexts/PriceContext';
+import { RectangleStackIcon } from '@heroicons/react/24/outline';
 import { MarketStatusDot } from '@/components/ui/MarketStatusDot';
 
 type Tag = 'track' | 'leverage' | 'inverse';
@@ -97,8 +98,8 @@ export function ActiveETFs() {
   return (
     <div className="rounded-2xl overflow-hidden" style={{ background: 'rgb(var(--rgb-bg2) / 0.8)', border: '1px solid rgb(var(--rgb-border) / 0.8)' }}>
       <div className="flex items-center gap-2 px-4 py-3" style={{ borderBottom: '1px solid rgb(var(--rgb-border) / 0.6)' }}>
-        <span className="text-lg">📊</span>
-        <h3 className="text-sm font-black text-tsua-text flex items-center gap-1.5">
+        <RectangleStackIcon className="w-4 h-4 shrink-0" style={{ color: 'var(--muted)' }} strokeWidth={1.75} aria-hidden="true" />
+        <h3 className="text-sm font-semibold text-tsua-text tracking-tight flex items-center gap-1.5">
           תעודות סל בולטות
           <MarketStatusDot market="US" />
         </h3>

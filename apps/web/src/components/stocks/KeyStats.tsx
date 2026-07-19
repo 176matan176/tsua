@@ -1,5 +1,6 @@
 'use client';
 
+import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline';
 import { InfoTooltip } from '@/components/ui/InfoTooltip';
 import { DICTIONARY, type DictEntry } from '@/lib/financialDictionary';
 
@@ -107,7 +108,10 @@ export function KeyStats({
   return (
     <div className="rounded-2xl overflow-visible" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
       <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--border2)' }}>
-        <h3 className="text-sm font-bold text-tsua-text">📋 נתונים מרכזיים</h3>
+        <h3 className="text-sm font-semibold text-tsua-text tracking-tight flex items-center gap-2">
+          <ClipboardDocumentListIcon className="w-4 h-4 shrink-0" style={{ color: 'var(--muted)' }} strokeWidth={1.75} aria-hidden="true" />
+          נתונים מרכזיים
+        </h3>
       </div>
       <div className="px-3 pb-3">
         {sections.map((section, si) => (
