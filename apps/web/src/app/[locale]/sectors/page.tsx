@@ -14,7 +14,7 @@ export default function SectorsPage() {
       <header className="rounded-2xl p-6" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div>
-            <h1 className="text-2xl font-black text-tsua-text mb-2">🗺️ מפת השוק</h1>
+            <h1 className="text-2xl font-bold text-tsua-text tracking-tight mb-2">מפת השוק</h1>
             <p className="text-sm text-tsua-muted leading-relaxed max-w-2xl">
               כל מניה כריבוע — גודל לפי שווי שוק, צבע לפי תנועה יומית. ירוק = עלייה, אדום = ירידה.
               לחיצה על ריבוע פותחת את דף המניה. הנתונים מתעדכנים כל דקה.
