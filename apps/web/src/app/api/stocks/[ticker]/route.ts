@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchQuote, fetchYahooExtendedQuote } from '@/lib/quotes';
+import { fetchQuote, fetchYahooExtendedQuote, fetchYahooPE } from '@/lib/quotes';
 
 // 60s ISR — quote is the freshness-critical field; profile/metrics barely
 // change. Better than force-dynamic which forced every page-view to hit
@@ -39,7 +39,7 @@ export async function GET(
     // Profile + metrics: Finnhub-only (Yahoo doesn't expose these on the public chart API).
     // Profile/metrics may return empty for symbols Finnhub doesn't support — that's fine,
     // the page still renders with the quote.
-    const [quote, profileRes, metricsRes, extended] = await Promise.all([
+    const [quote, profileRes, metricsRes, extended, yahooPE] = await Promise.all([
       fetchQuote(symbol),
       FINNHUB_KEY
         ? fetch(`https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=${FINNHUB_KEY}`, {
@@ -56,6 +56,11 @@ export async function GET(
       // expose. Returns null silently for symbols Yahoo doesn't cover (most
       // TASE-only listings); the page renders without the extra block.
       fetchYahooExtendedQuote(symbol),
+      // Forward P/E: Finnhub's dedicated `forwardPE` field, with Yahoo as a
+      // correct fallback. (We used to read `peNormalizedAnnual` here, which is
+      // a TRAILING normalized P/E — for cyclicals like MU it was 116 vs the
+      // real forward 9.75. This call is cached ~1h upstream.)
+      fetchYahooPE(symbol, 3600).catch(() => null),
     ]);
 
     if (!quote.c) {
@@ -112,7 +117,10 @@ export async function GET(
       week52High: num(m['52WeekHigh']),
       week52Low: num(m['52WeekLow']),
       peRatio: num(m['peBasicExclExtraTTM']) ?? num(m['peTTM']),
-      forwardPE: num(m['peNormalizedAnnual']) ?? num(m['peExclExtraAnnual']),
+      // Finnhub's real forward P/E field first; Yahoo forward P/E as fallback.
+      // Never fall back to peNormalizedAnnual — that's a trailing figure that
+      // badly misrepresents forward for cyclical earnings.
+      forwardPE: num(m['forwardPE']) ?? (yahooPE?.forwardPE ?? null),
       eps: num(m['epsBasicExclExtraItemsTTM']),
       beta: num(m['beta']),
       dividendYield: num(m['dividendYieldIndicatedAnnual']),
