@@ -20,6 +20,30 @@ export function PushToggle() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // בדיקת קצה-לקצה: שולח התראת דוגמה למכשירים של המשתמש דרך /api/push/test.
+  // קיים כי ב-PWA מותקן (במיוחד iOS) אין שורת כתובת לגלוש אליה ידנית.
+  const [testState, setTestState] = useState<'idle' | 'sending' | 'sent' | 'failed'>('idle');
+  const [testMsg, setTestMsg] = useState<string | null>(null);
+
+  async function sendTest() {
+    setTestState('sending');
+    setTestMsg(null);
+    try {
+      const res = await fetch('/api/push/test');
+      const json = await res.json();
+      if (res.ok && json.ok) {
+        setTestState('sent');
+        setTestMsg(`נשלחה ל-${json.delivered} מתוך ${json.devices} מכשירים — בדוק את ההתראות 🎉`);
+      } else {
+        setTestState('failed');
+        setTestMsg(json.hint || json.error || `שגיאה ${res.status}`);
+      }
+    } catch {
+      setTestState('failed');
+      setTestMsg('שגיאת רשת — נסה שוב');
+    }
+  }
+
   useEffect(() => {
     (async () => {
       if (typeof window === 'undefined') return;
@@ -162,6 +186,7 @@ export function PushToggle() {
 
   if (status === 'subscribed') {
     return (
+      <div className="space-y-2">
       <div
         className="flex items-center gap-3 px-3 py-2.5 rounded-xl"
         style={{
@@ -209,6 +234,41 @@ export function PushToggle() {
             }}
           />
         </button>
+      </div>
+
+      {/* שליחת התראת בדיקה — מאמת את הצינור עד למכשיר עצמו */}
+      <button
+        onClick={sendTest}
+        disabled={testState === 'sending'}
+        className="w-full text-[12px] font-bold px-3 py-2 rounded-xl transition-all active:scale-[0.98] disabled:opacity-50"
+        style={{
+          background: 'rgb(var(--rgb-accent) / 0.08)',
+          border: '1px dashed rgb(var(--rgb-accent) / 0.35)',
+          color: 'var(--accent)',
+        }}
+      >
+        {testState === 'sending' ? 'שולח…' : '🚀 שלח התראת בדיקה למכשיר הזה'}
+      </button>
+      {testMsg && (
+        <div
+          className="text-[11px] px-3 py-2 rounded-lg"
+          style={
+            testState === 'sent'
+              ? {
+                  background: 'rgb(var(--rgb-accent) / 0.08)',
+                  border: '1px solid rgb(var(--rgb-accent) / 0.22)',
+                  color: 'var(--accent)',
+                }
+              : {
+                  background: 'rgb(var(--rgb-red) / 0.08)',
+                  border: '1px solid rgb(var(--rgb-red) / 0.22)',
+                  color: 'var(--red)',
+                }
+          }
+        >
+          {testState === 'sent' ? '✓ ' : '⚠ '}{testMsg}
+        </div>
+      )}
       </div>
     );
   }
