@@ -321,7 +321,9 @@ function StreamPostCard({ post, onLike }: { post: StreamPost; onLike: () => void
           {post.ticker && (
             <span className="text-[10px] font-black" style={{ color: 'var(--accent)' }}>${post.ticker}</span>
           )}
-          <span className="text-[9px] text-tsua-muted ms-auto">{timeAgo}</span>
+          {/* זמן יחסי מחושב מחדש בצד לקוח — בלי suppressHydrationWarning זה גורם
+              ל-hydration mismatch שמרנדר מחדש את כל המסמך */}
+          <span className="text-[9px] text-tsua-muted ms-auto" suppressHydrationWarning>{timeAgo}</span>
         </div>
 
         {/* Body */}

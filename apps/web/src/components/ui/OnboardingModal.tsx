@@ -189,7 +189,7 @@ export function OnboardingModal() {
             <button
               onClick={dismiss}
               className="w-full text-center text-[11px] pt-0.5 transition-opacity hover:opacity-60"
-              style={{ color: 'rgba(60,80,110,0.65)', fontFamily: 'monospace' }}
+              style={{ color: 'var(--muted2)', fontFamily: 'monospace' }}
             >
               המשך כאורח
             </button>

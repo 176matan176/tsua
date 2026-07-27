@@ -53,7 +53,8 @@ function classifySource(source: string | null): SourceMeta {
     return { key: 'themarker', nameHe: 'TheMarker', color: '#d52b1e' };
   }
   if (s.includes('calcalist') || s.includes('כלכליסט')) {
-    return { key: 'calcalist', nameHe: 'כלכליסט', color: '#ff8c00' };
+    // כתום מעט כהה יותר מהמותג המקורי (#ff8c00) — קריא גם על רקע קרם בתמה בהירה
+    return { key: 'calcalist', nameHe: 'כלכליסט', color: '#e07800' };
   }
   if (s.includes('globes') || s.includes('גלובס')) {
     return { key: 'globes', nameHe: 'גלובס', color: '#7a3eb2' };
@@ -68,7 +69,7 @@ function classifySource(source: string | null): SourceMeta {
     return { key: 'maariv', nameHe: 'מעריב', color: '#003f87' };
   }
   if (s.includes('reuters')) {
-    return { key: 'reuters', nameHe: 'Reuters', color: '#ff8000' };
+    return { key: 'reuters', nameHe: 'Reuters', color: '#e57300' };
   }
   if (s.includes('investing')) {
     return { key: 'investing', nameHe: 'Investing.com', color: '#0066b2' };

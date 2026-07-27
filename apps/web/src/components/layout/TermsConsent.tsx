@@ -93,7 +93,9 @@ export function TermsConsent() {
             className="w-full py-3 rounded-xl text-sm font-black transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.98]"
             style={{
               background: checked ? 'linear-gradient(135deg, var(--accent), var(--accent2))' : 'rgb(var(--rgb-border) / 0.6)',
-              color: 'var(--accent-contrast)',
+              // accent-contrast מיועד לרקע הגרדיאנט בלבד; במצב מנוטרל הרקע אפור
+              // והטקסט חייב צבע קריא בשני התמות
+              color: checked ? 'var(--accent-contrast)' : 'var(--muted)',
               boxShadow: checked ? '0 4px 20px rgb(var(--rgb-accent) / 0.3)' : 'none',
             }}
           >
